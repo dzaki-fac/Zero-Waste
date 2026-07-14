@@ -8,7 +8,6 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
 /**
-<<<<<<< HEAD
  * @property int $id
  * @property string $name
  * @property string $email
@@ -22,20 +21,15 @@ use Illuminate\Notifications\Notifiable;
  * @property string|null $remember_token
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
- */
-#[Fillable(['name', 'email', 'password', 'nip', 'role'])]
-#[Hidden(['password', 'two_factor_secret', 'two_factor_recovery_codes', 'remember_token'])]
-=======
  * @use HasFactory<UserFactory>
  */
->>>>>>> main
 class User extends Authenticatable
 {
     use HasFactory, Notifiable;
 
-    protected $fillable = ['name', 'email', 'password'];
+    protected $fillable = ['name', 'email', 'password', 'nip', 'role'];
 
-    protected $hidden = ['password', 'remember_token'];
+    protected $hidden = ['password', 'two_factor_secret', 'two_factor_recovery_codes', 'remember_token'];
 
     protected function casts(): array
     {

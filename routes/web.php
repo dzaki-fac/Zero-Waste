@@ -9,4 +9,4 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('admin/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 });
 
-require __DIR__.'/settings.php';
+
