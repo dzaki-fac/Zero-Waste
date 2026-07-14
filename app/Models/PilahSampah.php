@@ -14,6 +14,8 @@ class PilahSampah extends Model
 {
     use HasFactory;
 
+    protected $table = 'pilah_sampah';
+
     protected $fillable = [
         'user_id',
         'tanggal',

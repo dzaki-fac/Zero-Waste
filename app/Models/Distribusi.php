@@ -14,6 +14,8 @@ class Distribusi extends Model
 {
     use HasFactory;
 
+    protected $table = 'distribusi';
+
     protected $fillable = [
         'user_id',
         'tanggal',
