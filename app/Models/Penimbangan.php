@@ -4,17 +4,15 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Penimbangan extends Model
 {
-    /**
-     * @use HasFactory<\Database\Factories\PenimbanganFactory>
-     */
     use HasFactory;
 
+    protected $table = 'penimbangan';
+
     protected $fillable = [
-        'user_id',
+        'nama',
         'tanggal',
         'berat_sampah',
         'area',
@@ -25,12 +23,4 @@ class Penimbangan extends Model
         'tanggal' => 'date',
         'berat_sampah' => 'decimal:2',
     ];
-
-    /**
-     * @return BelongsTo<User, $this>
-     */
-    public function user(): BelongsTo
-    {
-        return $this->belongsTo(User::class);
-    }
 }
