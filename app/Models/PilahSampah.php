@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\Database\Factories\DistribusiFactory>
+ * @use HasFactory<\Database\Factories\DistribusiFactory>
  */
 class PilahSampah extends Model
 {
