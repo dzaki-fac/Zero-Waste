@@ -6,9 +6,11 @@ import {
     EyeOff,
     Pencil,
     Plus,
+    Search,
     Trash2,
 } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
+import Heading from '@/components/heading';
 import { Button } from '@/components/ui/button';
 import {
     Dialog,
@@ -27,6 +29,14 @@ import {
     SelectTrigger,
     SelectValue,
 } from '@/components/ui/select';
+import {
+    Table,
+    TableBody,
+    TableCell,
+    TableHead,
+    TableHeader,
+    TableRow,
+} from '@/components/ui/table';
 import { cn } from '@/lib/utils';
 import type { Auth } from '@/types';
 
@@ -64,17 +74,6 @@ const roleLabel = (role: string) => {
             return 'Petugas';
         default:
             return role;
-    }
-};
-
-const roleBadgeClass = (role: string) => {
-    switch (role) {
-        case 'admin':
-            return 'bg-emerald-100 text-emerald-700 border-emerald-200';
-        case 'petugas':
-            return 'bg-emerald-50 text-emerald-600 border-emerald-200';
-        default:
-            return 'bg-slate-100 text-slate-700 border-slate-200';
     }
 };
 
@@ -240,47 +239,14 @@ export default function AdminAccounts() {
 
     return (
         <>
-            <Head title="Daftar Akun Admin" />
+            <Head title="Daftar Akun" />
 
-            <div className="mx-auto max-w-6xl">
-                <div className="mb-6 flex items-start justify-between">
-                    <div>
-                        <h1 className="text-2xl font-bold text-slate-900">
-                            Daftar Akun Admin
-                        </h1>
-                        <p className="mt-1 text-sm text-slate-500">
-                            Kelola akun admin dan petugas
-                        </p>
-                    </div>
-                </div>
-
-                <div className="mb-6 flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
-                    <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
-                        <div className="inline-flex overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
-                            {FILTERS.map((f) => (
-                                <button
-                                    key={f.value}
-                                    type="button"
-                                    onClick={() => handleFilterChange(f.value)}
-                                    className={cn(
-                                        'px-4 py-2 text-sm font-medium transition-colors',
-                                        activeFilter === f.value
-                                            ? 'bg-emerald-600 text-white'
-                                            : 'text-slate-600 hover:bg-slate-50',
-                                    )}
-                                >
-                                    {f.label}
-                                </button>
-                            ))}
-                        </div>
-
-                        <Input
-                            placeholder="Cari nama, email, atau NIP"
-                            value={searchInput}
-                            onChange={(e) => handleSearchInput(e.target.value)}
-                            className="w-56 text-slate-900"
-                        />
-                    </div>
+            <div className="flex h-full flex-1 flex-col gap-4 overflow-x-auto rounded-xl p-4">
+                <div className="flex items-center justify-between">
+                    <Heading
+                        title="Daftar Akun"
+                        description="Kelola akun admin dan petugas"
+                    />
 
                     <Button
                         onClick={() => {
@@ -289,140 +255,140 @@ export default function AdminAccounts() {
                             setShowPassword(false);
                             setAddOpen(true);
                         }}
-                        className="bg-emerald-600 text-white hover:bg-emerald-700 shadow-sm"
+                        className="bg-green-600 text-white hover:bg-green-700"
                     >
                         <Plus className="mr-2 size-4" />
                         Tambah Akun
                     </Button>
                 </div>
 
-                <div className="overflow-hidden rounded-xl bg-white shadow-sm ring-1 ring-slate-200">
-                    <div className="overflow-x-auto">
-                        <table className="w-full">
-                            <thead>
-                                <tr className="border-b border-slate-100 bg-slate-50/50">
-                                    <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-slate-500">
-                                        No
-                                    </th>
-                                    <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-slate-500">
-                                        Nama
-                                    </th>
-                                    <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-slate-500">
-                                        NIP
-                                    </th>
-                                    <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-slate-500">
-                                        Email
-                                    </th>
-                                    <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-slate-500">
-                                        Role
-                                    </th>
-                                    <th className="px-6 py-4 text-right text-xs font-semibold uppercase tracking-wider text-slate-500">
-                                        Aksi
-                                    </th>
-                                </tr>
-                            </thead>
-                            <tbody className="divide-y divide-slate-50">
-                                {users.data.map((user, index) => {
-                                    const rowNum =
-                                        users.from !== null
-                                            ? users.from + index
-                                            : index + 1;
-
-                                    return (
-                                        <tr
-                                            key={user.id}
-                                            className={cn(
-                                                'transition-colors hover:bg-slate-50/80',
-                                                user.id === current_user_id &&
-                                                    'bg-emerald-50/40',
-                                            )}
-                                        >
-                                            <td className="px-6 py-4 text-sm text-slate-500">
-                                                {rowNum}
-                                            </td>
-                                            <td className="px-6 py-4">
-                                                <div className="flex items-center gap-2">
-                                                    <span className="text-sm font-medium text-slate-900">
-                                                        {user.name}
-                                                    </span>
-                                                    {user.id ===
-                                                        current_user_id && (
-                                                        <span className="inline-flex items-center rounded-full bg-emerald-100 px-2 py-0.5 text-[10px] font-semibold text-emerald-700">
-                                                            Anda
-                                                        </span>
-                                                    )}
-                                                </div>
-                                            </td>
-                                            <td className="px-6 py-4 text-sm text-slate-500">
-                                                {user.nip ?? '-'}
-                                            </td>
-                                            <td className="px-6 py-4 text-sm text-slate-700">
-                                                {user.email}
-                                            </td>
-                                            <td className="px-6 py-4">
-                                                <span
-                                                    className={cn(
-                                                        'inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-medium',
-                                                        roleBadgeClass(
-                                                            user.role,
-                                                        ),
-                                                    )}
-                                                >
-                                                    {roleLabel(user.role)}
-                                                </span>
-                                            </td>
-                                            <td className="px-6 py-4">
-                                                <div className="flex items-center justify-end gap-2">
-                                                    <button
-                                                        type="button"
-                                                        onClick={() =>
-                                                            openEdit(user)
-                                                        }
-                                                        className="inline-flex items-center gap-1.5 rounded-lg border border-emerald-200 bg-white px-3 py-1.5 text-sm font-medium text-emerald-600 transition-colors hover:bg-emerald-50"
-                                                        title="Edit"
-                                                    >
-                                                        <Pencil className="size-3.5" />
-                                                        Edit
-                                                    </button>
-                                                    <button
-                                                        type="button"
-                                                        onClick={() => {
-                                                            setDeletingUser(
-                                                                user,
-                                                            );
-                                                            setDeleteOpen(true);
-                                                        }}
-                                                        disabled={
-                                                            !canDelete(user)
-                                                        }
-                                                        className="inline-flex items-center gap-1.5 rounded-lg border border-red-200 bg-white px-3 py-1.5 text-sm font-medium text-red-500 transition-colors hover:bg-red-50 disabled:cursor-not-allowed disabled:opacity-40"
-                                                        title="Hapus"
-                                                    >
-                                                        <Trash2 className="size-3.5" />
-                                                        Hapus
-                                                    </button>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                    );
-                                })}
-                                {users.data.length === 0 && (
-                                    <tr>
-                                        <td
-                                            colSpan={6}
-                                            className="px-6 py-12 text-center text-sm text-slate-400"
-                                        >
-                                            Tidak ada akun.
-                                        </td>
-                                    </tr>
+                <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+                    <div className="inline-flex overflow-hidden rounded-xl border border-green-200 bg-white shadow-sm">
+                        {FILTERS.map((f) => (
+                            <button
+                                key={f.value}
+                                type="button"
+                                onClick={() => handleFilterChange(f.value)}
+                                className={cn(
+                                    'px-4 py-2 text-sm font-medium transition-colors',
+                                    activeFilter === f.value
+                                        ? 'bg-green-600 text-white'
+                                        : 'text-green-700 hover:bg-green-50',
                                 )}
-                            </tbody>
-                        </table>
+                            >
+                                {f.label}
+                            </button>
+                        ))}
+                    </div>
+
+                    <div className="relative flex-1">
+                        <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-green-400" />
+                        <Input
+                            placeholder="Cari nama, email, atau NIP"
+                            value={searchInput}
+                            onChange={(e) => handleSearchInput(e.target.value)}
+                            className="border-green-200 pl-9 focus-visible:border-green-500 focus-visible:ring-green-500/20"
+                        />
+                    </div>
+                </div>
+
+                <div className="rounded-xl border border-green-200 bg-white shadow-sm">
+                    <div className="overflow-x-auto">
+                        <Table>
+                            <TableHeader>
+                                <TableRow className="border-green-100 bg-green-50/50">
+                                    <TableHead className="text-green-700">No</TableHead>
+                                    <TableHead className="text-green-700">Nama</TableHead>
+                                    <TableHead className="text-green-700">NIP</TableHead>
+                                    <TableHead className="text-green-700">Email</TableHead>
+                                    <TableHead className="text-green-700">Role</TableHead>
+                                    <TableHead className="text-right text-green-700">Aksi</TableHead>
+                                </TableRow>
+                            </TableHeader>
+                            <TableBody>
+                                {users.data.length === 0 ? (
+                                    <TableRow>
+                                        <TableCell colSpan={6} className="text-center text-green-600/70">
+                                            Tidak ada akun.
+                                        </TableCell>
+                                    </TableRow>
+                                ) : (
+                                    users.data.map((user, index) => {
+                                        const rowNum =
+                                            users.from !== null
+                                                ? users.from + index
+                                                : index + 1;
+
+                                        return (
+                                            <TableRow
+                                                key={user.id}
+                                                className={cn(
+                                                    'border-green-100',
+                                                    user.id === current_user_id &&
+                                                        'bg-green-50/40',
+                                                )}
+                                            >
+                                                <TableCell className="text-green-600">{rowNum}</TableCell>
+                                                <TableCell>
+                                                    <div className="flex items-center gap-2">
+                                                        <span className="font-medium text-green-900">
+                                                            {user.name}
+                                                        </span>
+                                                        {user.id === current_user_id && (
+                                                            <span className="inline-flex items-center rounded-full bg-green-100 px-2 py-0.5 text-[10px] font-semibold text-green-700">
+                                                                Anda
+                                                            </span>
+                                                        )}
+                                                    </div>
+                                                </TableCell>
+                                                <TableCell className="text-green-600">
+                                                    {user.nip ?? '-'}
+                                                </TableCell>
+                                                <TableCell className="text-green-600">
+                                                    {user.email}
+                                                </TableCell>
+                                                <TableCell>
+                                                    <span className="inline-flex items-center rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-medium text-green-700">
+                                                        {roleLabel(user.role)}
+                                                    </span>
+                                                </TableCell>
+                                                <TableCell>
+                                                    <div className="flex justify-end gap-2">
+                                                        <Button
+                                                            variant="outline"
+                                                            size="sm"
+                                                            onClick={() => openEdit(user)}
+                                                            className="border-green-200 text-green-700 hover:bg-green-50 hover:text-green-800"
+                                                        >
+                                                            <Pencil className="h-3.5 w-3.5" />
+                                                            Edit
+                                                        </Button>
+                                                        <Button
+                                                            variant="destructive"
+                                                            size="sm"
+                                                            onClick={() => {
+                                                                setDeletingUser(user);
+                                                                setDeleteOpen(true);
+                                                            }}
+                                                            disabled={!canDelete(user)}
+                                                            className="flex items-center gap-1"
+                                                        >
+                                                            <Trash2 className="h-3.5 w-3.5" />
+                                                            Hapus
+                                                        </Button>
+                                                    </div>
+                                                </TableCell>
+                                            </TableRow>
+                                        );
+                                    })
+                                )}
+                            </TableBody>
+                        </Table>
                     </div>
 
                     {users.last_page > 1 && (
-                        <div className="flex flex-col gap-3 border-t border-slate-100 px-6 py-4 sm:flex-row sm:items-center sm:justify-between">
-                            <p className="text-sm text-slate-500">
+                        <div className="flex flex-col gap-3 border-t border-green-100 px-6 py-4 sm:flex-row sm:items-center sm:justify-between">
+                            <p className="text-sm text-green-600/70">
                                 Menampilkan {users.from}–{users.to} dari{' '}
                                 {users.total} akun
                             </p>
@@ -433,7 +399,7 @@ export default function AdminAccounts() {
                                     onClick={() =>
                                         goToPage(users.current_page - 1)
                                     }
-                                    className="inline-flex items-center justify-center rounded-lg border border-slate-200 bg-white p-2 text-slate-500 transition-colors hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-50"
+                                    className="inline-flex items-center justify-center rounded-lg border border-green-200 bg-white p-2 text-green-600 transition-colors hover:bg-green-50 disabled:cursor-not-allowed disabled:opacity-50"
                                 >
                                     <ChevronLeft className="size-4" />
                                 </button>
@@ -448,8 +414,8 @@ export default function AdminAccounts() {
                                         className={cn(
                                             'inline-flex size-9 items-center justify-center rounded-lg text-sm font-medium transition-colors',
                                             page === users.current_page
-                                                ? 'bg-emerald-600 text-white shadow-sm'
-                                                : 'text-slate-500 hover:bg-slate-100',
+                                                ? 'bg-green-600 text-white shadow-sm'
+                                                : 'text-green-600 hover:bg-green-100',
                                         )}
                                     >
                                         {page}
@@ -463,7 +429,7 @@ export default function AdminAccounts() {
                                     onClick={() =>
                                         goToPage(users.current_page + 1)
                                     }
-                                    className="inline-flex items-center justify-center rounded-lg border border-slate-200 bg-white p-2 text-slate-500 transition-colors hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-50"
+                                    className="inline-flex items-center justify-center rounded-lg border border-green-200 bg-white p-2 text-green-600 transition-colors hover:bg-green-50 disabled:cursor-not-allowed disabled:opacity-50"
                                 >
                                     <ChevronRight className="size-4" />
                                 </button>
@@ -492,6 +458,7 @@ export default function AdminAccounts() {
                                     addForm.setData('name', e.target.value)
                                 }
                                 required
+                                className="border-green-200 focus-visible:border-green-500 focus-visible:ring-green-500/20"
                             />
                             {addForm.errors.name && (
                                 <p className="text-sm text-red-500">
@@ -509,6 +476,7 @@ export default function AdminAccounts() {
                                     addForm.setData('email', e.target.value)
                                 }
                                 required
+                                className="border-green-200 focus-visible:border-green-500 focus-visible:ring-green-500/20"
                             />
                             {addForm.errors.email && (
                                 <p className="text-sm text-red-500">
@@ -525,6 +493,7 @@ export default function AdminAccounts() {
                                     addForm.setData('nip', e.target.value)
                                 }
                                 placeholder="(opsional)"
+                                className="border-green-200 focus-visible:border-green-500 focus-visible:ring-green-500/20"
                             />
                             {addForm.errors.nip && (
                                 <p className="text-sm text-red-500">
@@ -540,7 +509,7 @@ export default function AdminAccounts() {
                                     addForm.setData('role', v)
                                 }
                             >
-                                <SelectTrigger id="add-role">
+                                <SelectTrigger id="add-role" className="border-green-200 focus-visible:border-green-500 focus-visible:ring-green-500/20">
                                     <SelectValue />
                                 </SelectTrigger>
                                 <SelectContent>
@@ -572,13 +541,14 @@ export default function AdminAccounts() {
                                         )
                                     }
                                     required
+                                    className="border-green-200 focus-visible:border-green-500 focus-visible:ring-green-500/20"
                                 />
                                 <button
                                     type="button"
                                     onClick={() =>
                                         setShowPassword(!showPassword)
                                     }
-                                    className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
+                                    className="absolute right-3 top-1/2 -translate-y-1/2 text-green-400 hover:text-green-600"
                                 >
                                     {showPassword ? (
                                         <EyeOff className="size-4" />
@@ -608,6 +578,7 @@ export default function AdminAccounts() {
                                     )
                                 }
                                 required
+                                className="border-green-200 focus-visible:border-green-500 focus-visible:ring-green-500/20"
                             />
                         </div>
                         <DialogFooter>
@@ -615,13 +586,14 @@ export default function AdminAccounts() {
                                 type="button"
                                 variant="outline"
                                 onClick={() => setAddOpen(false)}
+                                className="border-green-200 text-green-700 hover:bg-green-50"
                             >
                                 Batal
                             </Button>
                             <Button
                                 type="submit"
                                 disabled={addForm.processing}
-                                className="bg-emerald-600 hover:bg-emerald-700"
+                                className="bg-green-600 hover:bg-green-700"
                             >
                                 Simpan
                             </Button>
@@ -649,6 +621,7 @@ export default function AdminAccounts() {
                                     editForm.setData('name', e.target.value)
                                 }
                                 required
+                                className="border-green-200 focus-visible:border-green-500 focus-visible:ring-green-500/20"
                             />
                             {editForm.errors.name && (
                                 <p className="text-sm text-red-500">
@@ -666,6 +639,7 @@ export default function AdminAccounts() {
                                     editForm.setData('email', e.target.value)
                                 }
                                 required
+                                className="border-green-200 focus-visible:border-green-500 focus-visible:ring-green-500/20"
                             />
                             {editForm.errors.email && (
                                 <p className="text-sm text-red-500">
@@ -682,6 +656,7 @@ export default function AdminAccounts() {
                                     editForm.setData('nip', e.target.value)
                                 }
                                 placeholder="(opsional)"
+                                className="border-green-200 focus-visible:border-green-500 focus-visible:ring-green-500/20"
                             />
                             {editForm.errors.nip && (
                                 <p className="text-sm text-red-500">
@@ -702,7 +677,7 @@ export default function AdminAccounts() {
                                         : false
                                 }
                             >
-                                <SelectTrigger id="edit-role">
+                                <SelectTrigger id="edit-role" className="border-green-200 focus-visible:border-green-500 focus-visible:ring-green-500/20">
                                     <SelectValue />
                                 </SelectTrigger>
                                 <SelectContent>
@@ -723,7 +698,7 @@ export default function AdminAccounts() {
                         <div className="grid gap-2">
                             <Label htmlFor="edit-password">
                                 Password baru{' '}
-                                <span className="font-normal text-slate-400">
+                                <span className="font-normal text-green-400">
                                     (kosongkan jika tidak diubah)
                                 </span>
                             </Label>
@@ -741,13 +716,14 @@ export default function AdminAccounts() {
                                         )
                                     }
                                     autoComplete="new-password"
+                                    className="border-green-200 focus-visible:border-green-500 focus-visible:ring-green-500/20"
                                 />
                                 <button
                                     type="button"
                                     onClick={() =>
                                         setShowEditPassword(!showEditPassword)
                                     }
-                                    className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
+                                    className="absolute right-3 top-1/2 -translate-y-1/2 text-green-400 hover:text-green-600"
                                 >
                                     {showEditPassword ? (
                                         <EyeOff className="size-4" />
@@ -777,6 +753,7 @@ export default function AdminAccounts() {
                                     )
                                 }
                                 autoComplete="new-password"
+                                className="border-green-200 focus-visible:border-green-500 focus-visible:ring-green-500/20"
                             />
                         </div>
                         <DialogFooter>
@@ -784,13 +761,14 @@ export default function AdminAccounts() {
                                 type="button"
                                 variant="outline"
                                 onClick={() => setEditOpen(false)}
+                                className="border-green-200 text-green-700 hover:bg-green-50"
                             >
                                 Batal
                             </Button>
                             <Button
                                 type="submit"
                                 disabled={editForm.processing}
-                                className="bg-emerald-600 hover:bg-emerald-700"
+                                className="bg-green-600 hover:bg-green-700"
                             >
                                 Simpan
                             </Button>
@@ -814,6 +792,7 @@ export default function AdminAccounts() {
                         <Button
                             variant="outline"
                             onClick={() => setDeleteOpen(false)}
+                            className="border-green-200 text-green-700 hover:bg-green-50"
                         >
                             Batal
                         </Button>
