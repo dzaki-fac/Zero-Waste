@@ -115,7 +115,7 @@ export default function AdminAccounts() {
     });
 
     const [searchInput, setSearchInput] = useState(filters.search ?? '');
-    const debounceRef = useRef<ReturnType<typeof setTimeout>>();
+    const debounceRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
 
     useEffect(() => {
         // eslint-disable-next-line react-hooks/set-state-in-effect
