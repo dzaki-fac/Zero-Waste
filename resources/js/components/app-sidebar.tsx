@@ -20,6 +20,16 @@ const mainNavItems: NavItem[] = [
         href: '/penimbangan',
         icon: Leaf,
     },
+    {
+        title: 'Pilah Sampah',
+        href: '/pilah-sampah',
+        icon: Leaf,
+    },
+    {
+        title: 'Distribusi',
+        href: '/distribusi',
+        icon: Leaf,
+    },
 ];
 
 export function AppSidebar() {
