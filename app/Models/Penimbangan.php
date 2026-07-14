@@ -27,7 +27,7 @@ class Penimbangan extends Model
     ];
 
     /**
-     * @return BelongsTo<User, Penimbangan>
+     * @return BelongsTo<User, $this>
      */
     public function user(): BelongsTo
     {

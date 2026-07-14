@@ -45,16 +45,25 @@ class User extends Authenticatable
         ];
     }
 
+    /**
+     * @return HasMany<Penimbangan, $this>
+     */
     public function penimbangan(): HasMany
     {
         return $this->hasMany(Penimbangan::class);
     }
 
+    /**
+     * @return HasMany<PilahSampah, $this>
+     */
     public function pilahSampah(): HasMany
     {
         return $this->hasMany(PilahSampah::class);
     }
 
+    /**
+     * @return HasMany<Distribusi, $this>
+     */
     public function distribusi(): HasMany
     {
         return $this->hasMany(Distribusi::class);

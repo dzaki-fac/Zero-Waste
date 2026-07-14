@@ -28,7 +28,7 @@ class Distribusi extends Model
     ];
 
     /**
-     * @return BelongsTo<User, Distribusi>
+     * @return BelongsTo<User, $this>
      */
     public function user(): BelongsTo
     {
