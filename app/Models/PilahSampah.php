@@ -6,12 +6,11 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-
-/**
- * @use HasFactory<\Database\Factories\DistribusiFactory>
- */
 class PilahSampah extends Model
 {
+    /**
+     * @use HasFactory<\Database\Factories\PilahSampahFactory>
+     */
     use HasFactory;
 
     protected $fillable = [
@@ -26,6 +25,9 @@ class PilahSampah extends Model
         'berat' => 'decimal:2',
     ];
 
+    /**
+     * @return BelongsTo<User, PilahSampah>
+     */
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
