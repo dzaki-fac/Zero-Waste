@@ -6,6 +6,10 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
+
+/**
+ * @extends \Illuminate\Database\Eloquent\Factories\Factory<\Database\Factories\DistribusiFactory>
+ */
 class Penimbangan extends Model
 {
     use HasFactory;
