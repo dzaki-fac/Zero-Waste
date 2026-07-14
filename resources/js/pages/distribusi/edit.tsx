@@ -28,9 +28,14 @@ type Props = {
 };
 
 export default function DistribusiEdit({ distribusi }: Props) {
+    const initialTanggal = (() => {
+        const d = new Date(distribusi.tanggal);
+        return new Date(d.getTime() - d.getTimezoneOffset() * 60000).toISOString().slice(0, 16);
+    })();
+
     const { data, setData, put, processing, errors } = useForm({
         nama: distribusi.nama,
-        tanggal: distribusi.tanggal.split('T')[0],
+        tanggal: initialTanggal,
         berat: distribusi.berat,
         jenis_sampah: distribusi.jenis_sampah,
         tujuan_distribusi: distribusi.tujuan_distribusi,
@@ -60,10 +65,9 @@ export default function DistribusiEdit({ distribusi }: Props) {
                                 id="nama"
                                 name="nama"
                                 value={data.nama}
-                                onChange={(e) => setData('nama', e.target.value)}
+                                readOnly
                                 required
-                                placeholder="Masukkan nama"
-                                className="border-green-200 focus-visible:border-green-500 focus-visible:ring-green-500/20"
+                                className="border-green-200 bg-green-50 text-green-500"
                             />
                             <InputError message={errors.nama} />
                         </div>
@@ -73,7 +77,7 @@ export default function DistribusiEdit({ distribusi }: Props) {
                             <Input
                                 id="tanggal"
                                 name="tanggal"
-                                type="date"
+                                type="datetime-local"
                                 value={data.tanggal}
                                 onChange={(e) => setData('tanggal', e.target.value)}
                                 required

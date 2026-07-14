@@ -22,7 +22,7 @@ class PilahSampah extends Model
     ];
 
     protected $casts = [
-        'tanggal' => 'date',
+        'tanggal' => 'datetime',
         'berat' => 'decimal:2',
     ];
 }
