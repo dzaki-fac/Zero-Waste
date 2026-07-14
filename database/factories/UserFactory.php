@@ -31,12 +31,11 @@ class UserFactory extends Factory
             'email_verified_at' => now(),
             'password' => static::$password ??= Hash::make('password'),
             'remember_token' => Str::random(10),
+            'nip' => fake()->unique()->numerify(str_repeat('#', 18)),
+            'role' => 'petugas',
         ];
     }
 
-    /**
-     * Indicate that the model's email address should be unverified.
-     */
     public function unverified(): static
     {
         return $this->state(fn (array $attributes) => [
@@ -55,6 +54,20 @@ class UserFactory extends Factory
                 Collection::times(8, fn () => Str::random(10))->all()
             )),
             'two_factor_confirmed_at' => now(),
+        ]);
+    }
+
+    public function admin(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'role' => 'admin',
+        ]);
+    }
+
+    public function petugas(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'role' => 'petugas',
         ]);
     }
 }

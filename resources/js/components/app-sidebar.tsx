@@ -1,5 +1,5 @@
-import { Link } from '@inertiajs/react';
-import { Leaf } from 'lucide-react';
+import { Link, usePage } from '@inertiajs/react';
+import { Leaf, Users } from 'lucide-react';
 import AppLogo from '@/components/app-logo';
 import { NavMain } from '@/components/nav-main';
 import { NavUser } from '@/components/nav-user';
@@ -12,7 +12,7 @@ import {
     SidebarMenuButton,
     SidebarMenuItem,
 } from '@/components/ui/sidebar';
-import type { NavItem } from '@/types';
+import type { Auth, NavItem } from '@/types';
 
 const mainNavItems: NavItem[] = [
     {
@@ -33,6 +33,12 @@ const mainNavItems: NavItem[] = [
 ];
 
 export function AppSidebar() {
+    const { auth } = usePage().props as { auth: Auth };
+
+    const navItems: NavItem[] = auth.user.role === 'admin'
+        ? [...mainNavItems, { title: 'Akun', href: '/admin/accounts', icon: Users }]
+        : mainNavItems;
+
     return (
         <Sidebar collapsible="icon" variant="inset">
             <SidebarHeader>
@@ -48,7 +54,7 @@ export function AppSidebar() {
             </SidebarHeader>
 
             <SidebarContent>
-                <NavMain items={mainNavItems} />
+                <NavMain items={navItems} />
             </SidebarContent>
 
             <SidebarFooter>
