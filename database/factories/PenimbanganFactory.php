@@ -3,27 +3,27 @@
 namespace Database\Factories;
 
 use App\Models\Penimbangan;
-use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
-/**
- * @extends Factory<Penimbangan>
- */
 class PenimbanganFactory extends Factory
 {
-    /**
-     * Define the model's default state.
-     *
-     * @return array<string, mixed>
-     */
+    protected $model = Penimbangan::class;
+
     public function definition(): array
     {
+        $area = fake()->randomElement([
+            'Lantai 1', 'Lantai 2', 'Lantai 3', 'Lantai 4',
+            'Area Teras', 'Area Halaman', 'Area Parkir',
+        ]);
+
         return [
-            'user_id' => User::factory(),
+            'nama' => fake()->name(),
             'tanggal' => fake()->dateTimeBetween('-6 months', 'now'),
             'berat_sampah' => fake()->randomFloat(2, 1, 100),
-            'area' => fake()->randomElement(['Utara', 'Selatan', 'Timur', 'Barat']),
-            'sub_area' => fake()->streetName(),
+            'area' => $area,
+            'sub_area' => str_starts_with($area, 'Lantai')
+                ? fake()->randomElement(['Area Baca', 'Area Kantor', 'Area Pertemuan', 'Kamar Kecil'])
+                : '-',
         ];
     }
 }
