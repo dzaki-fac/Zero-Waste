@@ -1,5 +1,5 @@
 import { Link, usePage } from '@inertiajs/react';
-import { Leaf, Users } from 'lucide-react';
+import { LayoutDashboard, Leaf, Users } from 'lucide-react';
 import AppLogo from '@/components/app-logo';
 import { NavMain } from '@/components/nav-main';
 import { NavUser } from '@/components/nav-user';
@@ -15,6 +15,11 @@ import {
 import type { Auth, NavItem } from '@/types';
 
 const mainNavItems: NavItem[] = [
+    {
+        title: 'Dashboard',
+        href: '/admin/dashboard',
+        icon: LayoutDashboard,
+    },
     {
         title: 'Penimbangan',
         href: '/penimbangan',

@@ -34,6 +34,12 @@ export default function Welcome() {
 
                     <div className="flex gap-4">
                         <Link
+                            href="/login"
+                            className="inline-flex items-center gap-2 rounded-lg border border-green-200 bg-white px-6 py-2.5 text-sm font-medium text-green-700 shadow-sm hover:bg-green-50"
+                        >
+                            Login
+                        </Link>
+                        <Link
                             href="/penimbangan"
                             className="inline-flex items-center gap-2 rounded-lg bg-green-600 px-6 py-2.5 text-sm font-medium text-white shadow-sm hover:bg-green-700"
                         >
