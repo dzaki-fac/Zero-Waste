@@ -1,6 +1,3 @@
-import { useState } from 'react';
-import { Head, Link, useForm } from '@inertiajs/react';
-import { ArrowLeft, Save } from 'lucide-react';
 import Heading from '@/components/heading';
 import InputError from '@/components/input-error';
 import { Button } from '@/components/ui/button';
@@ -13,6 +10,8 @@ import {
     SelectTrigger,
     SelectValue,
 } from '@/components/ui/select';
+import { Head, Link, useForm } from '@inertiajs/react';
+import { ArrowLeft, Save } from 'lucide-react';
 
 const subAreaOptions = ['Area Baca', 'Area Kantor', 'Area Pertemuan', 'Kamar Kecil'];
 const nonLantaiAreas = ['Area Teras', 'Area Halaman', 'Area Parkir'];
