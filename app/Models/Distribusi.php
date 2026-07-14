@@ -4,11 +4,9 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
-
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\Database\Factories\DistribusiFactory>
+ * @use HasFactory<\Database\Factories\DistribusiFactory>
  */
 class Distribusi extends Model
 {
@@ -17,7 +15,7 @@ class Distribusi extends Model
     protected $table = 'distribusi';
 
     protected $fillable = [
-        'user_id',
+        'nama',
         'tanggal',
         'berat',
         'jenis_sampah',
@@ -29,9 +27,4 @@ class Distribusi extends Model
         'tanggal' => 'date',
         'berat' => 'decimal:2',
     ];
-
-    public function user(): BelongsTo
-    {
-        return $this->belongsTo(User::class);
-    }
 }
