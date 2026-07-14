@@ -102,9 +102,17 @@ export default function PilahSampahEdit({ pilahSampah }: Props) {
                                     <SelectValue placeholder="Pilih jenis sampah" />
                                 </SelectTrigger>
                                 <SelectContent>
-                                    <SelectItem value="organik">Organik</SelectItem>
-                                    <SelectItem value="anorganik">Anorganik</SelectItem>
+                                    <SelectItem value="Daun">Daun</SelectItem>
+                                    <SelectItem value="Ranting besar">Ranting besar</SelectItem>
+                                    <SelectItem value="Ranting kecil">Ranting kecil</SelectItem>
+                                    <SelectItem value="Sisa makanan">Sisa makanan</SelectItem>
+                                    <SelectItem value="Plastik berwarna">Plastik berwarna</SelectItem>
+                                    <SelectItem value="Plastik putih">Plastik putih</SelectItem>
+                                    <SelectItem value="Styrofoam">Styrofoam</SelectItem>
+                                    <SelectItem value="Botol">Botol</SelectItem>
+                                    <SelectItem value="Kardus dan Kertas">Kardus dan Kertas</SelectItem>
                                     <SelectItem value="B3">B3</SelectItem>
+                                    <SelectItem value="Lainnya">Lainnya</SelectItem>
                                 </SelectContent>
                             </Select>
                             <InputError message={errors.jenis_sampah} />

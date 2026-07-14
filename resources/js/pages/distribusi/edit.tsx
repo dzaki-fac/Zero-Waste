@@ -106,9 +106,17 @@ export default function DistribusiEdit({ distribusi }: Props) {
                                     <SelectValue placeholder="Pilih jenis sampah" />
                                 </SelectTrigger>
                                 <SelectContent>
-                                    <SelectItem value="organik">Organik</SelectItem>
-                                    <SelectItem value="anorganik">Anorganik</SelectItem>
+                                    <SelectItem value="Daun">Daun</SelectItem>
+                                    <SelectItem value="Ranting besar">Ranting besar</SelectItem>
+                                    <SelectItem value="Ranting kecil">Ranting kecil</SelectItem>
+                                    <SelectItem value="Sisa makanan">Sisa makanan</SelectItem>
+                                    <SelectItem value="Plastik berwarna">Plastik berwarna</SelectItem>
+                                    <SelectItem value="Plastik putih">Plastik putih</SelectItem>
+                                    <SelectItem value="Styrofoam">Styrofoam</SelectItem>
+                                    <SelectItem value="Botol">Botol</SelectItem>
+                                    <SelectItem value="Kardus dan Kertas">Kardus dan Kertas</SelectItem>
                                     <SelectItem value="B3">B3</SelectItem>
+                                    <SelectItem value="Lainnya">Lainnya</SelectItem>
                                 </SelectContent>
                             </Select>
                             <InputError message={errors.jenis_sampah} />
@@ -116,15 +124,17 @@ export default function DistribusiEdit({ distribusi }: Props) {
 
                         <div className="grid gap-2">
                             <Label htmlFor="tujuan_distribusi" className="text-green-700">Tujuan Distribusi</Label>
-                            <Input
-                                id="tujuan_distribusi"
-                                name="tujuan_distribusi"
-                                value={data.tujuan_distribusi}
-                                onChange={(e) => setData('tujuan_distribusi', e.target.value)}
-                                required
-                                placeholder="Masukkan tujuan distribusi"
-                                className="border-green-200 focus-visible:border-green-500 focus-visible:ring-green-500/20"
-                            />
+                            <Select name="tujuan_distribusi" value={data.tujuan_distribusi} onValueChange={(v) => setData('tujuan_distribusi', v)}>
+                                <SelectTrigger className="w-full border-green-200 focus-visible:border-green-500 focus-visible:ring-green-500/20">
+                                    <SelectValue placeholder="Pilih tujuan distribusi" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="TPS">TPS</SelectItem>
+                                    <SelectItem value="Pupuk/kompos">Pupuk/kompos</SelectItem>
+                                    <SelectItem value="PlasticPay">PlasticPay</SelectItem>
+                                    <SelectItem value="Tujuan lainnya">Tujuan lainnya</SelectItem>
+                                </SelectContent>
+                            </Select>
                             <InputError message={errors.tujuan_distribusi} />
                         </div>
 

@@ -10,8 +10,12 @@ class DistribusiSeeder extends Seeder
     public function run(): void
     {
         $names = ['Budi Santoso', 'Siti Rahayu', 'Andi Pratama', 'Dewi Lestari', 'Rizki Ramadhan'];
-        $jenisSampah = ['organik', 'anorganik', 'B3'];
-        $tujuan = ['bank sampah', 'pengepul', 'daur ulang'];
+        $jenisSampah = [
+            'Daun', 'Ranting besar', 'Ranting kecil', 'Sisa makanan',
+            'Plastik berwarna', 'Plastik putih', 'Styrofoam', 'Botol',
+            'Kardus dan Kertas', 'B3', 'Lainnya',
+        ];
+        $tujuan = ['TPS', 'Pupuk/kompos', 'PlasticPay', 'Tujuan lainnya'];
         $lokasi = ['Bandung', 'Jakarta', 'Surabaya', 'Semarang', 'Yogyakarta', 'Malang', 'Bogor', 'Depok'];
 
         for ($i = 0; $i < 20; $i++) {

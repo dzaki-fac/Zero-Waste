@@ -12,8 +12,8 @@ class DistribusiRequest extends FormRequest
             'nama' => ['required', 'string', 'max:255'],
             'tanggal' => ['required', 'date'],
             'berat' => ['required', 'numeric', 'min:0'],
-            'jenis_sampah' => ['required', 'in:organik,anorganik,B3'],
-            'tujuan_distribusi' => ['required', 'string', 'max:255'],
+            'jenis_sampah' => ['required', 'in:Daun,Ranting besar,Ranting kecil,Sisa makanan,Plastik berwarna,Plastik putih,Styrofoam,Botol,Kardus dan Kertas,B3,Lainnya'],
+            'tujuan_distribusi' => ['required', 'in:TPS,Pupuk/kompos,PlasticPay,Tujuan lainnya'],
             'lokasi' => ['required', 'string', 'max:255'],
         ];
     }

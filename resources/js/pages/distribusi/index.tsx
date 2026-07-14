@@ -26,9 +26,17 @@ type Props = {
 };
 
 const jenisSampahColors: Record<string, string> = {
-    organik: 'bg-green-100 text-green-700',
-    anorganik: 'bg-amber-100 text-amber-700',
-    B3: 'bg-red-100 text-red-700',
+    'Daun': 'bg-green-100 text-green-700',
+    'Ranting besar': 'bg-green-100 text-green-700',
+    'Ranting kecil': 'bg-green-100 text-green-700',
+    'Sisa makanan': 'bg-green-100 text-green-700',
+    'Plastik berwarna': 'bg-amber-100 text-amber-700',
+    'Plastik putih': 'bg-blue-100 text-blue-700',
+    'Styrofoam': 'bg-red-100 text-red-700',
+    'Botol': 'bg-blue-100 text-blue-700',
+    'Kardus dan Kertas': 'bg-amber-100 text-amber-700',
+    'B3': 'bg-red-100 text-red-700',
+    'Lainnya': 'bg-gray-100 text-gray-700',
 };
 
 export default function DistribusiIndex({ distribusi }: Props) {
@@ -103,7 +111,7 @@ export default function DistribusiIndex({ distribusi }: Props) {
                                         </TableCell>
                                         <TableCell>
                                             <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${jenisSampahColors[item.jenis_sampah] ?? 'bg-gray-100 text-gray-700'}`}>
-                                                {item.jenis_sampah.charAt(0).toUpperCase() + item.jenis_sampah.slice(1)}
+                                                {item.jenis_sampah}
                                             </span>
                                         </TableCell>
                                         <TableCell>{item.tujuan_distribusi}</TableCell>
