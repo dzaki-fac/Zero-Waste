@@ -16,7 +16,7 @@ import {
 export default function PilahSampahCreate() {
     const { data, setData, post, processing, errors } = useForm({
         nama: '',
-        tanggal: '',
+        tanggal: new Date().toISOString().split('T')[0],
         berat: '',
         jenis_sampah: '',
     });

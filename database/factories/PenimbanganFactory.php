@@ -11,12 +11,19 @@ class PenimbanganFactory extends Factory
 
     public function definition(): array
     {
+        $area = fake()->randomElement([
+            'Lantai 1', 'Lantai 2', 'Lantai 3', 'Lantai 4',
+            'Area Teras', 'Area Halaman', 'Area Parkir',
+        ]);
+
         return [
             'nama' => fake()->name(),
             'tanggal' => fake()->dateTimeBetween('-6 months', 'now'),
             'berat_sampah' => fake()->randomFloat(2, 1, 100),
-            'area' => fake()->randomElement(['Utara', 'Selatan', 'Timur', 'Barat']),
-            'sub_area' => fake()->streetName(),
+            'area' => $area,
+            'sub_area' => str_starts_with($area, 'Lantai')
+                ? fake()->randomElement(['Area Baca', 'Area Kantor', 'Area Pertemuan', 'Kamar Kecil'])
+                : '-',
         ];
     }
 }

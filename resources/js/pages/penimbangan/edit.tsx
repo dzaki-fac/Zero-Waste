@@ -26,6 +26,8 @@ type Props = {
     penimbangan: Penimbangan;
 };
 
+const subAreaOptions = ['Area Baca', 'Area Kantor', 'Area Pertemuan', 'Kamar Kecil'];
+
 export default function PenimbanganEdit({ penimbangan }: Props) {
     const { data, setData, put, processing, errors } = useForm({
         nama: penimbangan.nama,
@@ -34,6 +36,17 @@ export default function PenimbanganEdit({ penimbangan }: Props) {
         area: penimbangan.area,
         sub_area: penimbangan.sub_area,
     });
+
+    const isLantai = ['Lantai 1', 'Lantai 2', 'Lantai 3', 'Lantai 4'].includes(data.area);
+
+    const handleAreaChange = (value: string) => {
+        setData('area', value);
+        if (!['Lantai 1', 'Lantai 2', 'Lantai 3', 'Lantai 4'].includes(value)) {
+            setData('sub_area', '-');
+        } else if (!subAreaOptions.includes(data.sub_area)) {
+            setData('sub_area', '');
+        }
+    };
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
@@ -99,15 +112,18 @@ export default function PenimbanganEdit({ penimbangan }: Props) {
 
                         <div className="grid gap-2">
                             <Label htmlFor="area" className="text-green-700">Area</Label>
-                            <Select name="area" value={data.area} onValueChange={(v) => setData('area', v)}>
+                            <Select name="area" value={data.area} onValueChange={handleAreaChange}>
                                 <SelectTrigger className="w-full border-green-200 focus-visible:border-green-500 focus-visible:ring-green-500/20">
                                     <SelectValue placeholder="Pilih area" />
                                 </SelectTrigger>
                                 <SelectContent>
-                                    <SelectItem value="Utara">Utara</SelectItem>
-                                    <SelectItem value="Selatan">Selatan</SelectItem>
-                                    <SelectItem value="Timur">Timur</SelectItem>
-                                    <SelectItem value="Barat">Barat</SelectItem>
+                                    <SelectItem value="Lantai 1">Lantai 1</SelectItem>
+                                    <SelectItem value="Lantai 2">Lantai 2</SelectItem>
+                                    <SelectItem value="Lantai 3">Lantai 3</SelectItem>
+                                    <SelectItem value="Lantai 4">Lantai 4</SelectItem>
+                                    <SelectItem value="Area Teras">Area Teras</SelectItem>
+                                    <SelectItem value="Area Halaman">Area Halaman</SelectItem>
+                                    <SelectItem value="Area Parkir">Area Parkir</SelectItem>
                                 </SelectContent>
                             </Select>
                             <InputError message={errors.area} />
@@ -115,15 +131,26 @@ export default function PenimbanganEdit({ penimbangan }: Props) {
 
                         <div className="grid gap-2">
                             <Label htmlFor="sub_area" className="text-green-700">Sub Area</Label>
-                            <Input
-                                id="sub_area"
-                                name="sub_area"
-                                value={data.sub_area}
-                                onChange={(e) => setData('sub_area', e.target.value)}
-                                required
-                                placeholder="Masukkan nama sub area"
-                                className="border-green-200 focus-visible:border-green-500 focus-visible:ring-green-500/20"
-                            />
+                            {isLantai ? (
+                                <Select name="sub_area" value={data.sub_area} onValueChange={(v) => setData('sub_area', v)}>
+                                    <SelectTrigger className="w-full border-green-200 focus-visible:border-green-500 focus-visible:ring-green-500/20">
+                                        <SelectValue placeholder="Pilih sub area" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        {subAreaOptions.map((option) => (
+                                            <SelectItem key={option} value={option}>{option}</SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
+                            ) : (
+                                <Input
+                                    id="sub_area"
+                                    name="sub_area"
+                                    value="-"
+                                    disabled
+                                    className="border-green-200 bg-green-50 text-green-500"
+                                />
+                            )}
                             <InputError message={errors.sub_area} />
                         </div>
 

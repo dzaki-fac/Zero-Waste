@@ -11,20 +11,18 @@ class PenimbanganSeeder extends Seeder
     {
         $names = ['Budi Santoso', 'Siti Rahayu', 'Andi Pratama', 'Dewi Lestari', 'Rizki Ramadhan'];
 
-        $areas = ['Utara', 'Selatan', 'Timur', 'Barat'];
-        $subAreas = [
-            'Jl. Merdeka', 'Jl. Pahlawan', 'Jl. Sudirman', 'Jl. Thamrin',
-            'Jl. Asia Afrika', 'Jl. Gatot Subroto', 'Jl. Diponegoro',
-            'Jl. Ahmad Yani', 'Jl. Imam Bonjol', 'Jl. Kartini',
-        ];
+        $areas = ['Lantai 1', 'Lantai 2', 'Lantai 3', 'Lantai 4', 'Area Teras', 'Area Halaman', 'Area Parkir'];
+        $subAreas = ['Area Baca', 'Area Kantor', 'Area Pertemuan', 'Kamar Kecil'];
 
         for ($i = 0; $i < 20; $i++) {
+            $area = fake()->randomElement($areas);
+
             Penimbangan::create([
                 'nama' => fake()->randomElement($names),
                 'tanggal' => fake()->dateTimeBetween('-3 months', 'now'),
                 'berat_sampah' => fake()->randomFloat(2, 2, 85),
-                'area' => fake()->randomElement($areas),
-                'sub_area' => fake()->randomElement($subAreas),
+                'area' => $area,
+                'sub_area' => str_starts_with($area, 'Lantai') ? fake()->randomElement($subAreas) : '-',
             ]);
         }
     }
