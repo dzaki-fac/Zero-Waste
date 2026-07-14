@@ -5,10 +5,18 @@ namespace Database\Factories;
 use App\Models\Distribusi;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
+/**
+ * @extends Factory<Distribusi>
+ */
 class DistribusiFactory extends Factory
 {
     protected $model = Distribusi::class;
 
+    /**
+     * Define the model's default state.
+     *
+     * @return array<string, mixed>
+     */
     public function definition(): array
     {
         return [

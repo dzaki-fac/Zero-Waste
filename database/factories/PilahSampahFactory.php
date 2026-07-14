@@ -5,10 +5,18 @@ namespace Database\Factories;
 use App\Models\PilahSampah;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
+/**
+ * @extends Factory<PilahSampah>
+ */
 class PilahSampahFactory extends Factory
 {
     protected $model = PilahSampah::class;
 
+    /**
+     * Define the model's default state.
+     *
+     * @return array<string, mixed>
+     */
     public function definition(): array
     {
         return [
