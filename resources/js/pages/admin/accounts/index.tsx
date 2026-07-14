@@ -85,7 +85,7 @@ const FILTERS = [
 ];
 
 export default function AdminAccounts() {
-    const { users, filters, current_user_id, current_user_role } =
+    const { users, filters, current_user_id } =
         usePage<PageProps>().props;
     const [addOpen, setAddOpen] = useState(false);
     const [editOpen, setEditOpen] = useState(false);
@@ -118,12 +118,15 @@ export default function AdminAccounts() {
     const debounceRef = useRef<ReturnType<typeof setTimeout>>();
 
     useEffect(() => {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         setSearchInput(filters.search ?? '');
     }, [filters.search]);
 
     useEffect(() => {
         return () => {
-            if (debounceRef.current) clearTimeout(debounceRef.current);
+            if (debounceRef.current) {
+                clearTimeout(debounceRef.current);
+            }
         };
     }, []);
 
@@ -131,7 +134,11 @@ export default function AdminAccounts() {
 
     function handleSearchInput(value: string) {
         setSearchInput(value);
-        if (debounceRef.current) clearTimeout(debounceRef.current);
+
+        if (debounceRef.current) {
+            clearTimeout(debounceRef.current);
+        }
+
         debounceRef.current = setTimeout(() => {
             router.get(
                 '/admin/accounts',
@@ -175,8 +182,8 @@ export default function AdminAccounts() {
         e.preventDefault();
 
         if (!editingUser) {
-return;
-}
+            return;
+        }
 
         editForm.patch(`/admin/accounts/${editingUser.id}`, {
             preserveScroll: true,
@@ -189,8 +196,8 @@ return;
 
     function handleDelete() {
         if (!deletingUser) {
-return;
-}
+            return;
+        }
 
         setDeleteProcessing(true);
         router.delete(`/admin/accounts/${deletingUser.id}`, {
@@ -225,8 +232,9 @@ return;
 
     function canDelete(user: UserResource) {
         if (user.id === current_user_id) {
-return false;
-}
+            return false;
+        }
+
         return true;
     }
 
