@@ -3,14 +3,14 @@
 namespace Database\Seeders;
 
 use App\Models\PilahSampah;
+use App\Models\User;
 use Illuminate\Database\Seeder;
 
 class PilahSampahSeeder extends Seeder
 {
     public function run(): void
     {
-        $names = ['Budi Santoso', 'Siti Rahayu', 'Andi Pratama', 'Dewi Lestari', 'Rizki Ramadhan'];
-
+        $names = User::pluck('name')->toArray();
         $jenisSampah = [
             'Daun', 'Ranting besar', 'Ranting kecil', 'Sisa makanan',
             'Plastik berwarna', 'Plastik putih', 'Styrofoam', 'Botol',

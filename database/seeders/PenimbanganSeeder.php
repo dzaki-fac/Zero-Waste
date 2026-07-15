@@ -3,14 +3,14 @@
 namespace Database\Seeders;
 
 use App\Models\Penimbangan;
+use App\Models\User;
 use Illuminate\Database\Seeder;
 
 class PenimbanganSeeder extends Seeder
 {
     public function run(): void
     {
-        $names = ['Budi Santoso', 'Siti Rahayu', 'Andi Pratama', 'Dewi Lestari', 'Rizki Ramadhan'];
-
+        $names = User::pluck('name')->toArray();
         $areas = ['Lantai 1', 'Lantai 2', 'Lantai 3', 'Lantai 4', 'Area Teras', 'Area Halaman', 'Area Parkir'];
         $subAreas = ['Area Baca', 'Area Kantor', 'Area Pertemuan', 'Kamar Kecil'];
 
