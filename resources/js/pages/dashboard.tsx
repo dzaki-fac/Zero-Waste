@@ -623,27 +623,17 @@ export default function Dashboard() {
         </div>
       </section>
 
-      {/* ---- Bagian-bagian: Pengertian, Struktur Organisasi, SOP, Alur, Laporan ---- */}
-        <section className="max-w-6xl mx-auto px-5 sm:px-8 pt-16 sm:pt-20 pb-16">
-          {MENU_DECK.filter((item) => !PAGE_ROUTES[item.id]).map((item, i) => (
-            <div
-              key={item.id}
-              id={item.id}
-              ref={setSectionRef(item.id)}
-              className={i > 0 ? "mt-16" : ""}
-              style={{ scrollMarginTop: 72 }}
-            >
-              <Reveal>
-                <h2 className="text-2xl sm:text-3xl font-semibold mb-6" style={{ ...display, color: C.navy900 }}>
-                  {item.title}
-                </h2>
-              </Reveal>
-              <Reveal delay={80}>
-                <PlaceholderPanel item={item} />
-              </Reveal>
-            </div>
-          ))}
-        </section>
+      {/* ---- Laporan ---- */}
+      <section id="laporan" ref={setSectionRef("laporan")} className="max-w-6xl mx-auto px-5 sm:px-8 pt-16 sm:pt-20 pb-20" style={{ scrollMarginTop: 72 }}>
+        <Reveal>
+          <h2 className="text-2xl sm:text-3xl font-semibold mb-2" style={{ ...display, color: C.navy900 }}>
+            Laporan
+          </h2>
+        </Reveal>
+        <Reveal delay={80}>
+          <PlaceholderPanel item={MENU_DECK.find((item) => item.id === "laporan")!} />
+        </Reveal>
+      </section>
 
       {/* ---- Berita ---- */}
       <section id="berita" ref={setSectionRef("berita")} className="pt-6 sm:pt-8" style={{ backgroundColor: C.navy900, scrollMarginTop: 64 }}>

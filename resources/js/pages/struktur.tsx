@@ -6,9 +6,9 @@ import { Reveal } from "../components/shared";
 
 export default function StrukturPage() {
   return (
-    <div style={{ ...body, backgroundColor: C.paper50, color: C.ink900 }} className="min-h-screen">
+    <div style={{ ...body, backgroundColor: C.paper50, color: C.ink900 }} className="min-h-screen flex flex-col">
       <Navbar activeSection="struktur" />
-      <section className="max-w-6xl mx-auto px-5 sm:px-8 pt-8 sm:pt-10 pb-24">
+      <section className="flex-1 max-w-6xl mx-auto px-5 sm:px-8 pt-8 sm:pt-10 pb-24 w-full">
         <Reveal>
           <h2 className="text-2xl sm:text-3xl font-semibold mb-6" style={{ ...display, color: C.navy900 }}>
             Struktur Organisasi
