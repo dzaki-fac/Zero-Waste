@@ -302,9 +302,9 @@ export default function Dashboard() {
                             const STATUS_COLORS = ['#ef4444', '#f59e0b', '#22c55e'];
                             const STATUS_ICONS = [Clock, Package, CheckCircle];
                             const chartData = [
-                                { key: 'belum_dipilah', name: 'Belum Dipilah', value: statusBerat.belum_dipilah },
-                                { key: 'belum_didistribusikan', name: 'Belum Didistribusikan', value: statusBerat.belum_didistribusikan },
-                                { key: 'sudah_didistribusikan', name: 'Sudah Didistribusikan', value: statusBerat.sudah_didistribusikan },
+                                { key: 'belum_dipilah', name: 'Tahap Pemilahan', value: statusBerat.belum_dipilah },
+                                { key: 'belum_didistribusikan', name: 'Tahap Distribusi', value: statusBerat.belum_didistribusikan },
+                                { key: 'sudah_didistribusikan', name: 'Selesai', value: statusBerat.sudah_didistribusikan },
                             ];
                             const total = chartData.reduce((s, d) => s + d.value, 0);
 
