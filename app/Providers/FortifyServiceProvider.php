@@ -12,6 +12,7 @@ use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rules\Password;
 use Inertia\Inertia;
+use Laravel\Fortify\Contracts\LoginResponse;
 use Laravel\Fortify\Contracts\LogoutResponse;
 use Laravel\Fortify\Features;
 use Laravel\Fortify\Fortify;
@@ -26,7 +27,16 @@ class FortifyServiceProvider extends ServiceProvider
         $this->app->singleton(LogoutResponse::class, fn () => new class implements LogoutResponse {
             public function toResponse($request)
             {
-                return redirect('/login');
+                return redirect('/form');
+            }
+        });
+
+        $this->app->singleton(LoginResponse::class, fn () => new class implements LoginResponse {
+            public function toResponse($request)
+            {
+                return $request->user()?->role === 'petugas'
+                    ? redirect('/form')
+                    : redirect('/admin/dashboard');
             }
         });
     }

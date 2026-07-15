@@ -224,7 +224,7 @@ export default function FormDistribusi() {
                             asChild
                             className="flex-1 border-green-200 text-sm text-green-700 hover:bg-green-50"
                         >
-                            <Link href="/distribusi" className="flex items-center justify-center gap-2">
+                            <Link href="/form" className="flex items-center justify-center gap-2">
                                 <ArrowLeft className="h-4 w-4" />
                                 Batal
                             </Link>
