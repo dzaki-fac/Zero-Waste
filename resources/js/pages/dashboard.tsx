@@ -230,13 +230,6 @@ const SOCIALS = [
   { icon: TiktokIcon, label: "TikTok", handle: "@perpus.undip.press", href: "https://www.tiktok.com/@perpus.undip.press?_r=1&_t=ZS-97okoKr4q4S" },
 ];
 
-const FOOTER_QUICKLINKS = [
-  { title: "UPT Perpustakaan", note: "Layanan & katalog perpustakaan pusat" },
-  { title: "UNDIP Press", note: "Penerbitan dan publikasi kampus" },
-  { title: "Portal Akademik", note: "Sistem informasi akademik mahasiswa" },
-  { title: "Lapor Sampah", note: "Formulir pelaporan titik sampah menumpuk" },
-];
-
 const FOOTER_LINKS = ["Tentang", "Kontak", "Kebijakan Privasi", "Bantuan"];
 
 // Durasi autoplay poster edukasi (ms) — dipakai untuk timer & animasi progress bar
@@ -368,54 +361,6 @@ function SafeImage({ src, alt, icon: Icon, gradient, className, style }: { src: 
   );
 }
 
-function MenuCard({ item, isOpen, onToggle, innerRef }: { item: (typeof MENU_DECK)[number]; isOpen: boolean; onToggle: (id: string) => void; innerRef: (el: HTMLDivElement | null) => void }) {
-  const Icon = item.icon;
-  return (
-    <div ref={innerRef}>
-      <button
-        onClick={() => onToggle(item.id)}
-        className="w-full text-left rounded-2xl p-5 border"
-        style={{
-          backgroundColor: "#fff",
-          borderColor: isOpen ? C.leaf500 : C.line,
-          boxShadow: isOpen
-            ? "0 18px 30px -14px rgba(10,20,64,0.22)"
-            : "0 6px 14px -10px rgba(10,20,64,0.14)",
-          transition: "box-shadow 200ms ease, border-color 200ms ease, transform 200ms ease",
-        }}
-        onMouseEnter={(e) => (e.currentTarget.style.transform = "translateY(-3px)")}
-        onMouseLeave={(e) => (e.currentTarget.style.transform = "translateY(0)")}
-        aria-expanded={isOpen}
-      >
-        <div className="flex items-start justify-between mb-4">
-          <span className="text-[11px] font-semibold tracking-widest" style={{ ...body, color: C.ink500 }}>
-            {item.order}
-          </span>
-          <span
-            className="w-9 h-9 rounded-full flex items-center justify-center"
-            style={{ backgroundColor: C.leaf100 }}
-          >
-            <Icon size={17} color={C.leaf500} strokeWidth={2} />
-          </span>
-        </div>
-        <h3 className="text-lg font-semibold mb-1.5" style={{ ...display, color: C.navy900 }}>
-          {item.title}
-        </h3>
-        <p className="text-sm leading-snug" style={{ ...body, color: C.ink500 }}>
-          {item.teaser}
-        </p>
-        <div className="mt-4 flex items-center gap-1.5 text-xs font-semibold" style={{ ...body, color: C.leaf500 }}>
-          {isOpen ? "Tutup" : "Buka bagian"}
-          <ChevronDown
-            size={14}
-            style={{ transform: isOpen ? "rotate(180deg)" : "rotate(0deg)", transition: "transform 200ms ease" }}
-          />
-        </div>
-      </button>
-    </div>
-  );
-}
-
 function PlaceholderPanel({ item }: { item: (typeof MENU_DECK)[number] }) {
   const Icon = item.icon;
   return (
@@ -433,13 +378,10 @@ function PlaceholderPanel({ item }: { item: (typeof MENU_DECK)[number] }) {
   );
 }
 
-
-
 // ---- Main component ---------------------------------------------------
 
 export default function Dashboard() {
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
-  const [openCard, setOpenCard] = useState<string | null>(null);
   const [heroIndex, setHeroIndex] = useState(0);
   const [posterIndex, setPosterIndex] = useState(0);
   const [posterPaused, setPosterPaused] = useState(false);
@@ -540,22 +482,14 @@ export default function Dashboard() {
 
   const scrollTo = (id: string) => {
     setMobileNavOpen(false);
-    setActiveSection(id); 
-    suppressObserverUntilRef.current = Date.now() + 900; 
+    setActiveSection(id);
+    suppressObserverUntilRef.current = Date.now() + 900;
     const el = sectionRefs.current[id];
     if (el) {
       const offset = NAV_OFFSET_TIGHT[id] ?? NAV_OFFSET;
       const top = el.getBoundingClientRect().top + window.scrollY - offset;
       window.scrollTo({ top, behavior: "smooth" });
     }
-  };
-
-  const toggleCard = (id: string) => {
-    setOpenCard((prev) => (prev === id ? null : id));
-    setTimeout(() => {
-      const el = sectionRefs.current[id + "-panel"];
-      if (el) el.scrollIntoView({ behavior: "smooth", block: "center" });
-    }, 60);
   };
 
   const nextHero = () => setHeroIndex((i) => (i + 1) % HERO_SLIDES.length);
@@ -975,26 +909,6 @@ export default function Dashboard() {
       {/* ---- Footer ---- */}
       <footer style={{ backgroundColor: C.navy900 }}>
         <div className="max-w-6xl mx-auto px-5 sm:px-8 pt-14 sm:pt-16 pb-8">
-
-          <div className="mb-10">
-            <div className="text-xs font-semibold uppercase tracking-widest mb-4" style={{ ...body, color: "#8A8FB3" }}>
-              Tautan Cepat
-            </div>
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-              {FOOTER_QUICKLINKS.map((q, i) => (
-                <button
-                  key={i}
-                  className="text-left rounded-xl p-4 border"
-                  style={{ backgroundColor: C.navy800, borderColor: C.navy700, transition: "border-color 200ms ease" }}
-                  onMouseEnter={(e) => (e.currentTarget.style.borderColor = C.leaf500)}
-                  onMouseLeave={(e) => (e.currentTarget.style.borderColor = C.navy700)}
-                >
-                  <div className="text-sm font-semibold text-white mb-1" style={display}>{q.title}</div>
-                  <div className="text-xs leading-snug" style={{ color: "#8A8FB3" }}>{q.note}</div>
-                </button>
-              ))}
-            </div>
-          </div>
 
           <div className="mb-10">
             <div className="text-xs font-semibold uppercase tracking-widest mb-4" style={{ ...body, color: "#8A8FB3" }}>
