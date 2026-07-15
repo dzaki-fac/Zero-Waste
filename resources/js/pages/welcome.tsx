@@ -6,7 +6,16 @@ export default function Welcome() {
         <>
             <Head title="Welcome" />
 
-            <div className="flex min-h-screen flex-col items-center justify-center bg-gradient-to-b from-green-50 to-white p-6">
+            <div className="relative flex min-h-screen flex-col items-center justify-center bg-gradient-to-b from-green-50 to-white p-6">
+                <div className="absolute right-6 top-6">
+                    <Link
+                        href="/login"
+                        className="inline-flex items-center gap-2 rounded-lg border border-green-200 bg-white px-6 py-2.5 text-sm font-medium text-green-700 shadow-sm hover:bg-green-50"
+                    >
+                        Login
+                    </Link>
+                </div>
+
                 <div className="flex flex-col items-center gap-8 text-center">
                     <div className="flex items-center gap-3">
                         <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-green-100">
@@ -32,13 +41,27 @@ export default function Welcome() {
                         </div>
                     </div>
 
-                    <div className="flex gap-4">
+                    <div className="flex flex-wrap justify-center gap-3">
                         <Link
                             href="/penimbangan"
                             className="inline-flex items-center gap-2 rounded-lg bg-green-600 px-6 py-2.5 text-sm font-medium text-white shadow-sm hover:bg-green-700"
                         >
                             <Leaf className="h-4 w-4" />
-                            Tabel Penimbangan
+                            Penimbangan
+                        </Link>
+                        <Link
+                            href="/pilah-sampah"
+                            className="inline-flex items-center gap-2 rounded-lg bg-green-600 px-6 py-2.5 text-sm font-medium text-white shadow-sm hover:bg-green-700"
+                        >
+                            <Leaf className="h-4 w-4" />
+                            Pilah Sampah
+                        </Link>
+                        <Link
+                            href="/distribusi"
+                            className="inline-flex items-center gap-2 rounded-lg bg-green-600 px-6 py-2.5 text-sm font-medium text-white shadow-sm hover:bg-green-700"
+                        >
+                            <Leaf className="h-4 w-4" />
+                            Distribusi
                         </Link>
                     </div>
                 </div>

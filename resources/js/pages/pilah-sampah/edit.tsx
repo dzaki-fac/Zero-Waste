@@ -26,9 +26,14 @@ type Props = {
 };
 
 export default function PilahSampahEdit({ pilahSampah }: Props) {
+    const initialTanggal = (() => {
+        const d = new Date(pilahSampah.tanggal);
+        return new Date(d.getTime() - d.getTimezoneOffset() * 60000).toISOString().slice(0, 16);
+    })();
+
     const { data, setData, put, processing, errors } = useForm({
         nama: pilahSampah.nama,
-        tanggal: pilahSampah.tanggal.split('T')[0],
+        tanggal: initialTanggal,
         berat: pilahSampah.berat,
         jenis_sampah: pilahSampah.jenis_sampah,
     });
@@ -56,10 +61,9 @@ export default function PilahSampahEdit({ pilahSampah }: Props) {
                                 id="nama"
                                 name="nama"
                                 value={data.nama}
-                                onChange={(e) => setData('nama', e.target.value)}
+                                readOnly
                                 required
-                                placeholder="Masukkan nama"
-                                className="border-green-200 focus-visible:border-green-500 focus-visible:ring-green-500/20"
+                                className="border-green-200 bg-green-50 text-green-500"
                             />
                             <InputError message={errors.nama} />
                         </div>
@@ -69,7 +73,7 @@ export default function PilahSampahEdit({ pilahSampah }: Props) {
                             <Input
                                 id="tanggal"
                                 name="tanggal"
-                                type="date"
+                                type="datetime-local"
                                 value={data.tanggal}
                                 onChange={(e) => setData('tanggal', e.target.value)}
                                 required

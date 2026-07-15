@@ -11,7 +11,7 @@ return new class extends Migration
         Schema::create('distribusi', function (Blueprint $table) {
             $table->id();
             $table->string('nama');
-            $table->date('tanggal');
+            $table->dateTime('tanggal');
             $table->decimal('berat', 10, 2);
             $table->string('jenis_sampah');
             $table->string('tujuan_distribusi');

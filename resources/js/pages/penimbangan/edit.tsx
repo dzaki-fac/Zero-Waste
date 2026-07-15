@@ -29,9 +29,14 @@ type Props = {
 const subAreaOptions = ['Area Baca', 'Area Kantor', 'Area Pertemuan', 'Kamar Kecil'];
 
 export default function PenimbanganEdit({ penimbangan }: Props) {
+    const initialTanggal = (() => {
+        const d = new Date(penimbangan.tanggal);
+        return new Date(d.getTime() - d.getTimezoneOffset() * 60000).toISOString().slice(0, 16);
+    })();
+
     const { data, setData, put, processing, errors } = useForm({
         nama: penimbangan.nama,
-        tanggal: penimbangan.tanggal.split('T')[0],
+        tanggal: initialTanggal,
         berat_sampah: penimbangan.berat_sampah,
         area: penimbangan.area,
         sub_area: penimbangan.sub_area,
@@ -71,10 +76,9 @@ export default function PenimbanganEdit({ penimbangan }: Props) {
                                 id="nama"
                                 name="nama"
                                 value={data.nama}
-                                onChange={(e) => setData('nama', e.target.value)}
+                                readOnly
                                 required
-                                placeholder="Masukkan nama"
-                                className="border-green-200 focus-visible:border-green-500 focus-visible:ring-green-500/20"
+                                className="border-green-200 bg-green-50 text-green-500"
                             />
                             <InputError message={errors.nama} />
                         </div>
@@ -84,7 +88,7 @@ export default function PenimbanganEdit({ penimbangan }: Props) {
                             <Input
                                 id="tanggal"
                                 name="tanggal"
-                                type="date"
+                                type="datetime-local"
                                 value={data.tanggal}
                                 onChange={(e) => setData('tanggal', e.target.value)}
                                 required

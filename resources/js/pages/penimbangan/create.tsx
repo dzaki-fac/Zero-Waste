@@ -1,6 +1,3 @@
-import { useState } from 'react';
-import { Head, Link, useForm } from '@inertiajs/react';
-import { ArrowLeft, Save } from 'lucide-react';
 import Heading from '@/components/heading';
 import InputError from '@/components/input-error';
 import { Button } from '@/components/ui/button';
@@ -13,14 +10,17 @@ import {
     SelectTrigger,
     SelectValue,
 } from '@/components/ui/select';
+import { Head, Link, useForm, usePage } from '@inertiajs/react';
+import { ArrowLeft, Save } from 'lucide-react';
 
 const subAreaOptions = ['Area Baca', 'Area Kantor', 'Area Pertemuan', 'Kamar Kecil'];
 const nonLantaiAreas = ['Area Teras', 'Area Halaman', 'Area Parkir'];
 
 export default function PenimbanganCreate() {
+    const { auth } = usePage().props as { auth: { user: { name: string } } };
     const { data, setData, post, processing, errors } = useForm({
-        nama: '',
-        tanggal: new Date().toISOString().split('T')[0],
+        nama: auth.user.name,
+        tanggal: new Date(Date.now() - new Date().getTimezoneOffset() * 60000).toISOString().slice(0, 16),
         berat_sampah: '',
         area: '',
         sub_area: '',
@@ -60,10 +60,9 @@ export default function PenimbanganCreate() {
                                 id="nama"
                                 name="nama"
                                 value={data.nama}
-                                onChange={(e) => setData('nama', e.target.value)}
+                                readOnly
                                 required
-                                placeholder="Masukkan nama"
-                                className="border-green-200 focus-visible:border-green-500 focus-visible:ring-green-500/20"
+                                className="border-green-200 bg-green-50 text-green-500"
                             />
                             <InputError message={errors.nama} />
                         </div>
@@ -73,7 +72,7 @@ export default function PenimbanganCreate() {
                             <Input
                                 id="tanggal"
                                 name="tanggal"
-                                type="date"
+                                type="datetime-local"
                                 value={data.tanggal}
                                 onChange={(e) => setData('tanggal', e.target.value)}
                                 required

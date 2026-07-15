@@ -11,7 +11,7 @@ return new class extends Migration
         Schema::create('penimbangan', function (Blueprint $table) {
             $table->id();
             $table->string('nama');
-            $table->date('tanggal');
+            $table->dateTime('tanggal');
             $table->decimal('berat_sampah', 10, 2);
             $table->string('area');
             $table->string('sub_area');
