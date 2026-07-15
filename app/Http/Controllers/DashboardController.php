@@ -2,8 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\User;
+use App\Models\Distribusi;
+use App\Models\Penimbangan;
+use App\Models\PilahSampah;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -11,28 +14,31 @@ class DashboardController extends Controller
 {
     public function index(Request $request): Response
     {
-        $totalUsers = User::count();
-        $adminCount = User::where('role', 'admin')->count();
-        $petugasCount = User::where('role', 'petugas')->count();
+        $penimbanganByArea = Penimbangan::select('area', DB::raw('SUM(berat_sampah) as total'))
+            ->groupBy('area')
+            ->pluck('total', 'area')
+            ->map(fn ($total, $area) => ['name' => $area, 'value' => (float) $total])
+            ->values()
+            ->toArray();
 
-        $recentUsers = User::latest()
-            ->take(5)
-            ->get()
-            ->map(fn ($user) => [
-                'id' => $user->id,
-                'name' => $user->name,
-                'email' => $user->email,
-                'role' => $user->role,
-                'created_at' => $user->created_at->diffForHumans(),
-            ]);
+        $pilahByJenis = PilahSampah::select('jenis_sampah', DB::raw('SUM(berat) as total'))
+            ->groupBy('jenis_sampah')
+            ->pluck('total', 'jenis_sampah')
+            ->map(fn ($total, $jenis) => ['name' => $jenis, 'value' => (float) $total])
+            ->values()
+            ->toArray();
+
+        $distribusiByTujuan = Distribusi::select('tujuan_distribusi', DB::raw('SUM(berat) as total'))
+            ->groupBy('tujuan_distribusi')
+            ->pluck('total', 'tujuan_distribusi')
+            ->map(fn ($total, $tujuan) => ['name' => $tujuan, 'value' => (float) $total])
+            ->values()
+            ->toArray();
 
         return Inertia::render('dashboard', [
-            'stats' => [
-                'total_users' => $totalUsers,
-                'total_admin' => $adminCount,
-                'total_petugas' => $petugasCount,
-            ],
-            'recent_users' => $recentUsers,
+            'penimbanganByArea' => $penimbanganByArea,
+            'pilahByJenis' => $pilahByJenis,
+            'distribusiByTujuan' => $distribusiByTujuan,
         ]);
     }
 }
