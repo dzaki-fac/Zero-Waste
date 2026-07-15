@@ -1,5 +1,5 @@
 import { Link, usePage } from '@inertiajs/react';
-import { LayoutDashboard, Recycle, Scale, Truck, Users } from 'lucide-react';
+import { ClipboardCheck, LayoutDashboard, ListTodo, Recycle, Scale, Truck, Users } from 'lucide-react';
 import AppLogo from '@/components/app-logo';
 import { NavMain } from '@/components/nav-main';
 import { NavUser } from '@/components/nav-user';
@@ -35,13 +35,18 @@ const mainNavItems: NavItem[] = [
         href: '/admin/distribusi',
         icon: Truck,
     },
+    {
+        title: 'Checklist Pekerjaan',
+        href: '/admin/checklist-pekerjaan',
+        icon: ClipboardCheck,
+    },
 ];
 
 export function AppSidebar() {
     const { auth } = usePage().props as { auth: Auth };
 
     const navItems: NavItem[] = auth.user.role === 'admin'
-        ? [...mainNavItems, { title: 'Akun', href: '/admin/accounts', icon: Users }]
+        ? [...mainNavItems, { title: 'Kelola Pekerjaan', href: '/admin/kelola-pekerjaan', icon: ListTodo }, { title: 'Akun', href: '/admin/accounts', icon: Users }]
         : mainNavItems;
 
     return (
