@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect, useLayoutEffect, type ReactNode, type CSSProperties } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 import type { LucideIcon } from "lucide-react";
 import {
   Recycle,
@@ -12,48 +13,18 @@ import {
   Workflow,
   ChevronLeft,
   ChevronRight,
-  ChevronDown,
   ArrowRight,
   Image as ImageIcon,
-  Menu,
-  X,
-  Instagram,
-  Youtube,
-  Facebook,
-  Globe,
   Newspaper,
 } from "lucide-react";
-
-// ---- Design tokens -------------------------------------------------------
-const C = {
-  navy900: "#0A1440",
-  navy800: "#101B52",
-  navy700: "#16215A",
-  navy050: "#EEF0F9",
-  gold500: "#D4A72C",
-  leaf500: "#2FA36A",
-  leaf400: "#3FBE80",
-  leaf100: "#E4F0E7",
-  paper50: "#F5F6F8",
-  ink900: "#12142A",
-  ink500: "#5B5F73",
-  line: "#E1E3EC",
-};
-
-const display = { fontFamily: "'DM Sans', sans-serif" };
-const body = { fontFamily: "'DM Sans', sans-serif" };
+import { C, display, body } from "../theme";
+import { NAV_ITEMS, PAGE_ROUTES } from "../navData";
+import Navbar from "../components/Navbar";
+import Footer from "../components/Footer";
 
 // ---- Content data (ganti di sini nanti) -----------------------------
 
-const NAV_ITEMS = [
-  { id: "beranda", label: "Beranda" },
-  { id: "pengertian", label: "Pengertian" },
-  { id: "struktur", label: "Struktur" },
-  { id: "sop", label: "SOP" },
-  { id: "alur", label: "Alur" },
-  { id: "berita", label: "Berita" },
-  { id: "edukasi", label: "Edukasi" },
-];
+
 
 const HERO_SLIDES = [
   {
@@ -223,21 +194,7 @@ const POSTERS = [
 // digeser balik ke awal set (bukan direset ke 0), jadi mulus.
 const NEWS_LOOP = [...NEWS, ...NEWS];
 
-const SOCIALS = [
-  { icon: Instagram, label: "Instagram", handle: "@zerowaste.undip" },
-  { icon: Youtube, label: "YouTube", handle: "Zero Waste UNDIP" },
-  { icon: Facebook, label: "Facebook", handle: "Zero Waste UNDIP" },
-  { icon: Globe, label: "Website Resmi", handle: "digilib.undip.ac.id" },
-];
 
-const FOOTER_QUICKLINKS = [
-  { title: "UPT Perpustakaan", note: "Layanan & katalog perpustakaan pusat" },
-  { title: "UNDIP Press", note: "Penerbitan dan publikasi kampus" },
-  { title: "Portal Akademik", note: "Sistem informasi akademik mahasiswa" },
-  { title: "Lapor Sampah", note: "Formulir pelaporan titik sampah menumpuk" },
-];
-
-const FOOTER_LINKS = ["Tentang", "Kontak", "Kebijakan Privasi", "Bantuan"];
 
 // Durasi autoplay poster edukasi (ms) — dipakai untuk timer & animasi progress bar
 const POSTER_AUTOPLAY_MS = 7000;
@@ -365,54 +322,6 @@ function SafeImage({ src, alt, icon: Icon, gradient, className, style }: { src: 
       style={style}
       onError={() => setFailed(true)}
     />
-  );
-}
-
-function MenuCard({ item, isOpen, onToggle, innerRef }: { item: (typeof MENU_DECK)[number]; isOpen: boolean; onToggle: (id: string) => void; innerRef: (el: HTMLDivElement | null) => void }) {
-  const Icon = item.icon;
-  return (
-    <div ref={innerRef}>
-      <button
-        onClick={() => onToggle(item.id)}
-        className="w-full text-left rounded-2xl p-5 border"
-        style={{
-          backgroundColor: "#fff",
-          borderColor: isOpen ? C.leaf500 : C.line,
-          boxShadow: isOpen
-            ? "0 18px 30px -14px rgba(10,20,64,0.22)"
-            : "0 6px 14px -10px rgba(10,20,64,0.14)",
-          transition: "box-shadow 200ms ease, border-color 200ms ease, transform 200ms ease",
-        }}
-        onMouseEnter={(e) => (e.currentTarget.style.transform = "translateY(-3px)")}
-        onMouseLeave={(e) => (e.currentTarget.style.transform = "translateY(0)")}
-        aria-expanded={isOpen}
-      >
-        <div className="flex items-start justify-between mb-4">
-          <span className="text-[11px] font-semibold tracking-widest" style={{ ...body, color: C.ink500 }}>
-            {item.order}
-          </span>
-          <span
-            className="w-9 h-9 rounded-full flex items-center justify-center"
-            style={{ backgroundColor: C.leaf100 }}
-          >
-            <Icon size={17} color={C.leaf500} strokeWidth={2} />
-          </span>
-        </div>
-        <h3 className="text-lg font-semibold mb-1.5" style={{ ...display, color: C.navy900 }}>
-          {item.title}
-        </h3>
-        <p className="text-sm leading-snug" style={{ ...body, color: C.ink500 }}>
-          {item.teaser}
-        </p>
-        <div className="mt-4 flex items-center gap-1.5 text-xs font-semibold" style={{ ...body, color: C.leaf500 }}>
-          {isOpen ? "Tutup" : "Buka bagian"}
-          <ChevronDown
-            size={14}
-            style={{ transform: isOpen ? "rotate(180deg)" : "rotate(0deg)", transition: "transform 200ms ease" }}
-          />
-        </div>
-      </button>
-    </div>
   );
 }
 
@@ -546,8 +455,6 @@ function PengertianContent() {
 // ---- Main component ---------------------------------------------------
 
 export default function Dashboard() {
-  const [mobileNavOpen, setMobileNavOpen] = useState(false);
-  const [openCard, setOpenCard] = useState<string | null>(null);
   const [heroIndex, setHeroIndex] = useState(0);
   const [posterIndex, setPosterIndex] = useState(0);
   const [posterPaused, setPosterPaused] = useState(false);
@@ -555,20 +462,43 @@ export default function Dashboard() {
   const [activeSection, setActiveSection] = useState("beranda");
   const [scrollY, setScrollY] = useState(0);
 
+  const location = useLocation();
+  const navigate = useNavigate();
+
   const sectionRefs = useRef<Record<string, HTMLElement | null>>({});
   const newsScrollRef = useRef<HTMLDivElement | null>(null);
   const newsTrackRef = useRef<HTMLDivElement | null>(null);
   const newsOffsetRef = useRef(0);
+  const suppressObserverUntilRef = useRef(0);
 
-  // Paksa halaman mulai dari atas waktu pertama kali dibuka/direload, dan
-  // matikan scroll restoration bawaan browser (penyebab utama halaman
-  // "lompat" ke posisi scroll terakhir waktu pertama kali dibuka).
+  const NAV_HEIGHT = 64;
+  const NAV_OFFSET = NAV_HEIGHT + 8;
+  const NAV_OFFSET_TIGHT: Record<string, number> = { berita: NAV_HEIGHT, edukasi: NAV_HEIGHT };
+
   useLayoutEffect(() => {
     if (typeof window !== "undefined" && "scrollRestoration" in window.history) {
       window.history.scrollRestoration = "manual";
     }
-    window.scrollTo(0, 0);
+    const scrollToId = (location.state as { scrollTo?: string })?.scrollTo;
+    if (scrollToId) {
+      const el = sectionRefs.current[scrollToId];
+      if (el) {
+        const offset = NAV_OFFSET_TIGHT[scrollToId] ?? NAV_OFFSET;
+        const top = el.getBoundingClientRect().top + window.scrollY - offset;
+        window.scrollTo({ top, behavior: "instant" });
+      }
+      setActiveSection(scrollToId);
+    }
   }, []);
+
+  // Bersihkan scrollTo state setelah browser paint, supaya tidak ke-trigger
+  // ulang saat user navigasi lain / refresh.
+  useEffect(() => {
+    const scrollToId = (location.state as { scrollTo?: string })?.scrollTo;
+    if (scrollToId) {
+      navigate(location.pathname, { replace: true, state: {} });
+    }
+  }, [location.state]);
 
   useEffect(() => {
     const t = setInterval(() => {
@@ -617,8 +547,6 @@ export default function Dashboard() {
     return () => cancelAnimationFrame(raf);
   }, [newsPaused]);
 
-  const suppressObserverUntilRef = useRef(0);
-
   useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => {
@@ -642,28 +570,15 @@ export default function Dashboard() {
     return () => observer.disconnect();
   }, []);
 
-  const NAV_HEIGHT = 64;
-  const NAV_OFFSET = NAV_HEIGHT + 8;
-  const NAV_OFFSET_TIGHT: Record<string, number> = { berita: NAV_HEIGHT, edukasi: NAV_HEIGHT };
-
   const scrollTo = (id: string) => {
-    setMobileNavOpen(false);
-    setActiveSection(id); 
-    suppressObserverUntilRef.current = Date.now() + 900; 
+    setActiveSection(id);
+    suppressObserverUntilRef.current = Date.now() + 900;
     const el = sectionRefs.current[id];
     if (el) {
       const offset = NAV_OFFSET_TIGHT[id] ?? NAV_OFFSET;
       const top = el.getBoundingClientRect().top + window.scrollY - offset;
       window.scrollTo({ top, behavior: "smooth" });
     }
-  };
-
-  const toggleCard = (id: string) => {
-    setOpenCard((prev) => (prev === id ? null : id));
-    setTimeout(() => {
-      const el = sectionRefs.current[id + "-panel"];
-      if (el) el.scrollIntoView({ behavior: "smooth", block: "center" });
-    }, 60);
   };
 
   const nextHero = () => setHeroIndex((i) => (i + 1) % HERO_SLIDES.length);
@@ -693,7 +608,6 @@ export default function Dashboard() {
   return (
     <div style={{ ...body, backgroundColor: C.paper50, color: C.ink900 }} className="min-h-screen">
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;0,9..40,800;1,9..40,400;1,9..40,500&display=swap');
         html { scroll-behavior: smooth; }
         .news-scroll::-webkit-scrollbar { display: none; }
         .news-scroll { scroll-behavior: auto !important; }
@@ -704,63 +618,7 @@ export default function Dashboard() {
       `}</style>
 
       {/* ---- Nav ---- */}
-      <header className="sticky top-0 z-40 border-b" style={{ backgroundColor: C.navy900, borderColor: C.navy700 }}>
-        <div className="w-full pl-5 sm:pl-8 pr-5 sm:pr-8 h-16 flex items-center justify-between">
-          <div className="flex items-center gap-2.5">
-            <img
-              src="/images/undip-logo.png"
-              alt="UNDIP"
-              className="w-10 h-11 rounded-md object-contain shrink-0"
-            />
-            <div style={display} className="leading-tight">
-              <div className="text-[10px] font-semibold tracking-wide" style={{ color: C.gold500 }}>UNIVERSITAS DIPONEGORO</div>
-              <div className="text-white text-[11px] tracking-wide">
-                UPT PERPUSTAKAAN DAN UNDIP PRESS
-              </div>
-            </div>
-          </div>
-
-          <nav className="hidden md:flex items-center gap-1">
-            {NAV_ITEMS.map((n) => {
-              const active = activeSection === n.id;
-              return (
-                <button
-                  key={n.id}
-                  onClick={() => scrollTo(n.id)}
-                  className="relative px-3.5 py-2 rounded-full text-sm font-medium transition-colors"
-                  style={{ color: active ? "#fff" : "#D9DCEE", backgroundColor: active ? C.navy700 : "transparent" }}
-                  onMouseEnter={(e) => { if (!active) e.currentTarget.style.backgroundColor = C.navy700; }}
-                  onMouseLeave={(e) => { if (!active) e.currentTarget.style.backgroundColor = "transparent"; }}
-                >
-                  {n.label}
-                  <span
-                    className="absolute left-3.5 right-3.5 -bottom-[1px] h-[2px] rounded-full"
-                    style={{
-                      backgroundColor: C.leaf400,
-                      transform: active ? "scaleX(1)" : "scaleX(0)",
-                      transition: "transform 220ms ease",
-                    }}
-                  />
-                </button>
-              );
-            })}
-          </nav>
-
-          <button className="md:hidden text-white" onClick={() => setMobileNavOpen((v) => !v)} aria-label="Buka menu">
-            {mobileNavOpen ? <X size={22} /> : <Menu size={22} />}
-          </button>
-        </div>
-
-        {mobileNavOpen && (
-          <div className="md:hidden px-5 pb-4 flex flex-col gap-1" style={{ backgroundColor: C.navy900 }}>
-            {NAV_ITEMS.map((n) => (
-              <button key={n.id} onClick={() => scrollTo(n.id)} className="text-left px-3 py-2.5 rounded-lg text-sm font-medium" style={{ color: activeSection === n.id ? "#fff" : "#D9DCEE", backgroundColor: activeSection === n.id ? C.navy700 : "transparent" }}>
-                {n.label}
-              </button>
-            ))}
-          </div>
-        )}
-      </header>
+      <Navbar activeSection={activeSection} onNavItemClick={scrollTo} />
 
       {/* ---- Hero ---- */}
       <section id="beranda" ref={setSectionRef("beranda")}>
@@ -849,7 +707,7 @@ export default function Dashboard() {
 
       {/* ---- Bagian-bagian: Pengertian, Struktur Organisasi, SOP, Alur ---- */}
         <section className="max-w-6xl mx-auto px-5 sm:px-8 pt-16 sm:pt-20 pb-16">
-          {MENU_DECK.map((item, i) => (
+          {MENU_DECK.filter((item) => !PAGE_ROUTES[item.id]).map((item, i) => (
             <div
               key={item.id}
               id={item.id}
@@ -1054,67 +912,7 @@ export default function Dashboard() {
       </section>
 
       {/* ---- Footer ---- */}
-      <footer style={{ backgroundColor: C.navy900 }}>
-        <div className="max-w-6xl mx-auto px-5 sm:px-8 pt-14 sm:pt-16 pb-8">
-
-          <div className="mb-10">
-            <div className="text-xs font-semibold uppercase tracking-widest mb-4" style={{ ...body, color: "#8A8FB3" }}>
-              Tautan Cepat
-            </div>
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-              {FOOTER_QUICKLINKS.map((q, i) => (
-                <button
-                  key={i}
-                  className="text-left rounded-xl p-4 border"
-                  style={{ backgroundColor: C.navy800, borderColor: C.navy700, transition: "border-color 200ms ease" }}
-                  onMouseEnter={(e) => (e.currentTarget.style.borderColor = C.leaf500)}
-                  onMouseLeave={(e) => (e.currentTarget.style.borderColor = C.navy700)}
-                >
-                  <div className="text-sm font-semibold text-white mb-1" style={display}>{q.title}</div>
-                  <div className="text-xs leading-snug" style={{ color: "#8A8FB3" }}>{q.note}</div>
-                </button>
-              ))}
-            </div>
-          </div>
-
-          <div className="mb-10">
-            <div className="text-xs font-semibold uppercase tracking-widest mb-4" style={{ ...body, color: "#8A8FB3" }}>
-              Media &amp; Kanal Resmi
-            </div>
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-              {SOCIALS.map((s, i) => {
-                const SIcon = s.icon;
-                return (
-                  <button
-                    key={i}
-                    className="flex items-center gap-3 rounded-xl p-4 border"
-                    style={{ backgroundColor: C.navy800, borderColor: C.navy700 }}
-                  >
-                    <span className="w-9 h-9 rounded-full flex items-center justify-center shrink-0" style={{ backgroundColor: C.navy700 }}>
-                      <SIcon size={16} color={C.leaf400} />
-                    </span>
-                    <span className="text-left">
-                      <div className="text-xs font-semibold text-white">{s.label}</div>
-                      <div className="text-[11px]" style={{ color: "#8A8FB3" }}>{s.handle}</div>
-                    </span>
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pt-6 border-t" style={{ borderColor: C.navy700 }}>
-            <div className="flex flex-wrap gap-x-6 gap-y-2">
-              {FOOTER_LINKS.map((l, i) => (
-                <span key={i} className="text-xs" style={{ color: "#9FA4C4" }}>{l}</span>
-              ))}
-            </div>
-            <span className="text-[11px]" style={{ color: "#6E7396" }}>
-              © 2026 UPT Perpustakaan Universitas Diponegoro. Semua hak dilindungi.
-            </span>
-          </div>
-        </div>
-      </footer>
+      <Footer />
     </div>
   );
 }
