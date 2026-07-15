@@ -24,12 +24,18 @@ class PenimbanganController extends Controller
         return Inertia::render('penimbangan/create');
     }
 
-    public function store(PenimbanganRequest $request): RedirectResponse
+    public function store(PenimbanganRequest $request): RedirectResponse|Response
     {
-        Penimbangan::create([
+        $penimbangan = Penimbangan::create([
             ...$request->validated(),
             'nama' => $request->user()->name,
         ]);
+
+        if ($request->input('_redirect') === '/form') {
+            return Inertia::render('form/penimbangan', [
+                'submitted' => $penimbangan->toArray(),
+            ]);
+        }
 
         return to_route('penimbangan.index');
     }
