@@ -3,8 +3,12 @@ import InputError from '@/components/input-error';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Head, Link, useForm, usePage } from '@inertiajs/react';
-import { ArrowLeft, Save, MapPin, Calendar, Weight, User } from 'lucide-react';
+import { Head, Link, router, useForm, usePage } from '@inertiajs/react';
+import { ArrowLeft, Send, MapPin, Calendar, Weight, User, CheckCircle2 } from 'lucide-react';
+import {
+    Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle,
+} from '@/components/ui/dialog';
+import { useEffect, useState } from 'react';
 
 const areaOptions = [
     { value: 'Lantai 1', label: 'Lantai 1', icon: '1' },
@@ -26,8 +30,12 @@ const subAreaByLantai: Record<string, string[]> = {
 };
 
 export default function FormPenimbangan() {
-    const { auth } = usePage().props as { auth: { user: { name: string } } };
+    const { auth, submitted } = usePage().props as {
+        auth: { user: { name: string } };
+        submitted: Record<string, string | number | null> | null;
+    };
     const { data, setData, post, processing, errors } = useForm({
+        _redirect: '/form',
         nama: auth.user.name,
         tanggal: new Date(Date.now() - new Date().getTimezoneOffset() * 60000).toISOString().slice(0, 16),
         berat_sampah: '',
@@ -45,6 +53,12 @@ export default function FormPenimbangan() {
             setData('sub_area', '');
         }
     };
+
+    const [showSuccess, setShowSuccess] = useState(false);
+
+    useEffect(() => {
+        if (submitted) setShowSuccess(true);
+    }, [submitted]);
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
@@ -150,9 +164,10 @@ export default function FormPenimbangan() {
                                         required
                                         placeholder="0.00"
                                         inputMode="decimal"
-                                        className="h-12 border-green-200 ps-8 text-lg"
+                                        onWheel={(e) => e.currentTarget.blur()}
+                                        className="h-12 border-green-200 pe-8 text-lg [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
                                     />
-                                    <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-sm font-medium text-green-600">kg</span>
+                                    <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-sm font-medium text-green-600">kg</span>
                                 </div>
                                 <InputError message={errors.berat_sampah} />
                             </div>
@@ -251,12 +266,56 @@ export default function FormPenimbangan() {
                             onClick={handleSubmit}
                             className="flex-1 bg-green-600 text-sm hover:bg-green-700 active:bg-green-800"
                         >
-                            <Save className="h-4 w-4" />
-                            {processing ? 'Menyimpan...' : 'Simpan'}
+                            <Send className="h-4 w-4" />
+                            {processing ? 'Mengirim...' : 'Kirim'}
                         </Button>
                     </div>
                 </div>
             </div>
+
+            <Dialog open={showSuccess} onOpenChange={setShowSuccess}>
+                <DialogContent className="sm:max-w-sm">
+                    <DialogHeader>
+                        <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-green-100">
+                            <CheckCircle2 className="h-6 w-6 text-green-600" />
+                        </div>
+                        <DialogTitle className="text-center text-green-800">Data Berhasil Disimpan</DialogTitle>
+                        <DialogDescription className="text-center">
+                            oleh <span className="font-medium text-green-700">{submitted?.nama}</span>
+                        </DialogDescription>
+                    </DialogHeader>
+
+                    <div className="divide-y divide-green-100 rounded-lg border border-green-100 bg-green-50/50">
+                        <div className="flex items-center justify-between px-4 py-2.5 text-sm">
+                            <span className="text-gray-500">Tanggal</span>
+                            <span className="font-medium text-gray-800">
+                                {submitted?.tanggal
+                                    ? new Date(submitted.tanggal as string).toLocaleString('id-ID', {
+                                        year: 'numeric', month: 'long', day: 'numeric',
+                                        hour: '2-digit', minute: '2-digit',
+                                    })
+                                    : '-'}
+                            </span>
+                        </div>
+                        <div className="flex items-center justify-between px-4 py-2.5 text-sm">
+                            <span className="text-gray-500">Berat Sampah</span>
+                            <span className="font-medium text-gray-800">{String(submitted?.berat_sampah ?? '-')} kg</span>
+                        </div>
+                        <div className="flex items-center justify-between px-4 py-2.5 text-sm">
+                            <span className="text-gray-500">Area</span>
+                            <span className="font-medium text-gray-800">{String(submitted?.area ?? '-')}</span>
+                        </div>
+                        <div className="flex items-center justify-between px-4 py-2.5 text-sm">
+                            <span className="text-gray-500">Sub Area</span>
+                            <span className="font-medium text-gray-800">{String(submitted?.sub_area ?? '-')}</span>
+                        </div>
+                    </div>
+
+                    <Button onClick={() => router.visit('/form')} className="w-full bg-green-600 hover:bg-green-700">
+                        Tutup
+                    </Button>
+                </DialogContent>
+            </Dialog>
         </>
     );
 }
