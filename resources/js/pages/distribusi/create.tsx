@@ -26,7 +26,7 @@ export default function DistribusiCreate() {
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        post('/distribusi');
+        post('/admin/distribusi');
     };
 
     return (
@@ -144,7 +144,7 @@ export default function DistribusiCreate() {
                                 Simpan
                             </Button>
                             <Button variant="outline" asChild className="border-green-200 text-green-700 hover:bg-green-50">
-                                <Link href="/distribusi" className="flex items-center gap-1">
+                                <Link href="/admin/distribusi" className="flex items-center gap-1">
                                     <ArrowLeft className="h-4 w-4" />
                                     Batal
                                 </Link>

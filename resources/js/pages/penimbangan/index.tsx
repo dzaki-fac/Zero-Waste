@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Head, Link, router } from '@inertiajs/react';
-import { Leaf, Plus, Trash2, Pencil, Search } from 'lucide-react';
+import { CalendarDays, FileDown, Leaf, Plus, Trash2, Pencil, Search } from 'lucide-react';
 import Heading from '@/components/heading';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -35,21 +35,100 @@ type Props = {
 
 const areaOptions = ['Lantai 1', 'Lantai 2', 'Lantai 3', 'Lantai 4', 'Area Teras', 'Area Halaman', 'Area Parkir'];
 
+const months = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
+const currentYear = new Date().getFullYear();
+const years = Array.from({ length: 11 }, (_, i) => currentYear - i);
+
 export default function PenimbanganIndex({ penimbangan }: Props) {
     const [search, setSearch] = useState('');
     const [filterArea, setFilterArea] = useState('all');
+    const [filterPeriod, setFilterPeriod] = useState('all');
+    const [customStartDate, setCustomStartDate] = useState('');
+    const [customEndDate, setCustomEndDate] = useState('');
+    const [weekRange, setWeekRange] = useState('7');
+    const [selectedMonth, setSelectedMonth] = useState(String(new Date().getMonth() + 1));
+    const [selectedYear, setSelectedYear] = useState(String(new Date().getFullYear()));
+
+    const matchesDate = (tanggal: string) => {
+        if (filterPeriod === 'all') return true;
+        const date = new Date(tanggal);
+        const now = new Date();
+        const startOfDay = (d: Date) => new Date(d.getFullYear(), d.getMonth(), d.getDate());
+
+        switch (filterPeriod) {
+            case 'harian': {
+                const start = startOfDay(now);
+                const end = new Date(start);
+                end.setDate(end.getDate() + 1);
+                return date >= start && date < end;
+            }
+            case 'mingguan': {
+                const days = Number(weekRange);
+                const start = startOfDay(now);
+                start.setDate(start.getDate() - (days - 1));
+                const end = new Date(startOfDay(now));
+                end.setDate(end.getDate() + 1);
+                return date >= start && date < end;
+            }
+            case 'bulanan': {
+                const start = new Date(Number(selectedYear), Number(selectedMonth) - 1, 1);
+                const end = new Date(Number(selectedYear), Number(selectedMonth), 1);
+                return date >= start && date < end;
+            }
+            case 'tahunan': {
+                const start = new Date(Number(selectedYear), 0, 1);
+                const end = new Date(Number(selectedYear) + 1, 0, 1);
+                return date >= start && date < end;
+            }
+            case 'custom': {
+                if (customStartDate && customEndDate) {
+                    const start = new Date(customStartDate);
+                    const end = new Date(customEndDate);
+                    end.setDate(end.getDate() + 1);
+                    return date >= start && date < end;
+                }
+                return true;
+            }
+            default:
+                return true;
+        }
+    };
 
     const filtered = penimbangan.filter((item) => {
         const matchSearch = item.nama.toLowerCase().includes(search.toLowerCase());
         const matchArea = filterArea === 'all' || item.area === filterArea;
-        return matchSearch && matchArea;
+        const matchDate = matchesDate(item.tanggal);
+        return matchSearch && matchArea && matchDate;
     });
+
+    const totalWeight = filtered.reduce((sum, item) => sum + Number(item.berat_sampah), 0);
 
     const isEmpty = penimbangan.length === 0;
 
+    const exportCSV = () => {
+        const cell = (v: any) => `"${String(v).replace(/"/g, '""')}"`;
+        const headers = ['No', 'Nama', 'Tanggal', 'Berat (kg)', 'Area', 'Sub Area'];
+        const rows = filtered.map((item, index) => [
+            cell(index + 1),
+            cell(item.nama),
+            cell(new Date(item.tanggal).toLocaleString('id-ID')),
+            cell(item.berat_sampah),
+            cell(item.area),
+            cell(item.sub_area),
+        ]);
+        const csv = [headers.map(cell).join(','), ...rows.map(r => r.join(','))].join('\n');
+        const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'penimbangan.csv';
+        a.click();
+        URL.revokeObjectURL(url);
+    };
+
     const handleDelete = (id: number) => {
         if (confirm('Yakin ingin menghapus data ini?')) {
-            router.delete(`/penimbangan/${id}`);
+            router.delete(`/admin/penimbangan/${id}`);
         }
     };
 
@@ -64,12 +143,26 @@ export default function PenimbanganIndex({ penimbangan }: Props) {
                         description="Daftar data penimbangan sampah"
                     />
 
-                    <Button asChild className="bg-green-600 hover:bg-green-700">
-                        <Link href="/penimbangan/create" className="flex items-center gap-2">
-                            <Plus className="h-4 w-4" />
-                            Tambah Baru
-                        </Link>
-                    </Button>
+                    <div className="flex items-center gap-2">
+                        <Button onClick={exportCSV} variant="outline" className="border-green-200 text-green-700 hover:bg-green-50">
+                            <FileDown className="h-4 w-4" />
+                            Export CSV
+                        </Button>
+                        <Button asChild className="bg-green-600 hover:bg-green-700">
+                            <Link href="/admin/penimbangan/create" className="flex items-center gap-2">
+                                <Plus className="h-4 w-4" />
+                                Tambah Baru
+                            </Link>
+                        </Button>
+                    </div>
+                </div>
+
+                <div className="rounded-xl border border-green-200 bg-gradient-to-br from-green-50 to-white p-4 shadow-sm">
+                    <div className="text-sm font-medium text-green-600">Total Berat Sampah</div>
+                    <div className="mt-1 text-2xl font-bold text-green-900">
+                        {totalWeight.toLocaleString('id-ID', { minimumFractionDigits: 2 })}
+                        <span className="ml-1 text-sm font-medium text-green-500">kg</span>
+                    </div>
                 </div>
 
                 {isEmpty ? (
@@ -84,7 +177,7 @@ export default function PenimbanganIndex({ penimbangan }: Props) {
                             Mulai catat data penimbangan sampah untuk membantu pengelolaan lingkungan yang lebih baik.
                         </p>
                         <Button asChild className="mt-6 bg-green-600 hover:bg-green-700">
-                            <Link href="/penimbangan/create" className="flex items-center gap-2">
+                            <Link href="/admin/penimbangan/create" className="flex items-center gap-2">
                                 <Plus className="h-4 w-4" />
                                 Tambah Penimbangan
                             </Link>
@@ -114,6 +207,113 @@ export default function PenimbanganIndex({ penimbangan }: Props) {
                                 </SelectContent>
                             </Select>
                         </div>
+
+                        <div className="flex flex-wrap items-center gap-3">
+                            <span className="text-sm font-medium text-green-700">Periode</span>
+                            <Select value={filterPeriod} onValueChange={setFilterPeriod}>
+                                <SelectTrigger className="w-full sm:w-[180px] border-green-200 focus-visible:border-green-500 focus-visible:ring-green-500/20">
+                                    <SelectValue placeholder="Semua Waktu" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="all">Semua Waktu</SelectItem>
+                                    <SelectItem value="harian">Harian</SelectItem>
+                                    <SelectItem value="mingguan">Mingguan</SelectItem>
+                                    <SelectItem value="bulanan">Bulanan</SelectItem>
+                                    <SelectItem value="tahunan">Tahunan</SelectItem>
+                                    <SelectItem value="custom">Custom Date</SelectItem>
+                                </SelectContent>
+                            </Select>
+                            {filterPeriod === 'mingguan' && (
+                                <Select value={weekRange} onValueChange={setWeekRange}>
+                                    <SelectTrigger className="w-full sm:w-[180px] border-green-200 focus-visible:border-green-500 focus-visible:ring-green-500/20">
+                                        <SelectValue placeholder="7 Hari Terakhir" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value="7">7 Hari Terakhir</SelectItem>
+                                        <SelectItem value="14">14 Hari Terakhir</SelectItem>
+                                    </SelectContent>
+                                </Select>
+                            )}
+                            {filterPeriod === 'bulanan' && (
+                                <>
+                                    <Select value={selectedMonth} onValueChange={setSelectedMonth}>
+                                        <SelectTrigger className="w-full sm:w-[140px] border-green-200 focus-visible:border-green-500 focus-visible:ring-green-500/20">
+                                            <SelectValue placeholder="Bulan" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            {months.map((m, i) => (
+                                                <SelectItem key={i + 1} value={String(i + 1)}>{m}</SelectItem>
+                                            ))}
+                                        </SelectContent>
+                                    </Select>
+                                    <Select value={selectedYear} onValueChange={setSelectedYear}>
+                                        <SelectTrigger className="w-full sm:w-[120px] border-green-200 focus-visible:border-green-500 focus-visible:ring-green-500/20">
+                                            <SelectValue placeholder="Tahun" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            {years.map((y) => (
+                                                <SelectItem key={y} value={String(y)}>{y}</SelectItem>
+                                            ))}
+                                        </SelectContent>
+                                    </Select>
+                                </>
+                            )}
+                            {filterPeriod === 'tahunan' && (
+                                <Select value={selectedYear} onValueChange={setSelectedYear}>
+                                    <SelectTrigger className="w-full sm:w-[120px] border-green-200 focus-visible:border-green-500 focus-visible:ring-green-500/20">
+                                        <SelectValue placeholder="Tahun" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        {years.map((y) => (
+                                            <SelectItem key={y} value={String(y)}>{y}</SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
+                            )}
+                        </div>
+                        {filterPeriod === 'custom' && (
+                            <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
+                                <div className="relative">
+                                    <CalendarDays
+                                        className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 cursor-pointer text-green-400"
+                                        onClick={(e) => {
+                                            const input = (e.currentTarget.parentElement as HTMLElement).querySelector<HTMLInputElement>('input[type="date"]')
+                                            input?.showPicker?.()
+                                            input?.focus()
+                                        }}
+                                    />
+                                    <Input
+                                        type="date"
+                                        value={customStartDate}
+                                        onChange={(e) => setCustomStartDate(e.target.value)}
+                                        onKeyDown={(e) => {
+                                            if (e.key !== 'Tab') e.preventDefault()
+                                        }}
+                                        className="w-full sm:w-[180px] pl-9 border-green-200 focus-visible:border-green-500 focus-visible:ring-green-500/20"
+                                    />
+                                </div>
+                                <span className="hidden text-sm text-green-400 sm:inline">—</span>
+                                <div className="relative">
+                                    <CalendarDays
+                                        className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 cursor-pointer text-green-400"
+                                        onClick={(e) => {
+                                            const input = (e.currentTarget.parentElement as HTMLElement).querySelector<HTMLInputElement>('input[type="date"]')
+                                            input?.showPicker?.()
+                                            input?.focus()
+                                        }}
+                                    />
+                                    <Input
+                                        type="date"
+                                        value={customEndDate}
+                                        onChange={(e) => setCustomEndDate(e.target.value)}
+                                        onKeyDown={(e) => {
+                                            if (e.key !== 'Tab') e.preventDefault()
+                                        }}
+                                        className="w-full sm:w-[180px] pl-9 border-green-200 focus-visible:border-green-500 focus-visible:ring-green-500/20"
+                                    />
+                                </div>
+                            </div>
+                        )}
 
                         <div className="rounded-xl border border-green-200 bg-white shadow-sm">
                             <Table>
@@ -153,7 +353,7 @@ export default function PenimbanganIndex({ penimbangan }: Props) {
                                                 <TableCell className="text-right">
                                                     <div className="flex justify-end gap-2">
                                                         <Button variant="outline" size="sm" asChild className="border-green-200 text-green-700 hover:bg-green-50 hover:text-green-800">
-                                                            <Link href={`/penimbangan/${item.id}/edit`} className="flex items-center gap-1">
+                                                            <Link href={`/admin/penimbangan/${item.id}/edit`} className="flex items-center gap-1">
                                                                 <Pencil className="h-3.5 w-3.5" />
                                                                 Edit
                                                             </Link>
