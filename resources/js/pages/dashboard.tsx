@@ -1,9 +1,9 @@
 import { Head, router, usePage } from '@inertiajs/react';
-import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid } from 'recharts';
+import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from 'recharts';
 import type { PieLabelRenderProps } from 'recharts';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Scale, Recycle, Truck, Users, Calendar, ArrowDownRight } from 'lucide-react';
+import { Scale, Recycle, Truck, Users, Calendar, Clock, Package, CheckCircle } from 'lucide-react';
 import { useState } from 'react';
 
 type ChartData = {
@@ -59,21 +59,6 @@ function CustomTooltip({ active, payload }: { active?: boolean; payload?: Array<
         return (
             <div className="rounded-lg border bg-white px-3 py-2 shadow-md">
                 <p className="text-sm font-medium text-gray-900">{data.name}</p>
-                <p className="text-xs text-gray-600">
-                    {data.value.toLocaleString('id-ID', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} kg
-                </p>
-            </div>
-        );
-    }
-    return null;
-}
-
-function BarTooltip({ active, payload }: { active?: boolean; payload?: Array<{ name: string; value: number; payload: { label: string } }> }) {
-    if (active && payload && payload.length) {
-        const data = payload[0];
-        return (
-            <div className="rounded-lg border bg-white px-3 py-2 shadow-md">
-                <p className="text-sm font-medium text-gray-900">{data.payload.label}</p>
                 <p className="text-xs text-gray-600">
                     {data.value.toLocaleString('id-ID', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} kg
                 </p>
@@ -302,6 +287,91 @@ export default function Dashboard() {
                     </div>
                 </div>
 
+                <Card className="border-green-200">
+                    <CardHeader className="pb-2">
+                        <CardTitle className="flex items-center gap-2 text-base text-green-900">
+                            <Package className="size-5 text-green-600" />
+                            Status Berat Sampah
+                        </CardTitle>
+                        <p className="text-xs text-green-600/70">
+                            Alur berat sampah dari penimbangan hingga distribusi
+                        </p>
+                    </CardHeader>
+                    <CardContent>
+                        {(() => {
+                            const STATUS_COLORS = ['#ef4444', '#f59e0b', '#22c55e'];
+                            const STATUS_ICONS = [Clock, Package, CheckCircle];
+                            const chartData = [
+                                { key: 'belum_dipilah', name: 'Belum Dipilah', value: statusBerat.belum_dipilah },
+                                { key: 'belum_didistribusikan', name: 'Belum Didistribusikan', value: statusBerat.belum_didistribusikan },
+                                { key: 'sudah_didistribusikan', name: 'Sudah Didistribusikan', value: statusBerat.sudah_didistribusikan },
+                            ];
+                            const total = chartData.reduce((s, d) => s + d.value, 0);
+
+                            return (
+                                <div className="flex flex-col items-center gap-6 md:flex-row md:items-start">
+                                    <div className="relative h-[240px] w-[240px] shrink-0">
+                                        <ResponsiveContainer width="100%" height="100%">
+                                            <PieChart>
+                                                <Pie
+                                                    data={chartData}
+                                                    cx="50%"
+                                                    cy="50%"
+                                                    innerRadius={65}
+                                                    outerRadius={105}
+                                                    paddingAngle={3}
+                                                    dataKey="value"
+                                                    stroke="none"
+                                                >
+                                                    {chartData.map((_, index) => (
+                                                        <Cell key={`cell-${index}`} fill={STATUS_COLORS[index]} />
+                                                    ))}
+                                                </Pie>
+                                                <Tooltip content={<CustomTooltip />} />
+                                            </PieChart>
+                                        </ResponsiveContainer>
+                                        <div className="absolute inset-0 flex flex-col items-center justify-center">
+                                            <p className="text-2xl font-bold tabular-nums text-gray-900">
+                                                {total.toLocaleString('id-ID', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                                            </p>
+                                            <p className="text-xs text-gray-500">kg total</p>
+                                        </div>
+                                    </div>
+
+                                    <div className="flex w-full flex-col gap-3">
+                                        {chartData.map((item, index) => {
+                                            const pct = total > 0 ? (item.value / total) * 100 : 0;
+                                            const Icon = STATUS_ICONS[index];
+                                            return (
+                                                <div key={item.key} className="flex items-center gap-3 rounded-lg border border-gray-100 bg-gray-50 p-3">
+                                                    <div className="flex size-9 shrink-0 items-center justify-center rounded-lg" style={{ backgroundColor: `${STATUS_COLORS[index]}15` }}>
+                                                        <Icon className="size-4" style={{ color: STATUS_COLORS[index] }} />
+                                                    </div>
+                                                    <div className="min-w-0 flex-1">
+                                                        <p className="text-xs font-medium text-gray-700">{item.name}</p>
+                                                        <div className="mt-1 h-1.5 w-full overflow-hidden rounded-full bg-gray-200">
+                                                            <div
+                                                                className="h-full rounded-full transition-all"
+                                                                style={{ width: `${pct}%`, backgroundColor: STATUS_COLORS[index] }}
+                                                            />
+                                                        </div>
+                                                    </div>
+                                                    <div className="shrink-0 text-right">
+                                                        <p className="text-sm font-bold tabular-nums text-gray-900">
+                                                            {item.value.toLocaleString('id-ID', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                                                        </p>
+                                                        <p className="text-[10px] text-gray-500">kg &middot; {pct.toFixed(1)}%</p>
+                                                    </div>
+                                                </div>
+                                            );
+                                        })}
+                                    </div>
+                                </div>
+                            );
+                        })()}
+                    </CardContent>
+                </Card>
+
                 <div className="grid gap-4 lg:grid-cols-3">
                     <PieChartCard
                         title="Penimbangan per Area"
@@ -322,83 +392,6 @@ export default function Dashboard() {
                         totalLabel="Total berat didistribusikan"
                     />
                 </div>
-
-                <Card className="border-green-200">
-                    <CardHeader className="pb-2">
-                        <CardTitle className="flex items-center gap-2 text-base text-green-900">
-                            <ArrowDownRight className="size-5 text-green-600" />
-                            Status Berat Sampah
-                        </CardTitle>
-                        <p className="text-xs text-green-600/70">
-                            Alur berat sampah dari penimbangan hingga distribusi
-                        </p>
-                    </CardHeader>
-                    <CardContent>
-                        {(() => {
-                            const chartData = [
-                                {
-                                    key: 'belum_dipilah',
-                                    label: 'Belum Dipilah',
-                                    name: 'Belum Dipilah',
-                                    value: statusBerat.belum_dipilah,
-                                    fill: '#ef4444',
-                                },
-                                {
-                                    key: 'belum_didistribusikan',
-                                    label: 'Belum Didistribusikan',
-                                    name: 'Belum Didistribusikan',
-                                    value: statusBerat.belum_didistribusikan,
-                                    fill: '#f59e0b',
-                                },
-                                {
-                                    key: 'sudah_didistribusikan',
-                                    label: 'Sudah Didistribusikan',
-                                    name: 'Sudah Didistribusikan',
-                                    value: statusBerat.sudah_didistribusikan,
-                                    fill: '#22c55e',
-                                },
-                            ];
-                            const total = chartData.reduce((s, d) => s + d.value, 0);
-
-                            return (
-                                <>
-                                    <div className="h-[220px]">
-                                        <ResponsiveContainer width="100%" height="100%">
-                                            <BarChart data={chartData} layout="vertical" margin={{ left: 10, right: 30 }}>
-                                                <CartesianGrid strokeDasharray="3 3" horizontal={false} />
-                                                <XAxis type="number" tick={{ fontSize: 11 }} tickFormatter={(v: number) => `${v.toLocaleString('id-ID', { maximumFractionDigits: 0 })}`} />
-                                                <YAxis type="category" dataKey="name" width={150} tick={{ fontSize: 11 }} />
-                                                <Tooltip content={<BarTooltip />} />
-                                                <Bar dataKey="value" radius={[0, 6, 6, 0]} barSize={32}>
-                                                    {chartData.map((entry) => (
-                                                        <Cell key={entry.key} fill={entry.fill} />
-                                                    ))}
-                                                </Bar>
-                                            </BarChart>
-                                        </ResponsiveContainer>
-                                    </div>
-                                    <div className="mt-3 grid grid-cols-3 gap-3">
-                                        {chartData.map((item) => {
-                                            const pct = total > 0 ? (item.value / total) * 100 : 0;
-                                            return (
-                                                <div key={item.key} className="rounded-lg border border-gray-100 bg-gray-50 p-3 text-center">
-                                                    <div className="mb-1 flex items-center justify-center gap-1.5">
-                                                        <span className="size-2.5 rounded-full" style={{ backgroundColor: item.fill }} />
-                                                        <span className="text-xs font-medium text-gray-700">{item.label}</span>
-                                                    </div>
-                                                    <p className="text-lg font-bold tabular-nums text-gray-900">
-                                                        {item.value.toLocaleString('id-ID', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                                                    </p>
-                                                    <p className="text-[10px] text-gray-500">kg &middot; {pct.toFixed(1)}%</p>
-                                                </div>
-                                            );
-                                        })}
-                                    </div>
-                                </>
-                            );
-                        })()}
-                    </CardContent>
-                </Card>
 
                 <Card className="border-green-200">
                     <CardHeader className="pb-2">
