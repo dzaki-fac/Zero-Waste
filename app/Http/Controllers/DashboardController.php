@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Distribusi;
 use App\Models\Penimbangan;
 use App\Models\PilahSampah;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
@@ -35,10 +36,43 @@ class DashboardController extends Controller
             ->values()
             ->toArray();
 
+        $petugasStats = User::where('role', 'petugas')
+            ->get()
+            ->map(function ($user) {
+                $penimbangan = Penimbangan::where('nama', $user->name)
+                    ->selectRaw('COUNT(*) as jumlah, COALESCE(SUM(berat_sampah), 0) as total_berat')
+                    ->first();
+
+                $pilah = PilahSampah::where('nama', $user->name)
+                    ->selectRaw('COUNT(*) as jumlah, COALESCE(SUM(berat), 0) as total_berat')
+                    ->first();
+
+                $distribusi = Distribusi::where('nama', $user->name)
+                    ->selectRaw('COUNT(*) as jumlah, COALESCE(SUM(berat), 0) as total_berat')
+                    ->first();
+
+                return [
+                    'name' => $user->name,
+                    'penimbangan' => [
+                        'jumlah' => (int) $penimbangan->jumlah,
+                        'total_berat' => (float) $penimbangan->total_berat,
+                    ],
+                    'pilah_sampah' => [
+                        'jumlah' => (int) $pilah->jumlah,
+                        'total_berat' => (float) $pilah->total_berat,
+                    ],
+                    'distribusi' => [
+                        'jumlah' => (int) $distribusi->jumlah,
+                        'total_berat' => (float) $distribusi->total_berat,
+                    ],
+                ];
+            });
+
         return Inertia::render('dashboard', [
             'penimbanganByArea' => $penimbanganByArea,
             'pilahByJenis' => $pilahByJenis,
             'distribusiByTujuan' => $distribusiByTujuan,
+            'petugasStats' => $petugasStats,
         ]);
     }
 }
