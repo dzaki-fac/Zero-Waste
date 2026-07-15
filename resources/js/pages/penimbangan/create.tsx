@@ -13,8 +13,12 @@ import {
 import { Head, Link, useForm, usePage } from '@inertiajs/react';
 import { ArrowLeft, Save } from 'lucide-react';
 
-const subAreaOptions = ['Area Baca', 'Area Kantor', 'Area Pertemuan', 'Kamar Kecil'];
-const nonLantaiAreas = ['Area Teras', 'Area Halaman', 'Area Parkir'];
+const subAreaMap: Record<string, string[]> = {
+    'Lantai 1': ['Area Baca', 'Kamar Kecil'],
+    'Lantai 2': ['Area Baca', 'Kamar Kecil'],
+    'Lantai 3': ['Area Baca', 'Kamar Kecil'],
+    'Lantai 4': ['Area Pertemuan', 'Area Kantor', 'Kamar Kecil'],
+};
 
 export default function PenimbanganCreate() {
     const { auth } = usePage().props as { auth: { user: { name: string } } };
@@ -26,15 +30,11 @@ export default function PenimbanganCreate() {
         sub_area: '',
     });
 
-    const isLantai = !nonLantaiAreas.includes(data.area);
+    const subAreaOptions = subAreaMap[data.area] ?? null;
 
     const handleAreaChange = (value: string) => {
         setData('area', value);
-        if (!['Lantai 1', 'Lantai 2', 'Lantai 3', 'Lantai 4'].includes(value)) {
-            setData('sub_area', '-');
-        } else {
-            setData('sub_area', '');
-        }
+        setData('sub_area', '');
     };
 
     const handleSubmit = (e: React.FormEvent) => {
@@ -119,7 +119,7 @@ export default function PenimbanganCreate() {
 
                         <div className="grid gap-2">
                             <Label htmlFor="sub_area" className="text-green-700">Sub Area</Label>
-                            {isLantai ? (
+                            {subAreaOptions ? (
                                 <Select name="sub_area" value={data.sub_area} onValueChange={(v) => setData('sub_area', v)}>
                                     <SelectTrigger className="w-full border-green-200 focus-visible:border-green-500 focus-visible:ring-green-500/20">
                                         <SelectValue placeholder="Pilih sub area" />
@@ -134,9 +134,10 @@ export default function PenimbanganCreate() {
                                 <Input
                                     id="sub_area"
                                     name="sub_area"
-                                    value="-"
+                                    value=""
                                     disabled
-                                    className="border-green-200 bg-green-50 text-green-500"
+                                    placeholder="Sub area tidak tersedia"
+                                    className="border-green-200 bg-green-50 text-green-500 placeholder:text-green-500"
                                 />
                             )}
                             <InputError message={errors.sub_area} />

@@ -26,7 +26,12 @@ type Props = {
     penimbangan: Penimbangan;
 };
 
-const subAreaOptions = ['Area Baca', 'Area Kantor', 'Area Pertemuan', 'Kamar Kecil'];
+const subAreaMap: Record<string, string[]> = {
+    'Lantai 1': ['Area Baca', 'Kamar Kecil'],
+    'Lantai 2': ['Area Baca', 'Kamar Kecil'],
+    'Lantai 3': ['Area Baca', 'Kamar Kecil'],
+    'Lantai 4': ['Area Pertemuan', 'Area Kantor', 'Kamar Kecil'],
+};
 
 export default function PenimbanganEdit({ penimbangan }: Props) {
     const initialTanggal = (() => {
@@ -34,23 +39,23 @@ export default function PenimbanganEdit({ penimbangan }: Props) {
         return new Date(d.getTime() - d.getTimezoneOffset() * 60000).toISOString().slice(0, 16);
     })();
 
+    const initialSubArea = subAreaMap[penimbangan.area]?.includes(penimbangan.sub_area)
+        ? penimbangan.sub_area
+        : '';
+
     const { data, setData, put, processing, errors } = useForm({
         nama: penimbangan.nama,
         tanggal: initialTanggal,
         berat_sampah: penimbangan.berat_sampah,
         area: penimbangan.area,
-        sub_area: penimbangan.sub_area,
+        sub_area: initialSubArea,
     });
 
-    const isLantai = ['Lantai 1', 'Lantai 2', 'Lantai 3', 'Lantai 4'].includes(data.area);
+    const subAreaOptions = subAreaMap[data.area] ?? null;
 
     const handleAreaChange = (value: string) => {
         setData('area', value);
-        if (!['Lantai 1', 'Lantai 2', 'Lantai 3', 'Lantai 4'].includes(value)) {
-            setData('sub_area', '-');
-        } else if (!subAreaOptions.includes(data.sub_area)) {
-            setData('sub_area', '');
-        }
+        setData('sub_area', '');
     };
 
     const handleSubmit = (e: React.FormEvent) => {
@@ -135,7 +140,7 @@ export default function PenimbanganEdit({ penimbangan }: Props) {
 
                         <div className="grid gap-2">
                             <Label htmlFor="sub_area" className="text-green-700">Sub Area</Label>
-                            {isLantai ? (
+                            {subAreaOptions ? (
                                 <Select name="sub_area" value={data.sub_area} onValueChange={(v) => setData('sub_area', v)}>
                                     <SelectTrigger className="w-full border-green-200 focus-visible:border-green-500 focus-visible:ring-green-500/20">
                                         <SelectValue placeholder="Pilih sub area" />
@@ -150,9 +155,10 @@ export default function PenimbanganEdit({ penimbangan }: Props) {
                                 <Input
                                     id="sub_area"
                                     name="sub_area"
-                                    value="-"
+                                    value=""
                                     disabled
-                                    className="border-green-200 bg-green-50 text-green-500"
+                                    placeholder="Sub area tidak tersedia"
+                                    className="border-green-200 bg-green-50 text-green-500 placeholder:text-green-500"
                                 />
                             )}
                             <InputError message={errors.sub_area} />

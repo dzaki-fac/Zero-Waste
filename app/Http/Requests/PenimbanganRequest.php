@@ -18,7 +18,7 @@ class PenimbanganRequest extends FormRequest
             'tanggal' => ['required', 'date'],
             'berat_sampah' => ['required', 'numeric', 'min:0'],
             'area' => ['required', 'in:Lantai 1,Lantai 2,Lantai 3,Lantai 4,Area Teras,Area Halaman,Area Parkir'],
-            'sub_area' => ['required', 'string', 'max:255'],
+            'sub_area' => ['nullable', 'string', 'max:255'],
         ];
     }
 }

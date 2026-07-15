@@ -12,7 +12,7 @@ class PenimbanganSeeder extends Seeder
     {
         $names = User::pluck('name')->toArray();
         $areas = ['Lantai 1', 'Lantai 2', 'Lantai 3', 'Lantai 4', 'Area Teras', 'Area Halaman', 'Area Parkir'];
-        $subAreas = ['Area Baca', 'Area Kantor', 'Area Pertemuan', 'Kamar Kecil'];
+        $subAreas = ['Area Pertemuan', 'Area Kantor', 'Kamar Kecil'];
 
         $raw = [];
         for ($i = 0; $i < 20; $i++) {
@@ -30,7 +30,7 @@ class PenimbanganSeeder extends Seeder
                 'tanggal' => fake()->dateTimeBetween('-3 months', 'now'),
                 'berat_sampah' => $weights[$i],
                 'area' => $area,
-                'sub_area' => str_starts_with($area, 'Lantai') ? fake()->randomElement($subAreas) : '-',
+                'sub_area' => $area === 'Lantai 4' ? fake()->randomElement($subAreas) : null,
             ]);
         }
     }
