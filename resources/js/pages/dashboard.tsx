@@ -3,8 +3,8 @@ import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from 'recharts';
 import type { PieLabelRenderProps } from 'recharts';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Scale, Recycle, Truck, Users, Calendar, Clock, Package, CheckCircle } from 'lucide-react';
-import { useState } from 'react';
+import { Scale, Recycle, Truck, Users, CalendarIcon, Clock, Package, CheckCircle, ChevronLeft, ChevronRight } from 'lucide-react';
+import { useState, useRef, useEffect } from 'react';
 
 type ChartData = {
     name: string;
@@ -185,10 +185,173 @@ function formatDateInput(d: Date): string {
     return d.toISOString().split('T')[0];
 }
 
+function formatDisplayDate(dateStr: string): string {
+    const d = new Date(dateStr + 'T00:00:00');
+    const dd = String(d.getDate()).padStart(2, '0');
+    const mm = String(d.getMonth() + 1).padStart(2, '0');
+    const yyyy = d.getFullYear();
+    return `${dd}/${mm}/${yyyy}`;
+}
+
+const MONTH_NAMES = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
+
 function daysAgo(n: number): string {
     const d = new Date();
     d.setDate(d.getDate() - n);
     return formatDateInput(d);
+}
+
+function getDaysInMonth(year: number, month: number): number {
+    return new Date(year, month + 1, 0).getDate();
+}
+
+function SimpleDatePicker({ value, onChange, placeholder }: { value: string; onChange: (v: string) => void; placeholder?: string }) {
+    const [open, setOpen] = useState(false);
+    const ref = useRef<HTMLDivElement>(null);
+    const initial = value ? new Date(value + 'T00:00:00') : new Date();
+    const [viewMonth, setViewMonth] = useState(initial.getMonth());
+    const [viewYear, setViewYear] = useState(initial.getFullYear());
+    const [inputValue, setInputValue] = useState(value ? formatDisplayDate(value) : '');
+    const [typing, setTyping] = useState(false);
+
+    useEffect(() => {
+        if (!typing) {
+            setInputValue(value ? formatDisplayDate(value) : '');
+        }
+    }, [value, typing]);
+
+    useEffect(() => {
+        function handleClick(e: MouseEvent) {
+            if (ref.current && !ref.current.contains(e.target as Node)) {
+                setOpen(false);
+                setTyping(false);
+                setInputValue(value ? formatDisplayDate(value) : '');
+            }
+        }
+        document.addEventListener('mousedown', handleClick);
+        return () => document.removeEventListener('mousedown', handleClick);
+    }, [value]);
+
+    useEffect(() => {
+        if (open && value) {
+            const d = new Date(value + 'T00:00:00');
+            setViewMonth(d.getMonth());
+            setViewYear(d.getFullYear());
+        }
+    }, [open, value]);
+
+    const daysInMonth = getDaysInMonth(viewYear, viewMonth);
+    const firstDay = new Date(viewYear, viewMonth, 1).getDay();
+    const days: (number | null)[] = [
+        ...Array(firstDay).fill(null),
+        ...Array.from({ length: daysInMonth }, (_, i) => i + 1),
+    ];
+
+    const WEEK_DAYS = ['Min', 'Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab'];
+
+    function prevMonth() {
+        if (viewMonth === 0) { setViewMonth(11); setViewYear(viewYear - 1); }
+        else setViewMonth(viewMonth - 1);
+    }
+
+    function nextMonth() {
+        if (viewMonth === 11) { setViewMonth(0); setViewYear(viewYear + 1); }
+        else setViewMonth(viewMonth + 1);
+    }
+
+    function selectDay(day: number) {
+        const mm = String(viewMonth + 1).padStart(2, '0');
+        const dd = String(day).padStart(2, '0');
+        const result = `${viewYear}-${mm}-${dd}`;
+        onChange(result);
+        setInputValue(formatDisplayDate(result));
+        setTyping(false);
+        setOpen(false);
+    }
+
+    function parseTypedInput(raw: string): string | null {
+        const cleaned = raw.trim().replace(/[/\.]/g, '-');
+        const mdy = cleaned.match(/^(\d{1,2})-(\d{1,2})-(\d{4})$/);
+        if (mdy) {
+            const d = new Date(Number(mdy[3]), Number(mdy[2]) - 1, Number(mdy[1]));
+            if (!isNaN(d.getTime())) return formatDateInput(d);
+        }
+        const iso = cleaned.match(/^(\d{4})-(\d{1,2})-(\d{1,2})$/);
+        if (iso) {
+            const d = new Date(Number(iso[1]), Number(iso[2]) - 1, Number(iso[3]));
+            if (!isNaN(d.getTime())) return formatDateInput(d);
+        }
+        return null;
+    }
+
+    function commitTypedValue() {
+        const parsed = parseTypedInput(inputValue);
+        if (parsed) {
+            onChange(parsed);
+            setInputValue(formatDisplayDate(parsed));
+        } else {
+            setInputValue(value ? formatDisplayDate(value) : '');
+        }
+        setTyping(false);
+    }
+
+    return (
+        <div ref={ref} className="relative">
+            <input
+                type="text"
+                value={typing ? inputValue : (value ? formatDisplayDate(value) : '')}
+                placeholder={placeholder ?? 'tt/bb/tttt'}
+                onFocus={() => { setOpen(true); setTyping(true); setInputValue(value ? formatDisplayDate(value) : ''); }}
+                onChange={(e) => { setInputValue(e.target.value); setTyping(true); }}
+                onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); commitTypedValue(); setOpen(false); } if (e.key === 'Escape') { setInputValue(value ? formatDisplayDate(value) : ''); setTyping(false); setOpen(false); } }}
+                onBlur={() => { if (typing) commitTypedValue(); }}
+                className="w-[130px] border-0 bg-transparent text-xs text-gray-700 outline-none hover:text-gray-900 cursor-text placeholder:text-gray-400"
+            />
+            {open && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40" onMouseDown={(e) => { if (e.target === e.currentTarget) { commitTypedValue(); setOpen(false); } }}>
+                    <div className="w-full max-w-sm rounded-xl border border-gray-200 bg-white p-5 shadow-2xl">
+                        <div className="mb-4 flex items-center justify-between">
+                            <button type="button" onClick={prevMonth} className="rounded-lg p-2 hover:bg-gray-100">
+                                <ChevronLeft className="size-5" />
+                            </button>
+                            <span className="text-base font-semibold text-gray-800">
+                                {MONTH_NAMES[viewMonth]} {viewYear}
+                            </span>
+                            <button type="button" onClick={nextMonth} className="rounded-lg p-2 hover:bg-gray-100">
+                                <ChevronRight className="size-5" />
+                            </button>
+                        </div>
+                        <div className="grid grid-cols-7 gap-1">
+                            {WEEK_DAYS.map((d) => (
+                                <div key={d} className="py-2 text-center text-xs font-medium text-gray-400">{d}</div>
+                            ))}
+                            {days.map((day, i) =>
+                                day === null ? <div key={`e${i}`} /> : (
+                                    <button
+                                        type="button"
+                                        key={day}
+                                        onClick={() => selectDay(day)}
+                                        className={`h-10 rounded-lg text-sm font-medium transition-colors ${
+                                            value === `${viewYear}-${String(viewMonth + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`
+                                                ? 'bg-green-600 text-white shadow'
+                                                : 'hover:bg-green-50 text-gray-700'
+                                        }`}
+                                    >
+                                        {day}
+                                    </button>
+                                )
+                            )}
+                        </div>
+                        <div className="mt-4 flex justify-center">
+                            <button type="button" onClick={() => { commitTypedValue(); setOpen(false); }} className="rounded-lg bg-gray-100 px-4 py-2 text-xs font-medium text-gray-600 hover:bg-gray-200">
+                                Tutup
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+        </div>
+    );
 }
 
 export default function Dashboard() {
@@ -261,20 +424,10 @@ export default function Dashboard() {
                             ))}
                         </div>
                         <div className="flex items-center gap-1.5 rounded-lg border border-green-200 bg-white px-2 py-1">
-                            <Calendar className="size-3.5 text-gray-400" />
-                            <input
-                                type="date"
-                                value={startDate}
-                                onChange={(e) => setStartDate(e.target.value)}
-                                className="w-[130px] border-0 bg-transparent text-xs text-gray-700 outline-none [&::-webkit-calendar-picker-indicator]:hidden"
-                            />
+                            <CalendarIcon className="size-3.5 text-gray-400" />
+                            <SimpleDatePicker value={startDate} onChange={setStartDate} placeholder="tt/bb/tttt" />
                             <span className="text-xs text-gray-400">&ndash;</span>
-                            <input
-                                type="date"
-                                value={endDate}
-                                onChange={(e) => setEndDate(e.target.value)}
-                                className="w-[130px] border-0 bg-transparent text-xs text-gray-700 outline-none [&::-webkit-calendar-picker-indicator]:hidden"
-                            />
+                            <SimpleDatePicker value={endDate} onChange={setEndDate} placeholder="tt/bb/tttt" />
                             <Button
                                 variant="ghost"
                                 size="sm"
