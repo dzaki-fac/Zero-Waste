@@ -61,7 +61,7 @@ const HERO_SLIDES = [
     title: "Menuju kampus tanpa sampah tersisa",
     desc: "Satu sistem untuk memahami, menjalankan, dan memantau pengelolaan sampah kampus — dari pemilahan di tiap sub-area sampai distribusi akhirnya.",
     image:
-      "https://images.unsplash.com/photo-1521587760476-6c12a4b040da?auto=format&fit=crop&w=1600&q=80",
+      "https://images.unsplash.com/photo-1521587760476-6c12a4b040da?auto=format&fit=crop&w=900&q=80",
     icon: Recycle,
   },
   {
@@ -110,7 +110,7 @@ const MENU_DECK = [
     id: "struktur",
     order: "02",
     icon: Users,
-    title: "Struktur Organisasi",
+    title: "Organisasi",
     teaser: "Siapa yang menjalankan program ini di tiap unit.",
     placeholder:
       "Taruh di sini: bagan struktur organisasi, penanggung jawab per unit/lantai, dan kontak masing-masing.",
@@ -235,8 +235,6 @@ const FOOTER_QUICKLINKS = [
 const FOOTER_LINKS = ["Tentang", "Kontak", "Kebijakan Privasi", "Bantuan"];
 
 // ---- Interaction hooks -------------------------------------------------
-// Hook ini yang bikin section "muncul" pelan-pelan waktu discroll ke layar,
-// gaya yang sama dipakai di situs-situs korporat seperti Petronas.
 function useInView(threshold = 0.18) {
   const ref = useRef<HTMLDivElement | null>(null);
   const [inView, setInView] = useState(false);
@@ -288,7 +286,6 @@ function Reveal({
   );
 }
 
-// Angka statistik "menghitung naik" begitu hero tampil pertama kali.
 function useCountUp(target: number, active: boolean, duration = 1400) {
   const [value, setValue] = useState(0);
   useEffect(() => {
@@ -429,6 +426,72 @@ function PlaceholderPanel({ item }: { item: (typeof MENU_DECK)[number] }) {
   );
 }
 
+// ---- Pengertian: 3 kartu bergambar, hover-reveal ----------------------------------
+
+const PENGERTIAN_ITEMS = [
+  {
+    key: "definisi",
+    icon: Info,
+    title: "Definisi",
+    shortDesc:
+      "Meminimalkan dampak sampah terhadap lingkungan, bukan sekadar daur ulang — mengutamakan perbaikan, pemakaian ulang, dan bahan berkelanjutan.",
+    image:
+      "https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?auto=format&fit=crop&w=700&q=80",
+  },
+  {
+    key: "tujuan",
+    icon: Scale,
+    title: "Tujuan",
+    shortDesc:
+      "Menekan sampah yang berakhir di TPA lewat kebiasaan reduce, reuse, dan recycle di seluruh unit.",
+    image:
+      "https://images.unsplash.com/photo-1532996122724-e3c354a0b15b?auto=format&fit=crop&w=700&q=80",
+  },
+  {
+    key: "ruang-lingkup",
+    icon: MapPin,
+    title: "Ruang Lingkup",
+    shortDesc: "Lantai 1-4, teras, halaman, parkir, hingga UNDIP Press.",
+    image:
+      "https://images.unsplash.com/photo-1497366811353-6870744d04b2?auto=format&fit=crop&w=700&q=80",
+  },
+];
+
+function PengertianContent() {
+  return (
+    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+      {PENGERTIAN_ITEMS.map((it) => {
+        const Icon = it.icon;
+        return (
+          <div key={it.key} className="relative rounded-2xl overflow-hidden" style={{ aspectRatio: "4 / 5" }}>
+            <SafeImage
+              src={it.image}
+              alt={it.title}
+              icon={Icon}
+              gradient={`linear-gradient(160deg, ${C.navy700}, ${C.navy900})`}
+              className="absolute inset-0 w-full h-full object-cover"
+            />
+            <div
+              className="absolute left-0 right-0 bottom-0 flex flex-col justify-center p-5"
+              style={{
+                height: "48%",
+                background: "linear-gradient(160deg, rgba(16,27,82,0.95), rgba(47,163,106,0.9))",
+              }}
+            >
+              <div className="text-white text-lg font-semibold mb-1.5" style={display}>
+                {it.title}
+              </div>
+              <p className="text-xs leading-relaxed" style={{ color: "rgba(255,255,255,0.9)" }}>
+                {it.shortDesc}
+              </p>
+            </div>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
 // ---- Main component ---------------------------------------------------
 
 export default function Dashboard() {
@@ -449,14 +512,12 @@ export default function Dashboard() {
     return () => clearInterval(t);
   }, []);
 
-  // Efek parallax lembut untuk gambar hero mengikuti scroll (khas situs korporat).
   useEffect(() => {
     const onScroll = () => setScrollY(window.scrollY);
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  // Scroll-spy: nav akan menyorot section yang sedang aktif di layar.
   useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => {
@@ -511,7 +572,6 @@ export default function Dashboard() {
     sectionRefs.current[key] = el;
   };
 
-  // parallax dibatasi supaya gambar tidak "lepas" dari bingkainya
   const heroParallax = Math.min(scrollY * 0.18, 120);
 
   return (
@@ -527,7 +587,7 @@ export default function Dashboard() {
 
       {/* ---- Nav ---- */}
       <header className="sticky top-0 z-40 border-b" style={{ backgroundColor: C.navy900, borderColor: C.navy700 }}>
-        <div className="max-w-6xl mx-auto pl-0 pr-5 sm:pr-8 h-16 flex items-center justify-between">
+        <div className="w-full pl-5 sm:pl-8 pr-5 sm:pr-8 h-16 flex items-center justify-between">
           <div className="flex items-center gap-2.5">
             <img
               src="/images/undip-logo.png"
@@ -585,18 +645,13 @@ export default function Dashboard() {
       </header>
 
       {/* ---- Hero ---- */}
-      {/* Tinggi hero dibuat 100dvh (tinggi layar penuh) supaya gambar mengisi
-          seluruh viewport dulu, dan bagian putih baru muncul setelah user scroll. */}
       <section id="beranda" ref={setSectionRef("beranda")}>
         <div className="relative w-full overflow-hidden" style={{ height: "100dvh", minHeight: 560 }}>
           {HERO_SLIDES.map((s, i) => (
             <div
               key={i}
               className="absolute inset-0"
-              style={{
-                opacity: i === heroIndex ? 1 : 0,
-                transition: "opacity 900ms ease",
-              }}
+              style={{ opacity: i === heroIndex ? 1 : 0, transition: "opacity 900ms ease" }}
             >
               <SafeImage
                 src={s.image}
@@ -605,7 +660,6 @@ export default function Dashboard() {
                 gradient={`linear-gradient(135deg, ${C.navy900}, ${C.navy700})`}
                 className="w-full h-full object-cover"
                 style={{
-                  // sedikit "scale up" + parallax mengikuti scroll, khas hero interaktif
                   transform: `translateY(${heroParallax}px) scale(1.08)`,
                   transition: "transform 100ms linear",
                 }}
@@ -656,7 +710,6 @@ export default function Dashboard() {
             </div>
           </div>
 
-          {/* indikator scroll, isyarat visual bahwa masih ada konten di bawah */}
           <div
             className="absolute bottom-24 sm:bottom-28 right-5 sm:right-8 hidden sm:flex flex-col items-center gap-2"
             style={{ opacity: scrollY > 40 ? 0 : 1, transition: "opacity 300ms ease" }}
@@ -684,42 +737,21 @@ export default function Dashboard() {
         </div>
       </section>
 
-      {/* ---- Menu deck ---- */}
-      <section className="max-w-6xl mx-auto px-5 sm:px-8 pt-16 sm:pt-20 pb-4">
-        <Reveal>
-          <SectionLabel>Pusat Informasi</SectionLabel>
-          <div className="flex items-end justify-between flex-wrap gap-3 mb-8">
-            <h2 className="text-2xl sm:text-3xl font-semibold" style={{ ...display, color: C.navy900 }}>
-              Buka setiap bagiannya
-            </h2>
-            <p className="text-sm max-w-sm" style={{ color: C.ink500 }}>
-              Klik salah satu kartu untuk membuka ruang konten — panduan lengkapnya bisa ditambahkan langsung di ruang tersebut.
-            </p>
-          </div>
-        </Reveal>
-
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-5 sm:gap-6">
+      {/* ---- Bagian-bagian: Pengertian, Organisasi, SOP, Alur ---- */}
+        <section className="max-w-6xl mx-auto px-5 sm:px-8 pt-16 sm:pt-20 pb-16">
           {MENU_DECK.map((item, i) => (
-            <Reveal key={item.id} delay={i * 90}>
-              <MenuCard
-                item={item}
-                isOpen={openCard === item.id}
-                onToggle={toggleCard}
-                innerRef={setSectionRef(item.id)}
-              />
-            </Reveal>
+            <div key={item.id} ref={setSectionRef(item.id)} className={i > 0 ? "mt-16" : ""}>
+              <Reveal>
+                <h2 className="text-2xl sm:text-3xl font-semibold mb-6" style={{ ...display, color: C.navy900 }}>
+                  {item.title}
+                </h2>
+              </Reveal>
+              <Reveal delay={80}>
+                {item.id === "pengertian" ? <PengertianContent /> : <PlaceholderPanel item={item} />}
+              </Reveal>
+            </div>
           ))}
-        </div>
-
-        {MENU_DECK.map(
-          (item) =>
-            openCard === item.id && (
-              <div key={item.id + "-panel"} ref={setSectionRef(item.id + "-panel")}>
-                <PlaceholderPanel item={item} />
-              </div>
-            )
-        )}
-      </section>
+        </section>
 
       {/* ---- Berita ---- */}
       <section id="berita" ref={setSectionRef("berita")} className="pt-16 sm:pt-20" style={{ backgroundColor: C.navy900 }}>
@@ -846,10 +878,7 @@ export default function Dashboard() {
                   key={i}
                   onClick={() => setPosterIndex(i)}
                   className="shrink-0 w-20 h-16 rounded-lg overflow-hidden relative"
-                  style={{
-                    outline: i === posterIndex ? `2px solid ${C.leaf500}` : "none",
-                    outlineOffset: "2px",
-                  }}
+                  style={{ outline: i === posterIndex ? `2px solid ${C.leaf500}` : "none", outlineOffset: "2px" }}
                 >
                   <SafeImage
                     src={p.image}
