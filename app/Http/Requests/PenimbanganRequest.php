@@ -2,22 +2,21 @@
 
 namespace App\Http\Requests;
 
+use App\Helpers\OptionHelper;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class PenimbanganRequest extends FormRequest
 {
-    /**
-     * Get the validation rules that apply to the request.
-     *
-     * @return array<string, mixed>
-     */
     public function rules(): array
     {
+        $areaValues = collect(OptionHelper::get('area'))->pluck('value')->toArray();
+
         return [
             'nama' => ['required', 'string', 'max:255'],
             'tanggal' => ['required', 'date'],
             'berat_sampah' => ['required', 'numeric', 'min:0'],
-            'area' => ['required', 'in:Lantai 1,Lantai 2,Lantai 3,Lantai 4,Area Teras,Area Halaman,Area Parkir'],
+            'area' => ['required', Rule::in($areaValues)],
             'sub_area' => ['nullable', 'string', 'max:255'],
         ];
     }

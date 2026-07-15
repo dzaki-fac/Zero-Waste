@@ -10,17 +10,21 @@ import {
 } from '@/components/ui/dialog';
 import { useEffect, useState } from 'react';
 
-const jenisSampahOptions = [
-    'Daun', 'Ranting besar', 'Ranting kecil', 'Sisa makanan',
-    'Plastik berwarna', 'Plastik putih', 'Styrofoam', 'Botol',
-    'Kardus dan Kertas', 'B3', 'Lainnya',
-];
+type Options = {
+    area: Array<{ value: string; label: string; icon: string }>;
+    sub_area: Record<string, string[]>;
+    jenis_sampah: string[];
+    tujuan_distribusi: string[];
+};
 
 export default function FormPilahSampah() {
-    const { auth, submitted } = usePage().props as {
+    const { auth, submitted, options } = usePage().props as unknown as {
         auth: { user: { name: string } };
         submitted: Record<string, unknown> | null;
+        options: Options;
     };
+
+    const jenisSampahOptions = options.jenis_sampah;
     const { data, setData, post, processing, errors } = useForm({
         _redirect: '/form',
         nama: auth.user.name,
@@ -64,7 +68,7 @@ export default function FormPilahSampah() {
         <>
             <Head title="Tambah Pilah Sampah" />
 
-            <div className="mx-auto flex min-h-dvh w-full max-w-lg flex-col bg-gradient-to-b from-green-50/50 to-white">
+            <div className="mx-auto flex min-h-dvh w-full max-w-lg flex-col bg-linear-to-b from-green-50/50 to-white">
                 <div className="flex-1 px-4 pb-36 pt-6">
                     <Heading
                         title="Tambah Pilah Sampah"
