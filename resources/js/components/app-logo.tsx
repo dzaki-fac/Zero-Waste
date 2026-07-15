@@ -5,11 +5,11 @@ const appName = import.meta.env.VITE_APP_NAME || 'Zero Waste';
 export default function AppLogo() {
     return (
         <>
-            <div className="flex aspect-square size-8 items-center justify-center rounded-md bg-sidebar-primary text-sidebar-primary-foreground">
-                <AppLogoIcon className="size-5 fill-current text-white" />
+            <div className="flex aspect-square size-9 items-center justify-center rounded-xl bg-sidebar-primary text-sidebar-primary-foreground shadow-sm">
+                <AppLogoIcon className="size-5 fill-current" />
             </div>
-            <div className="ml-1 grid flex-1 text-left text-sm">
-                <span className="mb-0.5 truncate leading-tight font-semibold">
+            <div className="ml-2 grid flex-1 text-left text-sm">
+                <span className="truncate leading-tight font-semibold tracking-tight">
                     {appName}
                 </span>
             </div>

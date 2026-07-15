@@ -12,7 +12,7 @@ export default function Welcome() {
         <>
             <Head title="Welcome" />
 
-            <div className="relative flex min-h-screen flex-col items-center justify-center bg-gradient-to-b from-green-50 to-white p-6">
+            <div className="relative flex min-h-screen flex-col items-center justify-center bg-linear-to-b from-green-50 to-white p-6">
                 <div className="absolute right-6 top-6 flex items-center gap-3">
                     {auth.user ? (
                         <>

@@ -10,9 +10,9 @@ use Illuminate\Support\Facades\Route;
 Route::inertia('/form', 'welcome')->name('home');
 
 Route::middleware(['auth'])->group(function () {
-    Route::resource('penimbangan', PenimbanganController::class);
-    Route::resource('pilah-sampah', PilahSampahController::class);
-    Route::resource('distribusi', DistribusiController::class);
+    Route::resource('admin/penimbangan', PenimbanganController::class)->names('penimbangan');
+    Route::resource('admin/pilah-sampah', PilahSampahController::class)->names('pilah-sampah');
+    Route::resource('admin/distribusi', DistribusiController::class)->names('distribusi');
 
     Route::inertia('form/penimbangan', 'form/penimbangan')->name('form.penimbangan');
     Route::inertia('form/pilah-sampah', 'form/pilah-sampah')->name('form.pilah-sampah');

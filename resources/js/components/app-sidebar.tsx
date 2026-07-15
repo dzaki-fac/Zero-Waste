@@ -1,5 +1,5 @@
 import { Link, usePage } from '@inertiajs/react';
-import { LayoutDashboard, Leaf, Users } from 'lucide-react';
+import { LayoutDashboard, Recycle, Scale, Truck, Users } from 'lucide-react';
 import AppLogo from '@/components/app-logo';
 import { NavMain } from '@/components/nav-main';
 import { NavUser } from '@/components/nav-user';
@@ -22,18 +22,18 @@ const mainNavItems: NavItem[] = [
     },
     {
         title: 'Penimbangan',
-        href: '/penimbangan',
-        icon: Leaf,
+        href: '/admin/penimbangan',
+        icon: Scale,
     },
     {
         title: 'Pilah Sampah',
-        href: '/pilah-sampah',
-        icon: Leaf,
+        href: '/admin/pilah-sampah',
+        icon: Recycle,
     },
     {
         title: 'Distribusi',
-        href: '/distribusi',
-        icon: Leaf,
+        href: '/admin/distribusi',
+        icon: Truck,
     },
 ];
 
@@ -45,7 +45,7 @@ export function AppSidebar() {
         : mainNavItems;
 
     return (
-        <Sidebar collapsible="icon" variant="inset">
+        <Sidebar collapsible="icon">
             <SidebarHeader>
                 <SidebarMenu>
                     <SidebarMenuItem>
