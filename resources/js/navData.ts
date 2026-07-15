@@ -4,6 +4,7 @@ export const NAV_ITEMS = [
   { id: "struktur", label: "Struktur" },
   { id: "sop", label: "SOP" },
   { id: "alur", label: "Alur" },
+  { id: "laporan", label: "Laporan" },
   { id: "berita", label: "Berita" },
   { id: "edukasi", label: "Edukasi" },
 ];

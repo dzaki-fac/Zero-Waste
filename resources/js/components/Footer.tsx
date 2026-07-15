@@ -1,5 +1,13 @@
-import { Instagram, Youtube, Facebook, Globe } from "lucide-react";
+import { Instagram, Youtube, Globe } from "lucide-react";
 import { C, body, display } from "../theme";
+
+function TiktokIcon({ size = 16, color = "currentColor" }: { size?: number; color?: string }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M9 12a4 4 0 1 0 4 4V4a5 5 0 0 0 5 5" />
+    </svg>
+  );
+}
 
 const FOOTER_QUICKLINKS = [
   { title: "UPT Perpustakaan", note: "Layanan & katalog perpustakaan pusat" },
@@ -9,10 +17,10 @@ const FOOTER_QUICKLINKS = [
 ];
 
 const SOCIALS = [
-  { icon: Instagram, label: "Instagram", handle: "@zerowaste.undip" },
-  { icon: Youtube, label: "YouTube", handle: "Zero Waste UNDIP" },
-  { icon: Facebook, label: "Facebook", handle: "Zero Waste UNDIP" },
-  { icon: Globe, label: "Website Resmi", handle: "digilib.undip.ac.id" },
+  { icon: Globe, label: "Website Resmi", handle: "digilib.undip.ac.id", href: "https://digilib.undip.ac.id/" },
+  { icon: Youtube, label: "YouTube", handle: "@perpustakaanundip", href: "https://youtube.com/@perpustakaanundip?si=RgDQgwp-UlPD7ryq" },
+  { icon: Instagram, label: "Instagram", handle: "@perpus.undip", href: "https://www.instagram.com/perpus.undip?igsh=MTh4bXFtd3AzbmRmdQ==" },
+  { icon: TiktokIcon, label: "TikTok", handle: "@perpus.undip.press", href: "https://www.tiktok.com/@perpus.undip.press?_r=1&_t=ZS-97okoKr4q4S" },
 ];
 
 const FOOTER_LINKS = ["Tentang", "Kontak", "Kebijakan Privasi", "Bantuan"];
@@ -50,8 +58,11 @@ export default function Footer() {
             {SOCIALS.map((s, i) => {
               const SIcon = s.icon;
               return (
-                <button
+                <a
                   key={i}
+                  href={s.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
                   className="flex items-center gap-3 rounded-xl p-4 border"
                   style={{ backgroundColor: C.navy800, borderColor: C.navy700 }}
                 >
@@ -62,7 +73,7 @@ export default function Footer() {
                     <div className="text-xs font-semibold text-white">{s.label}</div>
                     <div className="text-[11px]" style={{ color: "#8A8FB3" }}>{s.handle}</div>
                   </span>
-                </button>
+                </a>
               );
             })}
           </div>

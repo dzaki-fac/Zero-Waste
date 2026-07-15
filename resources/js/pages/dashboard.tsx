@@ -5,26 +5,35 @@ import {
   Recycle,
   Leaf,
   Layers,
-  Scale,
   MapPin,
-  Info,
-  Users,
   ClipboardList,
   Workflow,
+  BarChart3,
   ChevronLeft,
   ChevronRight,
   ArrowRight,
   Image as ImageIcon,
   Newspaper,
+  Info,
+  Users,
+  Instagram,
+  Youtube,
+  Globe,
 } from "lucide-react";
 import { C, display, body } from "../theme";
 import { NAV_ITEMS, PAGE_ROUTES } from "../navData";
 import Navbar from "../components/Navbar";
-import Footer from "../components/Footer";
 
-// ---- Content data (ganti di sini nanti) -----------------------------
+// ---- Tiktok Icon --------------------------------------------------------
+function TiktokIcon({ size = 16, color = "currentColor" }: { size?: number; color?: string }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M9 12a4 4 0 1 0 4 4V4a5 5 0 0 0 5 5" />
+    </svg>
+  );
+}
 
-
+// ---- Content data --------------------------------------------------------
 
 const HERO_SLIDES = [
   {
@@ -103,6 +112,15 @@ const MENU_DECK = [
     teaser: "Perjalanan sampah dari sub-area hingga distribusi akhir.",
     placeholder:
       "Taruh di sini: diagram alur — dari input per sub-area, pilah, sampai distribusi (TPS / pupuk / Plasticpay).",
+  },
+  {
+    id: "laporan",
+    order: "05",
+    icon: BarChart3,
+    title: "Laporan",
+    teaser: "Ringkasan capaian dan rekap data pengelolaan sampah.",
+    placeholder:
+      "Taruh di sini: laporan bulanan/tahunan, grafik capaian per lantai, dan rekap total sampah terpilah.",
   },
 ];
 
@@ -194,7 +212,14 @@ const POSTERS = [
 // digeser balik ke awal set (bukan direset ke 0), jadi mulus.
 const NEWS_LOOP = [...NEWS, ...NEWS];
 
+const SOCIALS = [
+  { icon: Globe, label: "Website Resmi", handle: "digilib.undip.ac.id", href: "https://digilib.undip.ac.id/" },
+  { icon: Youtube, label: "YouTube", handle: "@perpustakaanundip", href: "https://youtube.com/@perpustakaanundip?si=RgDQgwp-UlPD7ryq" },
+  { icon: Instagram, label: "Instagram", handle: "@perpus.undip", href: "https://www.instagram.com/perpus.undip?igsh=MTh4bXFtd3AzbmRmdQ==" },
+  { icon: TiktokIcon, label: "TikTok", handle: "@perpus.undip.press", href: "https://www.tiktok.com/@perpus.undip.press?_r=1&_t=ZS-97okoKr4q4S" },
+];
 
+const FOOTER_LINKS = ["Tentang", "Kontak", "Kebijakan Privasi", "Bantuan"];
 
 // Durasi autoplay poster edukasi (ms) — dipakai untuk timer & animasi progress bar
 const POSTER_AUTOPLAY_MS = 7000;
@@ -342,116 +367,6 @@ function PlaceholderPanel({ item }: { item: (typeof MENU_DECK)[number] }) {
   );
 }
 
-// ---- Pengertian: 3 kartu bergambar, hover-reveal ----------------------------------
-
-const PENGERTIAN_ITEMS = [
-  {
-    key: "definisi",
-    icon: Info,
-    title: "Definisi",
-    shortDesc:
-      "Meminimalkan dampak sampah terhadap lingkungan, bukan sekadar daur ulang — mengutamakan perbaikan, pemakaian ulang, dan bahan berkelanjutan.",
-    image:
-      "https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?auto=format&fit=crop&w=700&q=80",
-  },
-  {
-    key: "tujuan",
-    icon: Scale,
-    title: "Tujuan",
-    shortDesc:
-      "Menekan sampah yang berakhir di TPA lewat kebiasaan reduce, reuse, dan recycle di seluruh unit.",
-    image:
-      "https://images.unsplash.com/photo-1532996122724-e3c354a0b15b?auto=format&fit=crop&w=700&q=80",
-  },
-  {
-    key: "ruang-lingkup",
-    icon: MapPin,
-    title: "Ruang Lingkup",
-    shortDesc: "Lantai 1-4, teras, halaman, parkir, hingga UNDIP Press.",
-    image:
-      "https://images.unsplash.com/photo-1497366811353-6870744d04b2?auto=format&fit=crop&w=700&q=80",
-  },
-];
-
-function PengertianContent() {
-  const [activeKey, setActiveKey] = useState<string | null>(null);
-
-  return (
-    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-      {PENGERTIAN_ITEMS.map((it) => {
-        const Icon = it.icon;
-        const isOpen = activeKey === it.key;
-        return (
-          <button
-            key={it.key}
-            onMouseEnter={() => setActiveKey(it.key)}
-            onMouseLeave={() => setActiveKey((prev) => (prev === it.key ? null : prev))}
-            onClick={() => setActiveKey((prev) => (prev === it.key ? null : it.key))}
-            className="relative rounded-2xl overflow-hidden text-left w-full"
-            style={{ aspectRatio: "4 / 5" }}
-            aria-expanded={isOpen}
-          >
-            <SafeImage
-              src={it.image}
-              alt={it.title}
-              icon={Icon}
-              gradient={`linear-gradient(160deg, ${C.navy700}, ${C.navy900})`}
-              className="absolute inset-0 w-full h-full object-cover"
-              style={{
-                transform: isOpen ? "scale(1.06)" : "scale(1)",
-                transition: "transform 450ms cubic-bezier(0.16,1,0.3,1)",
-              }}
-            />
-
-            {/* Dim tipis + badge judul: terlihat waktu kartu belum disentuh kursor */}
-            <div
-              className="absolute inset-0"
-              style={{
-                background: "linear-gradient(0deg, rgba(10,20,64,0.55) 0%, rgba(10,20,64,0) 35%)",
-                opacity: isOpen ? 0 : 1,
-                transition: "opacity 250ms ease",
-              }}
-            />
-            <div
-              className="absolute left-4 right-4 bottom-4 flex items-center gap-2"
-              style={{ opacity: isOpen ? 0 : 1, transition: "opacity 200ms ease" }}
-            >
-              <span
-                className="w-8 h-8 rounded-full flex items-center justify-center shrink-0"
-                style={{ backgroundColor: "rgba(255,255,255,0.15)", backdropFilter: "blur(4px)" }}
-              >
-                <Icon size={15} color="#fff" strokeWidth={2} />
-              </span>
-              <span className="text-white text-sm font-semibold" style={display}>
-                {it.title}
-              </span>
-            </div>
-
-            {/* Panel teks: naik pelan begitu kursor menyentuh gambar, sedikit transparan */}
-            <div
-              className="absolute left-0 right-0 bottom-0 flex flex-col justify-center p-5"
-              style={{
-                height: "58%",
-                background: "linear-gradient(160deg, rgba(16,27,82,0.8), rgba(47,163,106,0.75))",
-                backdropFilter: "blur(2px)",
-                transform: isOpen ? "translateY(0)" : "translateY(100%)",
-                transition: "transform 700ms cubic-bezier(0.16,1,0.3,1)",
-              }}
-            >
-              <div className="text-white text-lg font-semibold mb-1.5" style={display}>
-                {it.title}
-              </div>
-              <p className="text-xs leading-relaxed" style={{ color: "rgba(255,255,255,0.9)" }}>
-                {it.shortDesc}
-              </p>
-            </div>
-          </button>
-        );
-      })}
-    </div>
-  );
-}
-
 // ---- Main component ---------------------------------------------------
 
 export default function Dashboard() {
@@ -475,6 +390,9 @@ export default function Dashboard() {
   const NAV_OFFSET = NAV_HEIGHT + 8;
   const NAV_OFFSET_TIGHT: Record<string, number> = { berita: NAV_HEIGHT, edukasi: NAV_HEIGHT };
 
+  // Paksa halaman mulai dari atas waktu pertama kali dibuka/direload, dan
+  // matikan scroll restoration bawaan browser (penyebab utama halaman
+  // "lompat" ke posisi scroll terakhir waktu pertama kali dibuka).
   useLayoutEffect(() => {
     if (typeof window !== "undefined" && "scrollRestoration" in window.history) {
       window.history.scrollRestoration = "manual";
@@ -705,7 +623,7 @@ export default function Dashboard() {
         </div>
       </section>
 
-      {/* ---- Bagian-bagian: Pengertian, Struktur Organisasi, SOP, Alur ---- */}
+      {/* ---- Bagian-bagian: Pengertian, Struktur Organisasi, SOP, Alur, Laporan ---- */}
         <section className="max-w-6xl mx-auto px-5 sm:px-8 pt-16 sm:pt-20 pb-16">
           {MENU_DECK.filter((item) => !PAGE_ROUTES[item.id]).map((item, i) => (
             <div
@@ -721,7 +639,7 @@ export default function Dashboard() {
                 </h2>
               </Reveal>
               <Reveal delay={80}>
-                {item.id === "pengertian" ? <PengertianContent /> : <PlaceholderPanel item={item} />}
+                <PlaceholderPanel item={item} />
               </Reveal>
             </div>
           ))}
@@ -912,7 +830,50 @@ export default function Dashboard() {
       </section>
 
       {/* ---- Footer ---- */}
-      <Footer />
+      <footer style={{ backgroundColor: C.navy900 }}>
+        <div className="max-w-6xl mx-auto px-5 sm:px-8 pt-14 sm:pt-16 pb-8">
+
+          <div className="mb-10">
+            <div className="text-xs font-semibold uppercase tracking-widest mb-4" style={{ ...body, color: "#8A8FB3" }}>
+              Media &amp; Kanal Resmi
+            </div>
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+              {SOCIALS.map((s, i) => {
+                const SIcon = s.icon;
+                return (
+                  <a
+                    key={i}
+                    href={s.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-3 rounded-xl p-4 border"
+                    style={{ backgroundColor: C.navy800, borderColor: C.navy700 }}
+                  >
+                    <span className="w-9 h-9 rounded-full flex items-center justify-center shrink-0" style={{ backgroundColor: C.navy700 }}>
+                      <SIcon size={16} color={C.leaf400} />
+                    </span>
+                    <span className="text-left">
+                      <div className="text-xs font-semibold text-white">{s.label}</div>
+                      <div className="text-[11px]" style={{ color: "#8A8FB3" }}>{s.handle}</div>
+                    </span>
+                  </a>
+                );
+              })}
+            </div>
+          </div>
+
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pt-6 border-t" style={{ borderColor: C.navy700 }}>
+            <div className="flex flex-wrap gap-x-6 gap-y-2">
+              {FOOTER_LINKS.map((l, i) => (
+                <span key={i} className="text-xs" style={{ color: "#9FA4C4" }}>{l}</span>
+              ))}
+            </div>
+            <span className="text-[11px]" style={{ color: "#6E7396" }}>
+              © 2026 UPT Perpustakaan Universitas Diponegoro. Semua hak dilindungi.
+            </span>
+          </div>
+        </div>
+      </footer>
     </div>
   );
 }
