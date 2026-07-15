@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect, type ReactNode, type CSSProperties } from "react";
+import React, { useState, useRef, useEffect, useLayoutEffect, type ReactNode, type CSSProperties } from "react";
 import type { LucideIcon } from "lucide-react";
 import {
   Recycle,
@@ -110,7 +110,7 @@ const MENU_DECK = [
     id: "struktur",
     order: "02",
     icon: Users,
-    title: "Organisasi",
+    title: "Struktur Organisasi",
     teaser: "Siapa yang menjalankan program ini di tiap unit.",
     placeholder:
       "Taruh di sini: bagan struktur organisasi, penanggung jawab per unit/lantai, dan kontak masing-masing.",
@@ -558,6 +558,16 @@ export default function Dashboard() {
   const sectionRefs = useRef<Record<string, HTMLElement | null>>({});
   const newsScrollRef = useRef<HTMLDivElement | null>(null);
 
+  // Paksa halaman mulai dari atas waktu pertama kali dibuka/direload, dan
+  // matikan scroll restoration bawaan browser (penyebab utama halaman
+  // "lompat" ke posisi scroll terakhir waktu pertama kali dibuka).
+  useLayoutEffect(() => {
+    if (typeof window !== "undefined" && "scrollRestoration" in window.history) {
+      window.history.scrollRestoration = "manual";
+    }
+    window.scrollTo(0, 0);
+  }, []);
+
   useEffect(() => {
     const t = setInterval(() => {
       setHeroIndex((i) => (i + 1) % HERO_SLIDES.length);
@@ -582,14 +592,10 @@ export default function Dashboard() {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  // Berita jalan sendiri (auto-scroll) pelan-pelan dan looping. Karena
-  // NEWS_LOOP berisi 2 salinan berita yang sama, begitu sudah geser sejauh
-  // satu set pertama, posisinya ditarik mundur sejauh itu juga — jadi
-  // keliatannya nyambung terus tanpa reset yang kelihatan lompat.
   useEffect(() => {
     const el = newsScrollRef.current;
     if (!el) return;
-    const SPEED_PX_PER_SEC = 32; // pelan, biar masih nyaman dibaca
+    const SPEED_PX_PER_SEC = 32; 
     let raf = 0;
     let last = performance.now();
     const step = (now: number) => {
@@ -608,9 +614,12 @@ export default function Dashboard() {
     return () => cancelAnimationFrame(raf);
   }, [newsPaused]);
 
+  const suppressObserverUntilRef = useRef(0);
+
   useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => {
+        if (Date.now() < suppressObserverUntilRef.current) return;
         entries.forEach((entry) => {
           if (entry.isIntersecting) {
             const id = (entry.target as HTMLElement).dataset.navid;
@@ -630,15 +639,18 @@ export default function Dashboard() {
     return () => observer.disconnect();
   }, []);
 
-  // Tinggi nav sticky (~64px) + sedikit jarak napas, biar heading section
-  // nggak ketutup pas di-scroll ke situ.
-  const NAV_OFFSET = 64;
+  const NAV_HEIGHT = 64;
+  const NAV_OFFSET = NAV_HEIGHT + 8;
+  const NAV_OFFSET_TIGHT: Record<string, number> = { berita: NAV_HEIGHT, edukasi: NAV_HEIGHT };
 
   const scrollTo = (id: string) => {
     setMobileNavOpen(false);
+    setActiveSection(id); 
+    suppressObserverUntilRef.current = Date.now() + 900; 
     const el = sectionRefs.current[id];
     if (el) {
-      const top = el.getBoundingClientRect().top + window.scrollY - NAV_OFFSET;
+      const offset = NAV_OFFSET_TIGHT[id] ?? NAV_OFFSET;
+      const top = el.getBoundingClientRect().top + window.scrollY - offset;
       window.scrollTo({ top, behavior: "smooth" });
     }
   };
@@ -677,6 +689,7 @@ export default function Dashboard() {
         @import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;0,9..40,800;1,9..40,400;1,9..40,500&display=swap');
         html { scroll-behavior: smooth; }
         .news-scroll::-webkit-scrollbar { display: none; }
+        .news-scroll { scroll-behavior: auto !important; }
         @keyframes posterProgress { from { transform: scaleX(0); } to { transform: scaleX(1); } }
         @media (prefers-reduced-motion: reduce) {
           * { transition-duration: 0.01ms !important; animation-duration: 0.01ms !important; }
@@ -794,7 +807,7 @@ export default function Dashboard() {
             <SectionLabel hideLine>
               <span style={{ color: C.gold500 }}>Sistem Informasi Pengelolaan Sampah</span>
             </SectionLabel>
-            <h1 key={activeHero.title} className="text-3xl sm:text-5xl font-semibold max-w-2xl leading-tight text-white mb-4 hero-fade" style={display}>
+            <h1 key={activeHero.title} className="text-2xl sm:text-4xl lg:text-5xl font-semibold max-w-4xl leading-tight text-white mb-4 hero-fade whitespace-normal sm:whitespace-nowrap" style={display}>
               {activeHero.title}
             </h1>
             <p className="max-w-xl text-sm sm:text-base mb-7" style={{ color: "#C3C6DE" }}>
@@ -827,10 +840,16 @@ export default function Dashboard() {
         </div>
       </section>
 
-      {/* ---- Bagian-bagian: Pengertian, Organisasi, SOP, Alur ---- */}
+      {/* ---- Bagian-bagian: Pengertian, Struktur Organisasi, SOP, Alur ---- */}
         <section className="max-w-6xl mx-auto px-5 sm:px-8 pt-16 sm:pt-20 pb-16">
           {MENU_DECK.map((item, i) => (
-            <div key={item.id} ref={setSectionRef(item.id)} className={i > 0 ? "mt-16" : ""}>
+            <div
+              key={item.id}
+              id={item.id}
+              ref={setSectionRef(item.id)}
+              className={i > 0 ? "mt-16" : ""}
+              style={{ scrollMarginTop: 72 }}
+            >
               <Reveal>
                 <h2 className="text-2xl sm:text-3xl font-semibold mb-6" style={{ ...display, color: C.navy900 }}>
                   {item.title}
@@ -844,7 +863,7 @@ export default function Dashboard() {
         </section>
 
       {/* ---- Berita ---- */}
-      <section id="berita" ref={setSectionRef("berita")} className="pt-8 sm:pt-10" style={{ backgroundColor: C.navy900 }}>
+      <section id="berita" ref={setSectionRef("berita")} className="pt-6 sm:pt-8" style={{ backgroundColor: C.navy900, scrollMarginTop: 64 }}>
         <div className="max-w-6xl mx-auto px-5 sm:px-8 pb-12">
           <Reveal>
             <div className="flex items-end justify-between flex-wrap gap-3 mb-8">
@@ -868,7 +887,7 @@ export default function Dashboard() {
           <div
             ref={newsScrollRef}
             className="news-scroll flex gap-5 overflow-x-auto pb-2"
-            style={{ scrollbarWidth: "none" }}
+            style={{ scrollbarWidth: "none", scrollBehavior: "auto" }}
             onMouseEnter={() => setNewsPaused(true)}
             onMouseLeave={() => setNewsPaused(false)}
           >
@@ -907,24 +926,24 @@ export default function Dashboard() {
       </section>
 
       {/* ---- Edukasi: poster slideshow ---- */}
-      <section id="edukasi" ref={setSectionRef("edukasi")} className="max-w-6xl mx-auto px-5 sm:px-8 pt-8 sm:pt-10 pb-20">
+      <section id="edukasi" ref={setSectionRef("edukasi")} className="max-w-6xl mx-auto px-5 sm:px-8 pt-6 sm:pt-8 pb-20" style={{ scrollMarginTop: 64 }}>
         <Reveal>
           <h2 className="text-2xl sm:text-3xl font-semibold mb-2" style={{ ...display, color: C.navy900 }}>
             Poster Edukasi
           </h2>
-          <p className="text-sm mb-8 max-w-lg" style={{ color: C.ink500 }}>
+          <p className="text-sm mb-5 max-w-lg" style={{ color: C.ink500 }}>
             Geser kartu poster untuk edukasi pemilahan sampah. Gambar bisa diganti kapan saja dengan poster resmi.
           </p>
         </Reveal>
 
         <Reveal delay={120}>
           <div
-            className="rounded-3xl p-5 sm:p-8 border"
+            className="rounded-3xl p-4 sm:p-5 border"
             style={{ backgroundColor: "#fff", borderColor: C.line }}
             onMouseEnter={() => setPosterPaused(true)}
             onMouseLeave={() => setPosterPaused(false)}
           >
-            <div className="flex items-center justify-between mb-5">
+            <div className="flex items-center justify-between mb-2">
               <span className="text-xs font-semibold px-3 py-1 rounded-full" style={{ backgroundColor: C.leaf100, color: C.leaf500 }}>
                 {activePoster.tag}
               </span>
@@ -935,7 +954,7 @@ export default function Dashboard() {
 
             {/* Frame poster — rasio A3 vertikal (297 x 420), gambar dipusatkan */}
             <div
-              className="mx-auto rounded-2xl overflow-hidden relative mb-5"
+              className="mx-auto rounded-2xl overflow-hidden relative mb-3"
               style={{ aspectRatio: "297 / 420", width: "min(100%, 420px)", backgroundColor: C.navy050 }}
             >
               <SafeImage
@@ -944,7 +963,7 @@ export default function Dashboard() {
                 icon={ImageIcon}
                 gradient={`linear-gradient(135deg, ${C.navy900}, ${C.navy700})`}
                 className="w-full h-full object-cover"
-                style={{ objectPosition: "center" }}
+                style={{ objectPosition: "center 65%" }}
               />
               <div
                 className="absolute inset-0 flex flex-col items-center justify-end text-center px-6 py-8"
@@ -957,7 +976,7 @@ export default function Dashboard() {
               </div>
             </div>
 
-            <div className="flex items-center justify-between mb-6">
+            <div className="flex items-center justify-between mb-4">
               <button onClick={prevPoster} className="w-10 h-10 rounded-full flex items-center justify-center border" style={{ borderColor: C.line }} aria-label="Poster sebelumnya">
                 <ChevronLeft size={18} color={C.navy900} />
               </button>
@@ -979,7 +998,7 @@ export default function Dashboard() {
 
             {/* Thumbnail strip — overlay penanda di thumbnail aktif tumbuh dari kiri
                 ke kanan selama 7 detik (pakai transform, jadi mulus/GPU-accelerated) */}
-            <div className="flex flex-wrap justify-center gap-2.5 overflow-x-auto pb-1">
+            <div className="flex flex-wrap justify-center gap-2 overflow-x-auto pb-1">
               {POSTERS.map((p, i) => {
                 const isActive = i === posterIndex;
                 return (
