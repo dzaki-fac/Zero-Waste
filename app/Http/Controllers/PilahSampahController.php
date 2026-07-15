@@ -26,10 +26,14 @@ class PilahSampahController extends Controller
 
     public function store(PilahSampahRequest $request): RedirectResponse
     {
-        PilahSampah::create([
+        $pilahSampah = PilahSampah::create([
             ...$request->validated(),
             'nama' => $request->user()->name,
         ]);
+
+        if ($request->input('_redirect') === '/form') {
+            return redirect('/form/pilah-sampah')->with('submitted', $pilahSampah->toArray());
+        }
 
         return to_route('pilah-sampah.index');
     }

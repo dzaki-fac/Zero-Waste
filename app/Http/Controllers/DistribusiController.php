@@ -26,10 +26,14 @@ class DistribusiController extends Controller
 
     public function store(DistribusiRequest $request): RedirectResponse
     {
-        Distribusi::create([
+        $distribusi = Distribusi::create([
             ...$request->validated(),
             'nama' => $request->user()->name,
         ]);
+
+        if ($request->input('_redirect') === '/form') {
+            return redirect('/form/distribusi')->with('submitted', $distribusi->toArray());
+        }
 
         return to_route('distribusi.index');
     }
