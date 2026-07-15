@@ -75,18 +75,25 @@ export default function FormPenimbangan() {
         if (data.berat_sampah) setBeratError('');
     }, [data.berat_sampah]);
 
+    const scrollTo = (id: string) => {
+        document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    };
+
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
         if (!data.berat_sampah) {
             setBeratError('Masukkan berat sampah');
+            scrollTo('section-berat');
             return;
         }
         if (!data.area) {
             setAreaError('Pilih area terlebih dahulu');
+            scrollTo('section-lokasi');
             return;
         }
         if (isLantai && !data.sub_area) {
             setSubAreaError('Silakan pilih sub area terlebih dahulu');
+            scrollTo('section-lokasi');
             return;
         }
         post('/admin/penimbangan');
@@ -171,7 +178,7 @@ export default function FormPenimbangan() {
                             </div>
                         </div>
 
-                        <div className="rounded-2xl border border-green-100 bg-white p-5 shadow-sm">
+                        <div id="section-berat" className="rounded-2xl border border-green-100 bg-white p-5 shadow-sm">
                             <div className="mb-4 flex items-center gap-2 text-sm font-medium text-green-700">
                                 <Weight className="h-4 w-4" />
                                 Berat Sampah
@@ -200,7 +207,7 @@ export default function FormPenimbangan() {
                             </div>
                         </div>
 
-                        <div className="rounded-2xl border border-green-100 bg-white p-5 shadow-sm">
+                        <div id="section-lokasi" className="rounded-2xl border border-green-100 bg-white p-5 shadow-sm">
                             <div className="mb-4 flex items-center gap-2 text-sm font-medium text-green-700">
                                 <MapPin className="h-4 w-4" />
                                 Lokasi

@@ -38,11 +38,16 @@ export default function FormPilahSampah() {
     const totalBerat = data.items.reduce((sum, item) => sum + (parseFloat(item.berat) || 0), 0);
     const filledCount = data.items.filter((item) => parseFloat(item.berat) > 0).length;
 
+    const scrollTo = (id: string) => {
+        document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    };
+
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
         const filledCount = data.items.filter((item) => parseFloat(item.berat) > 0).length;
         if (!filledCount) {
             setSubmitError('Minimal isi berat pada 1 jenis sampah');
+            scrollTo('section-jenis-berat');
             return;
         }
         setSubmitError('');
@@ -127,7 +132,7 @@ export default function FormPilahSampah() {
                             </div>
                         </div>
 
-                        <div className="rounded-2xl border border-green-100 bg-white p-5 shadow-sm">
+                        <div id="section-jenis-berat" className="rounded-2xl border border-green-100 bg-white p-5 shadow-sm">
                             <div className="mb-4 flex items-center gap-2 text-sm font-medium text-green-700">
                                 <Trash2 className="h-4 w-4" />
                                 Jenis & Berat Sampah
