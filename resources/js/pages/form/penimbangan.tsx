@@ -62,7 +62,7 @@ export default function FormPenimbangan() {
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        post('/penimbangan');
+        post('/admin/penimbangan');
     };
 
     const now = new Date(Date.now() - new Date().getTimezoneOffset() * 60000).toISOString().slice(0, 16);

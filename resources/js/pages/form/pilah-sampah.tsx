@@ -37,7 +37,7 @@ export default function FormPilahSampah() {
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        post('/pilah-sampah');
+        post('/admin/pilah-sampah');
     };
 
     const now = new Date(Date.now() - new Date().getTimezoneOffset() * 60000).toISOString().slice(0, 16);
