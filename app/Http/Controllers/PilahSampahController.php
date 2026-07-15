@@ -26,14 +26,43 @@ class PilahSampahController extends Controller
 
     public function store(PilahSampahRequest $request): RedirectResponse
     {
-        $pilahSampah = PilahSampah::create([
-            ...$request->validated(),
-            'nama' => $request->user()->name,
-        ]);
+        $nama = $request->user()->name;
 
         if ($request->input('_redirect') === '/form') {
-            return redirect('/form/pilah-sampah')->with('submitted', $pilahSampah->toArray());
+            $items = $request->input('items', []);
+            $created = [];
+
+            foreach ($items as $item) {
+                $berat = $item['berat'] ?? null;
+                if ($berat === null || $berat === '' || (float) $berat <= 0) {
+                    continue;
+                }
+
+                $pilahSampah = PilahSampah::create([
+                    'nama' => $nama,
+                    'tanggal' => $request->input('tanggal'),
+                    'jenis_sampah' => $item['jenis_sampah'],
+                    'berat' => $berat,
+                ]);
+                $created[] = $pilahSampah->toArray();
+            }
+
+            if (empty($created)) {
+                return back()->withErrors(['items' => 'Minimal isi berat pada 1 jenis sampah']);
+            }
+
+            return redirect('/form/pilah-sampah')->with('submitted', [
+                'nama' => $nama,
+                'tanggal' => $request->input('tanggal'),
+                'items' => $created,
+                'total_berat' => array_sum(array_column($created, 'berat')),
+            ]);
         }
+
+        $pilahSampah = PilahSampah::create([
+            ...$request->validated(),
+            'nama' => $nama,
+        ]);
 
         return to_route('pilah-sampah.index');
     }

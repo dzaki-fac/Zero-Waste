@@ -30,18 +30,66 @@ export default function FormDistribusi() {
         berat: '',
         jenis_sampah: '',
         tujuan_distribusi: '',
+        tujuan_lainnya: '',
         lokasi: '',
     });
 
     const [showSuccess, setShowSuccess] = useState(false);
+    const [beratError, setBeratError] = useState('');
+    const [jenisError, setJenisError] = useState('');
+    const [tujuanError, setTujuanError] = useState('');
+    const [lokasiError, setLokasiError] = useState('');
 
     useEffect(() => {
         if (submitted) setShowSuccess(true);
     }, [submitted]);
 
+    useEffect(() => {
+        if (data.berat) setBeratError('');
+    }, [data.berat]);
+
+    useEffect(() => {
+        if (data.jenis_sampah) setJenisError('');
+    }, [data.jenis_sampah]);
+
+    useEffect(() => {
+        if (data.tujuan_distribusi) setTujuanError('');
+    }, [data.tujuan_distribusi]);
+
+    useEffect(() => {
+        if (data.tujuan_lainnya) setTujuanError('');
+    }, [data.tujuan_lainnya]);
+
+    useEffect(() => {
+        if (data.lokasi) setLokasiError('');
+    }, [data.lokasi]);
+
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        post('/admin/distribusi');
+        if (!data.berat) {
+            setBeratError('Masukkan berat sampah');
+            return;
+        }
+        if (!data.jenis_sampah) {
+            setJenisError('Pilih jenis sampah');
+            return;
+        }
+        if (!data.tujuan_distribusi) {
+            setTujuanError('Pilih tujuan distribusi');
+            return;
+        }
+        if (data.tujuan_distribusi === 'Tujuan lainnya' && !data.tujuan_lainnya) {
+            setTujuanError('Isi tujuan distribusi lainnya');
+            return;
+        }
+        if (!data.lokasi) {
+            setLokasiError('Masukkan lokasi');
+            return;
+        }
+        router.post('/admin/distribusi', {
+            ...data,
+            tujuan_distribusi: data.tujuan_distribusi === 'Tujuan lainnya' ? data.tujuan_lainnya : data.tujuan_distribusi,
+        });
     };
 
     const now = new Date(Date.now() - new Date().getTimezoneOffset() * 60000).toISOString().slice(0, 16);
@@ -122,37 +170,8 @@ export default function FormDistribusi() {
 
                         <div className="rounded-2xl border border-green-100 bg-white p-5 shadow-sm">
                             <div className="mb-4 flex items-center gap-2 text-sm font-medium text-green-700">
-                                <Weight className="h-4 w-4" />
-                                Berat Sampah
-                            </div>
-
-                            <div className="grid gap-2">
-                                <Label htmlFor="berat" className="text-xs font-medium text-gray-600">Berat (kg)</Label>
-                                <div className="relative">
-                                    <Input
-                                        id="berat"
-                                        name="berat"
-                                        type="number"
-                                        step="0.01"
-                                        min="0"
-                                        value={data.berat}
-                                        onChange={(e) => setData('berat', e.target.value)}
-                                        required
-                                        placeholder="0.00"
-                                        inputMode="decimal"
-                                        onWheel={(e) => e.currentTarget.blur()}
-                                        className="h-12 border-green-200 pe-8 text-lg [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
-                                    />
-                                    <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-sm font-medium text-green-600">kg</span>
-                                </div>
-                                <InputError message={errors.berat} />
-                            </div>
-                        </div>
-
-                        <div className="rounded-2xl border border-green-100 bg-white p-5 shadow-sm">
-                            <div className="mb-4 flex items-center gap-2 text-sm font-medium text-green-700">
                                 <Trash2 className="h-4 w-4" />
-                                Jenis Sampah
+                                Jenis & Berat Sampah
                             </div>
 
                             <div className="grid gap-2">
@@ -176,7 +195,29 @@ export default function FormDistribusi() {
                                         );
                                     })}
                                 </div>
-                                <InputError message={errors.jenis_sampah} />
+                                <InputError message={errors.jenis_sampah || jenisError} />
+                            </div>
+
+                            <div className="mt-4 grid gap-2">
+                                <Label htmlFor="berat" className="text-xs font-medium text-gray-600">Berat (kg)</Label>
+                                <div className="relative">
+                                    <Input
+                                        id="berat"
+                                        name="berat"
+                                        type="number"
+                                        step="0.01"
+                                        min="0"
+                                        value={data.berat}
+                                        onChange={(e) => setData('berat', e.target.value)}
+                                        required
+                                        placeholder="0.00"
+                                        inputMode="decimal"
+                                        onWheel={(e) => e.currentTarget.blur()}
+                                        className="h-12 border-green-200 pe-8 text-lg [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
+                                    />
+                                    <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-sm font-medium text-green-600">kg</span>
+                                </div>
+                                <InputError message={errors.berat || beratError} />
                             </div>
                         </div>
 
@@ -208,7 +249,21 @@ export default function FormDistribusi() {
                                             );
                                         })}
                                     </div>
-                                    <InputError message={errors.tujuan_distribusi} />
+                                    <InputError message={errors.tujuan_distribusi || tujuanError} />
+
+                                    {data.tujuan_distribusi === 'Tujuan lainnya' && (
+                                        <div className="mt-2">
+                                            <Label htmlFor="tujuan_lainnya" className="text-xs font-medium text-gray-600">Sebutkan tujuan lainnya</Label>
+                                            <Input
+                                                id="tujuan_lainnya"
+                                                name="tujuan_lainnya"
+                                                value={data.tujuan_lainnya}
+                                                onChange={(e) => setData('tujuan_lainnya', e.target.value)}
+                                                placeholder="Masukkan tujuan distribusi"
+                                                className="mt-1 h-12 border-green-200 text-base"
+                                            />
+                                        </div>
+                                    )}
                                 </div>
 
                                 <div className="grid gap-2">
@@ -225,7 +280,7 @@ export default function FormDistribusi() {
                                         />
                                         <MapPin className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-green-500" />
                                     </div>
-                                    <InputError message={errors.lokasi} />
+                                    <InputError message={errors.lokasi || lokasiError} />
                                 </div>
                             </div>
                         </div>

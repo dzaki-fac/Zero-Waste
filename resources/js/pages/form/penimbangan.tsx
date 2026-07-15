@@ -55,13 +55,40 @@ export default function FormPenimbangan() {
     };
 
     const [showSuccess, setShowSuccess] = useState(false);
+    const [areaError, setAreaError] = useState('');
+    const [subAreaError, setSubAreaError] = useState('');
+    const [beratError, setBeratError] = useState('');
 
     useEffect(() => {
         if (submitted) setShowSuccess(true);
     }, [submitted]);
 
+    useEffect(() => {
+        if (data.area) setAreaError('');
+    }, [data.area]);
+
+    useEffect(() => {
+        if (data.sub_area) setSubAreaError('');
+    }, [data.sub_area]);
+
+    useEffect(() => {
+        if (data.berat_sampah) setBeratError('');
+    }, [data.berat_sampah]);
+
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
+        if (!data.berat_sampah) {
+            setBeratError('Masukkan berat sampah');
+            return;
+        }
+        if (!data.area) {
+            setAreaError('Pilih area terlebih dahulu');
+            return;
+        }
+        if (isLantai && !data.sub_area) {
+            setSubAreaError('Silakan pilih sub area terlebih dahulu');
+            return;
+        }
         post('/admin/penimbangan');
     };
 
@@ -169,7 +196,7 @@ export default function FormPenimbangan() {
                                     />
                                     <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-sm font-medium text-green-600">kg</span>
                                 </div>
-                                <InputError message={errors.berat_sampah} />
+                                <InputError message={errors.berat_sampah || beratError} />
                             </div>
                         </div>
 
@@ -206,11 +233,11 @@ export default function FormPenimbangan() {
                                             );
                                         })}
                                     </div>
-                                    <InputError message={errors.area} />
+                                    <InputError message={errors.area || areaError} />
                                 </div>
 
                                 {isLantai ? (
-                                    <div className="grid gap-2">
+                                    <div id="sub_area_section" className="grid gap-2">
                                         <Label className="text-xs font-medium text-gray-600">Pilih Sub Area</Label>
                                         <div className="grid grid-cols-2 gap-2">
                                             {subAreaByLantai[data.area]?.map((opt) => {
@@ -231,7 +258,7 @@ export default function FormPenimbangan() {
                                                 );
                                             })}
                                         </div>
-                                        <InputError message={errors.sub_area} />
+                                        <InputError message={errors.sub_area || subAreaError} />
                                     </div>
                                 ) : (
                                     <div className="grid gap-2">
