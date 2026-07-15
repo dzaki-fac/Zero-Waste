@@ -527,7 +527,7 @@ export default function Dashboard() {
 
       {/* ---- Nav ---- */}
       <header className="sticky top-0 z-40 border-b" style={{ backgroundColor: C.navy900, borderColor: C.navy700 }}>
-        <div className="max-w-6xl mx-auto pl-0 pr-5 sm:pr-8 h-16 flex items-center justify-between">
+        <div className="w-full pl-5 sm:pl-8 pr-5 sm:pr-8 h-16 flex items-center justify-between">
           <div className="flex items-center gap-2.5">
             <img
               src="/images/undip-logo.png"
