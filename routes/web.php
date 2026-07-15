@@ -13,6 +13,8 @@ Route::middleware(['auth'])->group(function () {
     Route::resource('pilah-sampah', PilahSampahController::class);
     Route::resource('distribusi', DistribusiController::class);
 
+    Route::inertia('form/penimbangan', 'form/penimbangan')->name('form.penimbangan');
+
     Route::get('admin/dashboard', [DashboardController::class, 'index'])->name('dashboard')->middleware('verified');
 });
 
