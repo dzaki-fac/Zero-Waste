@@ -40,7 +40,7 @@ export default function PilahSampahEdit({ pilahSampah }: Props) {
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        put(`/pilah-sampah/${pilahSampah.id}`);
+        put(`/admin/pilah-sampah/${pilahSampah.id}`);
     };
 
     return (
@@ -128,7 +128,7 @@ export default function PilahSampahEdit({ pilahSampah }: Props) {
                                 Perbarui
                             </Button>
                             <Button variant="outline" asChild className="border-green-200 text-green-700 hover:bg-green-50">
-                                <Link href="/pilah-sampah" className="flex items-center gap-1">
+                                <Link href="/admin/pilah-sampah" className="flex items-center gap-1">
                                     <ArrowLeft className="h-4 w-4" />
                                     Batal
                                 </Link>

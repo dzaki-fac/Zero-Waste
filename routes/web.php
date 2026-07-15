@@ -9,9 +9,9 @@ use Illuminate\Support\Facades\Route;
 Route::inertia('/', 'welcome')->name('home');
 
 Route::middleware(['auth'])->group(function () {
-    Route::resource('penimbangan', PenimbanganController::class);
-    Route::resource('pilah-sampah', PilahSampahController::class);
-    Route::resource('distribusi', DistribusiController::class);
+    Route::resource('admin/penimbangan', PenimbanganController::class)->names('penimbangan');
+    Route::resource('admin/pilah-sampah', PilahSampahController::class)->names('pilah-sampah');
+    Route::resource('admin/distribusi', DistribusiController::class)->names('distribusi');
 
     Route::get('admin/dashboard', [DashboardController::class, 'index'])->name('dashboard')->middleware('verified');
 });

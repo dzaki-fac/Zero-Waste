@@ -24,7 +24,7 @@ export default function PilahSampahCreate() {
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        post('/pilah-sampah');
+        post('/admin/pilah-sampah');
     };
 
     return (
@@ -112,7 +112,7 @@ export default function PilahSampahCreate() {
                                 Simpan
                             </Button>
                             <Button variant="outline" asChild className="border-green-200 text-green-700 hover:bg-green-50">
-                                <Link href="/pilah-sampah" className="flex items-center gap-1">
+                                <Link href="/admin/pilah-sampah" className="flex items-center gap-1">
                                     <ArrowLeft className="h-4 w-4" />
                                     Batal
                                 </Link>
