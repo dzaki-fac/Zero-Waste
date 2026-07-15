@@ -26,7 +26,10 @@ class PenimbanganController extends Controller
 
     public function store(PenimbanganRequest $request): RedirectResponse
     {
-        Penimbangan::create($request->validated());
+        Penimbangan::create([
+            ...$request->validated(),
+            'nama' => $request->user()->name,
+        ]);
 
         return to_route('penimbangan.index');
     }

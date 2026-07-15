@@ -24,7 +24,7 @@ class Distribusi extends Model
     ];
 
     protected $casts = [
-        'tanggal' => 'date',
+        'tanggal' => 'datetime',
         'berat' => 'decimal:2',
     ];
 }

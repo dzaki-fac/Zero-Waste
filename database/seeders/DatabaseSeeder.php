@@ -15,10 +15,17 @@ class DatabaseSeeder extends Seeder
         User::factory()->admin()->create([
             'name' => 'Admin',
             'email' => 'admin@example.com',
-            'nip' => '111111111111111111',
+            'nip' => '111111111111111110',
         ]);
 
-        User::factory()->count(5)->petugas()->create();
+        foreach (range(1, 5) as $i) {
+            User::factory()->petugas()->create([
+                'name' => "Petugas $i",
+                'email' => "petugas{$i}@example.com",
+                'nip' => "11111111111111111{$i}",
+                'password' => bcrypt('petugas123'),
+            ]);
+        }
 
         $this->call([
             PenimbanganSeeder::class,

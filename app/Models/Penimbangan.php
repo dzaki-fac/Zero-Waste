@@ -23,7 +23,7 @@ class Penimbangan extends Model
     ];
 
     protected $casts = [
-        'tanggal' => 'date',
+        'tanggal' => 'datetime',
         'berat_sampah' => 'decimal:2',
     ];
 }
