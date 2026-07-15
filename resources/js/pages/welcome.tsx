@@ -43,21 +43,21 @@ export default function Welcome() {
 
                     <div className="flex flex-wrap justify-center gap-3">
                         <Link
-                            href="/penimbangan"
+                            href="/form/penimbangan"
                             className="inline-flex items-center gap-2 rounded-lg bg-green-600 px-6 py-2.5 text-sm font-medium text-white shadow-sm hover:bg-green-700"
                         >
                             <Leaf className="h-4 w-4" />
                             Penimbangan
                         </Link>
                         <Link
-                            href="/pilah-sampah"
+                            href="/form/pilah-sampah"
                             className="inline-flex items-center gap-2 rounded-lg bg-green-600 px-6 py-2.5 text-sm font-medium text-white shadow-sm hover:bg-green-700"
                         >
                             <Leaf className="h-4 w-4" />
                             Pilah Sampah
                         </Link>
                         <Link
-                            href="/distribusi"
+                            href="/form/distribusi"
                             className="inline-flex items-center gap-2 rounded-lg bg-green-600 px-6 py-2.5 text-sm font-medium text-white shadow-sm hover:bg-green-700"
                         >
                             <Leaf className="h-4 w-4" />
