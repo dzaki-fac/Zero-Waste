@@ -218,6 +218,11 @@ const POSTERS = [
   },
 ];
 
+// Dua salinan berita digabung biar carousel-nya bisa looping mulus tanpa
+// "lompat" kelihatan — begitu geser sejauh satu set pertama, posisinya
+// digeser balik ke awal set (bukan direset ke 0), jadi mulus.
+const NEWS_LOOP = [...NEWS, ...NEWS];
+
 const SOCIALS = [
   { icon: Instagram, label: "Instagram", handle: "@zerowaste.undip" },
   { icon: Youtube, label: "YouTube", handle: "Zero Waste UNDIP" },
@@ -233,6 +238,9 @@ const FOOTER_QUICKLINKS = [
 ];
 
 const FOOTER_LINKS = ["Tentang", "Kontak", "Kebijakan Privasi", "Bantuan"];
+
+// Durasi autoplay poster edukasi (ms) — dipakai untuk timer & animasi progress bar
+const POSTER_AUTOPLAY_MS = 7000;
 
 // ---- Interaction hooks -------------------------------------------------
 function useInView(threshold = 0.18) {
@@ -326,13 +334,12 @@ function StatCounter({ stat, delay }: { stat: (typeof HERO_STATS)[number]; delay
 
 // ---- Small building blocks -------------------------------------------------
 
-function SectionLabel({ children, hideLine }: { children: ReactNode; hideLine?: boolean }) {
+function SectionLabel({ children }: { children: ReactNode; hideLine?: boolean }) {
   return (
     <div
       className="inline-flex items-center gap-2 text-xs uppercase tracking-widest font-semibold mb-3"
       style={{ ...body, color: C.leaf500 }}
     >
-      {!hideLine && <span className="inline-block w-6 h-px" style={{ backgroundColor: C.leaf500 }} />}
       {children}
     </div>
   );
@@ -458,24 +465,68 @@ const PENGERTIAN_ITEMS = [
 ];
 
 function PengertianContent() {
+  const [activeKey, setActiveKey] = useState<string | null>(null);
+
   return (
     <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
       {PENGERTIAN_ITEMS.map((it) => {
         const Icon = it.icon;
+        const isOpen = activeKey === it.key;
         return (
-          <div key={it.key} className="relative rounded-2xl overflow-hidden" style={{ aspectRatio: "4 / 5" }}>
+          <button
+            key={it.key}
+            onMouseEnter={() => setActiveKey(it.key)}
+            onMouseLeave={() => setActiveKey((prev) => (prev === it.key ? null : prev))}
+            onClick={() => setActiveKey((prev) => (prev === it.key ? null : it.key))}
+            className="relative rounded-2xl overflow-hidden text-left w-full"
+            style={{ aspectRatio: "4 / 5" }}
+            aria-expanded={isOpen}
+          >
             <SafeImage
               src={it.image}
               alt={it.title}
               icon={Icon}
               gradient={`linear-gradient(160deg, ${C.navy700}, ${C.navy900})`}
               className="absolute inset-0 w-full h-full object-cover"
+              style={{
+                transform: isOpen ? "scale(1.06)" : "scale(1)",
+                transition: "transform 450ms cubic-bezier(0.16,1,0.3,1)",
+              }}
             />
+
+            {/* Dim tipis + badge judul: terlihat waktu kartu belum disentuh kursor */}
+            <div
+              className="absolute inset-0"
+              style={{
+                background: "linear-gradient(0deg, rgba(10,20,64,0.55) 0%, rgba(10,20,64,0) 35%)",
+                opacity: isOpen ? 0 : 1,
+                transition: "opacity 250ms ease",
+              }}
+            />
+            <div
+              className="absolute left-4 right-4 bottom-4 flex items-center gap-2"
+              style={{ opacity: isOpen ? 0 : 1, transition: "opacity 200ms ease" }}
+            >
+              <span
+                className="w-8 h-8 rounded-full flex items-center justify-center shrink-0"
+                style={{ backgroundColor: "rgba(255,255,255,0.15)", backdropFilter: "blur(4px)" }}
+              >
+                <Icon size={15} color="#fff" strokeWidth={2} />
+              </span>
+              <span className="text-white text-sm font-semibold" style={display}>
+                {it.title}
+              </span>
+            </div>
+
+            {/* Panel teks: naik pelan begitu kursor menyentuh gambar, sedikit transparan */}
             <div
               className="absolute left-0 right-0 bottom-0 flex flex-col justify-center p-5"
               style={{
-                height: "48%",
-                background: "linear-gradient(160deg, rgba(16,27,82,0.95), rgba(47,163,106,0.9))",
+                height: "58%",
+                background: "linear-gradient(160deg, rgba(16,27,82,0.8), rgba(47,163,106,0.75))",
+                backdropFilter: "blur(2px)",
+                transform: isOpen ? "translateY(0)" : "translateY(100%)",
+                transition: "transform 700ms cubic-bezier(0.16,1,0.3,1)",
               }}
             >
               <div className="text-white text-lg font-semibold mb-1.5" style={display}>
@@ -485,7 +536,7 @@ function PengertianContent() {
                 {it.shortDesc}
               </p>
             </div>
-          </div>
+          </button>
         );
       })}
     </div>
@@ -499,6 +550,8 @@ export default function Dashboard() {
   const [openCard, setOpenCard] = useState<string | null>(null);
   const [heroIndex, setHeroIndex] = useState(0);
   const [posterIndex, setPosterIndex] = useState(0);
+  const [posterPaused, setPosterPaused] = useState(false);
+  const [newsPaused, setNewsPaused] = useState(false);
   const [activeSection, setActiveSection] = useState("beranda");
   const [scrollY, setScrollY] = useState(0);
 
@@ -512,11 +565,48 @@ export default function Dashboard() {
     return () => clearInterval(t);
   }, []);
 
+  // Autoplay poster edukasi setiap 7 detik — timer ini dipakai ulang tiap kali
+  // posterIndex berubah (baik otomatis maupun diklik manual), jadi hitungan
+  // mundurnya selalu mulai dari 0 lagi. Berhenti sementara saat kartu di-hover.
+  useEffect(() => {
+    if (posterPaused) return;
+    const t = setTimeout(() => {
+      setPosterIndex((i) => (i + 1) % POSTERS.length);
+    }, POSTER_AUTOPLAY_MS);
+    return () => clearTimeout(t);
+  }, [posterIndex, posterPaused]);
+
   useEffect(() => {
     const onScroll = () => setScrollY(window.scrollY);
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
+
+  // Berita jalan sendiri (auto-scroll) pelan-pelan dan looping. Karena
+  // NEWS_LOOP berisi 2 salinan berita yang sama, begitu sudah geser sejauh
+  // satu set pertama, posisinya ditarik mundur sejauh itu juga — jadi
+  // keliatannya nyambung terus tanpa reset yang kelihatan lompat.
+  useEffect(() => {
+    const el = newsScrollRef.current;
+    if (!el) return;
+    const SPEED_PX_PER_SEC = 32; // pelan, biar masih nyaman dibaca
+    let raf = 0;
+    let last = performance.now();
+    const step = (now: number) => {
+      const dt = (now - last) / 1000;
+      last = now;
+      if (!newsPaused && el) {
+        el.scrollLeft += SPEED_PX_PER_SEC * dt;
+        const singleSetWidth = el.scrollWidth / 2;
+        if (el.scrollLeft >= singleSetWidth) {
+          el.scrollLeft -= singleSetWidth;
+        }
+      }
+      raf = requestAnimationFrame(step);
+    };
+    raf = requestAnimationFrame(step);
+    return () => cancelAnimationFrame(raf);
+  }, [newsPaused]);
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -540,10 +630,17 @@ export default function Dashboard() {
     return () => observer.disconnect();
   }, []);
 
+  // Tinggi nav sticky (~64px) + sedikit jarak napas, biar heading section
+  // nggak ketutup pas di-scroll ke situ.
+  const NAV_OFFSET = 64;
+
   const scrollTo = (id: string) => {
     setMobileNavOpen(false);
     const el = sectionRefs.current[id];
-    if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+    if (el) {
+      const top = el.getBoundingClientRect().top + window.scrollY - NAV_OFFSET;
+      window.scrollTo({ top, behavior: "smooth" });
+    }
   };
 
   const toggleCard = (id: string) => {
@@ -580,6 +677,7 @@ export default function Dashboard() {
         @import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;0,9..40,800;1,9..40,400;1,9..40,500&display=swap');
         html { scroll-behavior: smooth; }
         .news-scroll::-webkit-scrollbar { display: none; }
+        @keyframes posterProgress { from { transform: scaleX(0); } to { transform: scaleX(1); } }
         @media (prefers-reduced-motion: reduce) {
           * { transition-duration: 0.01ms !important; animation-duration: 0.01ms !important; }
         }
@@ -678,7 +776,7 @@ export default function Dashboard() {
           <button
             onClick={prevHero}
             aria-label="Slide sebelumnya"
-            className="absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full flex items-center justify-center"
+            className="absolute left-4 top-1/2 -translate-y-1/2 z-50 w-10 h-10 rounded-full flex items-center justify-center"
             style={{ backgroundColor: "rgba(10,20,64,0.45)", border: "1px solid rgba(255,255,255,0.25)" }}
           >
             <ChevronLeft size={18} color="#fff" />
@@ -686,7 +784,7 @@ export default function Dashboard() {
           <button
             onClick={nextHero}
             aria-label="Slide berikutnya"
-            className="absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full flex items-center justify-center"
+            className="absolute right-4 top-1/2 -translate-y-1/2 z-50 w-10 h-10 rounded-full flex items-center justify-center"
             style={{ backgroundColor: "rgba(10,20,64,0.45)", border: "1px solid rgba(255,255,255,0.25)" }}
           >
             <ChevronRight size={18} color="#fff" />
@@ -708,14 +806,6 @@ export default function Dashboard() {
                 <StatCounter key={i} stat={st} delay={300 + i * 180} />
               ))}
             </div>
-          </div>
-
-          <div
-            className="absolute bottom-24 sm:bottom-28 right-5 sm:right-8 hidden sm:flex flex-col items-center gap-2"
-            style={{ opacity: scrollY > 40 ? 0 : 1, transition: "opacity 300ms ease" }}
-          >
-            <span className="text-[10px] tracking-widest uppercase" style={{ color: "#9FA4C4" }}>Scroll</span>
-            <span className="w-px h-8 animate-pulse" style={{ backgroundColor: "#9FA4C4" }} />
           </div>
 
           <div className="absolute bottom-6 left-0 right-0 flex justify-center gap-2">
@@ -754,7 +844,7 @@ export default function Dashboard() {
         </section>
 
       {/* ---- Berita ---- */}
-      <section id="berita" ref={setSectionRef("berita")} className="pt-16 sm:pt-20" style={{ backgroundColor: C.navy900 }}>
+      <section id="berita" ref={setSectionRef("berita")} className="pt-8 sm:pt-10" style={{ backgroundColor: C.navy900 }}>
         <div className="max-w-6xl mx-auto px-5 sm:px-8 pb-12">
           <Reveal>
             <div className="flex items-end justify-between flex-wrap gap-3 mb-8">
@@ -775,9 +865,15 @@ export default function Dashboard() {
             </div>
           </Reveal>
 
-          <div ref={newsScrollRef} className="news-scroll flex gap-5 overflow-x-auto pb-2" style={{ scrollbarWidth: "none" }}>
-            {NEWS.map((n, i) => (
-              <Reveal key={i} delay={i * 80} className="shrink-0 w-64 sm:w-72">
+          <div
+            ref={newsScrollRef}
+            className="news-scroll flex gap-5 overflow-x-auto pb-2"
+            style={{ scrollbarWidth: "none" }}
+            onMouseEnter={() => setNewsPaused(true)}
+            onMouseLeave={() => setNewsPaused(false)}
+          >
+            {NEWS_LOOP.map((n, i) => (
+              <Reveal key={i} delay={(i % NEWS.length) * 80} className="shrink-0 w-64 sm:w-72">
                 <div
                   className="rounded-2xl overflow-hidden"
                   style={{ backgroundColor: C.navy800, transition: "transform 220ms ease" }}
@@ -811,9 +907,8 @@ export default function Dashboard() {
       </section>
 
       {/* ---- Edukasi: poster slideshow ---- */}
-      <section id="edukasi" ref={setSectionRef("edukasi")} className="max-w-6xl mx-auto px-5 sm:px-8 pt-16 sm:pt-20 pb-20">
+      <section id="edukasi" ref={setSectionRef("edukasi")} className="max-w-6xl mx-auto px-5 sm:px-8 pt-8 sm:pt-10 pb-20">
         <Reveal>
-          <SectionLabel>Fitur Edukasi</SectionLabel>
           <h2 className="text-2xl sm:text-3xl font-semibold mb-2" style={{ ...display, color: C.navy900 }}>
             Poster Edukasi
           </h2>
@@ -823,7 +918,12 @@ export default function Dashboard() {
         </Reveal>
 
         <Reveal delay={120}>
-          <div className="rounded-3xl p-5 sm:p-8 border" style={{ backgroundColor: "#fff", borderColor: C.line }}>
+          <div
+            className="rounded-3xl p-5 sm:p-8 border"
+            style={{ backgroundColor: "#fff", borderColor: C.line }}
+            onMouseEnter={() => setPosterPaused(true)}
+            onMouseLeave={() => setPosterPaused(false)}
+          >
             <div className="flex items-center justify-between mb-5">
               <span className="text-xs font-semibold px-3 py-1 rounded-full" style={{ backgroundColor: C.leaf100, color: C.leaf500 }}>
                 {activePoster.tag}
@@ -833,13 +933,18 @@ export default function Dashboard() {
               </span>
             </div>
 
-            <div className="w-full rounded-2xl overflow-hidden relative mb-5" style={{ height: "clamp(260px, 40vw, 380px)" }}>
+            {/* Frame poster — rasio A3 vertikal (297 x 420), gambar dipusatkan */}
+            <div
+              className="mx-auto rounded-2xl overflow-hidden relative mb-5"
+              style={{ aspectRatio: "297 / 420", width: "min(100%, 420px)", backgroundColor: C.navy050 }}
+            >
               <SafeImage
                 src={activePoster.image}
                 alt={activePoster.title}
                 icon={ImageIcon}
                 gradient={`linear-gradient(135deg, ${C.navy900}, ${C.navy700})`}
                 className="w-full h-full object-cover"
+                style={{ objectPosition: "center" }}
               />
               <div
                 className="absolute inset-0 flex flex-col items-center justify-end text-center px-6 py-8"
@@ -872,24 +977,49 @@ export default function Dashboard() {
               </button>
             </div>
 
-            <div className="flex gap-2.5 overflow-x-auto pb-1">
-              {POSTERS.map((p, i) => (
-                <button
-                  key={i}
-                  onClick={() => setPosterIndex(i)}
-                  className="shrink-0 w-20 h-16 rounded-lg overflow-hidden relative"
-                  style={{ outline: i === posterIndex ? `2px solid ${C.leaf500}` : "none", outlineOffset: "2px" }}
-                >
-                  <SafeImage
-                    src={p.image}
-                    alt={p.title}
-                    icon={ImageIcon}
-                    gradient={`linear-gradient(135deg, ${C.navy700}, ${C.navy900})`}
-                    className="w-full h-full object-cover"
-                    style={{ opacity: i === posterIndex ? 1 : 0.55, transition: "opacity 200ms ease" }}
-                  />
-                </button>
-              ))}
+            {/* Thumbnail strip — overlay penanda di thumbnail aktif tumbuh dari kiri
+                ke kanan selama 7 detik (pakai transform, jadi mulus/GPU-accelerated) */}
+            <div className="flex flex-wrap justify-center gap-2.5 overflow-x-auto pb-1">
+              {POSTERS.map((p, i) => {
+                const isActive = i === posterIndex;
+                return (
+                  <button
+                    key={i}
+                    onClick={() => setPosterIndex(i)}
+                    className="shrink-0 w-20 h-16 rounded-lg overflow-hidden relative"
+                    style={{
+                      outline: isActive ? `2px solid ${C.leaf500}` : "none",
+                      outlineOffset: "2px",
+                      transition: "transform 180ms ease",
+                    }}
+                    onMouseEnter={(e) => (e.currentTarget.style.transform = "scale(1.06)")}
+                    onMouseLeave={(e) => (e.currentTarget.style.transform = "scale(1)")}
+                  >
+                    <SafeImage
+                      src={p.image}
+                      alt={p.title}
+                      icon={ImageIcon}
+                      gradient={`linear-gradient(135deg, ${C.navy700}, ${C.navy900})`}
+                      className="w-full h-full object-cover"
+                      style={{ opacity: isActive ? 1 : 0.55, transition: "opacity 200ms ease" }}
+                    />
+                    {isActive && (
+                      <span
+                        key={posterIndex}
+                        className="absolute inset-0 pointer-events-none"
+                        style={{
+                          backgroundColor: "rgba(255,255,255,0.55)",
+                          mixBlendMode: "overlay",
+                          transformOrigin: "left center",
+                          animation: `posterProgress ${POSTER_AUTOPLAY_MS}ms linear forwards`,
+                          animationPlayState: posterPaused ? "paused" : "running",
+                          willChange: "transform",
+                        }}
+                      />
+                    )}
+                  </button>
+                );
+              })}
             </div>
           </div>
         </Reveal>
