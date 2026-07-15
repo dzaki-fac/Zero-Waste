@@ -1,13 +1,11 @@
 import React, { useState, useRef, useEffect, useLayoutEffect, type ReactNode, type CSSProperties } from "react";
+import { Link } from "@inertiajs/react";
 import type { LucideIcon } from "lucide-react";
 import {
   Recycle,
   Leaf,
   Layers,
-  Scale,
   MapPin,
-  Info,
-  Users,
   ClipboardList,
   Workflow,
   BarChart3,
@@ -53,15 +51,17 @@ const body = { fontFamily: "'DM Sans', sans-serif" };
 
 // ---- Content data (ganti di sini nanti) -----------------------------
 
-const NAV_ITEMS = [
-  { id: "beranda", label: "Beranda" },
-  { id: "pengertian", label: "Pengertian" },
-  { id: "struktur", label: "Struktur" },
-  { id: "sop", label: "SOP" },
-  { id: "alur", label: "Alur" },
-  { id: "laporan", label: "Laporan" },
-  { id: "berita", label: "Berita" },
-  { id: "edukasi", label: "Edukasi" },
+type NavItem = { id: string; label: string; type: "anchor" } | { id: string; label: string; type: "page"; href: string };
+
+const NAV_ITEMS: NavItem[] = [
+  { id: "beranda", label: "Beranda", type: "anchor" },
+  { id: "pengertian", label: "Pengertian", type: "page", href: "/pengertian" },
+  { id: "struktur", label: "Struktur", type: "page", href: "/struktur" },
+  { id: "sop", label: "SOP", type: "anchor" },
+  { id: "alur", label: "Alur", type: "anchor" },
+  { id: "laporan", label: "Laporan", type: "anchor" },
+  { id: "berita", label: "Berita", type: "anchor" },
+  { id: "edukasi", label: "Edukasi", type: "anchor" },
 ];
 
 const HERO_SLIDES = [
@@ -107,26 +107,8 @@ const HERO_STATS = [
 
 const MENU_DECK = [
   {
-    id: "pengertian",
-    order: "01",
-    icon: Info,
-    title: "Pengertian",
-    teaser: "Apa itu Zero Waste dan kenapa kampus menjalankannya.",
-    placeholder:
-      "Taruh di sini: definisi Zero Waste, tujuan program, dan ruang lingkup penerapan (lantai 1-4, teras, halaman, parkir, termasuk UNDIP Press).",
-  },
-  {
-    id: "struktur",
-    order: "02",
-    icon: Users,
-    title: "Struktur Organisasi",
-    teaser: "Siapa yang menjalankan program ini di tiap unit.",
-    placeholder:
-      "Taruh di sini: bagan struktur organisasi, penanggung jawab per unit/lantai, dan kontak masing-masing.",
-  },
-  {
     id: "sop",
-    order: "03",
+    order: "01",
     icon: ClipboardList,
     title: "SOP",
     teaser: "Langkah baku pemilahan, penimbangan, dan pelaporan.",
@@ -135,7 +117,7 @@ const MENU_DECK = [
   },
   {
     id: "alur",
-    order: "04",
+    order: "02",
     icon: Workflow,
     title: "Alur",
     teaser: "Perjalanan sampah dari sub-area hingga distribusi akhir.",
@@ -144,7 +126,7 @@ const MENU_DECK = [
   },
   {
     id: "laporan",
-    order: "05",
+    order: "03",
     icon: BarChart3,
     title: "Laporan",
     teaser: "Ringkasan capaian dan rekap data pengelolaan sampah.",
@@ -451,115 +433,7 @@ function PlaceholderPanel({ item }: { item: (typeof MENU_DECK)[number] }) {
   );
 }
 
-// ---- Pengertian: 3 kartu bergambar, hover-reveal ----------------------------------
 
-const PENGERTIAN_ITEMS = [
-  {
-    key: "definisi",
-    icon: Info,
-    title: "Definisi",
-    shortDesc:
-      "Meminimalkan dampak sampah terhadap lingkungan, bukan sekadar daur ulang — mengutamakan perbaikan, pemakaian ulang, dan bahan berkelanjutan.",
-    image:
-      "https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?auto=format&fit=crop&w=700&q=80",
-  },
-  {
-    key: "tujuan",
-    icon: Scale,
-    title: "Tujuan",
-    shortDesc:
-      "Menekan sampah yang berakhir di TPA lewat kebiasaan reduce, reuse, dan recycle di seluruh unit.",
-    image:
-      "https://images.unsplash.com/photo-1532996122724-e3c354a0b15b?auto=format&fit=crop&w=700&q=80",
-  },
-  {
-    key: "ruang-lingkup",
-    icon: MapPin,
-    title: "Ruang Lingkup",
-    shortDesc: "Lantai 1-4, teras, halaman, parkir, hingga UNDIP Press.",
-    image:
-      "https://images.unsplash.com/photo-1497366811353-6870744d04b2?auto=format&fit=crop&w=700&q=80",
-  },
-];
-
-function PengertianContent() {
-  const [activeKey, setActiveKey] = useState<string | null>(null);
-
-  return (
-    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-      {PENGERTIAN_ITEMS.map((it) => {
-        const Icon = it.icon;
-        const isOpen = activeKey === it.key;
-        return (
-          <button
-            key={it.key}
-            onMouseEnter={() => setActiveKey(it.key)}
-            onMouseLeave={() => setActiveKey((prev) => (prev === it.key ? null : prev))}
-            onClick={() => setActiveKey((prev) => (prev === it.key ? null : it.key))}
-            className="relative rounded-2xl overflow-hidden text-left w-full"
-            style={{ aspectRatio: "4 / 5" }}
-            aria-expanded={isOpen}
-          >
-            <SafeImage
-              src={it.image}
-              alt={it.title}
-              icon={Icon}
-              gradient={`linear-gradient(160deg, ${C.navy700}, ${C.navy900})`}
-              className="absolute inset-0 w-full h-full object-cover"
-              style={{
-                transform: isOpen ? "scale(1.06)" : "scale(1)",
-                transition: "transform 450ms cubic-bezier(0.16,1,0.3,1)",
-              }}
-            />
-
-            {/* Dim tipis + badge judul: terlihat waktu kartu belum disentuh kursor */}
-            <div
-              className="absolute inset-0"
-              style={{
-                background: "linear-gradient(0deg, rgba(10,20,64,0.55) 0%, rgba(10,20,64,0) 35%)",
-                opacity: isOpen ? 0 : 1,
-                transition: "opacity 250ms ease",
-              }}
-            />
-            <div
-              className="absolute left-4 right-4 bottom-4 flex items-center gap-2"
-              style={{ opacity: isOpen ? 0 : 1, transition: "opacity 200ms ease" }}
-            >
-              <span
-                className="w-8 h-8 rounded-full flex items-center justify-center shrink-0"
-                style={{ backgroundColor: "rgba(255,255,255,0.15)", backdropFilter: "blur(4px)" }}
-              >
-                <Icon size={15} color="#fff" strokeWidth={2} />
-              </span>
-              <span className="text-white text-sm font-semibold" style={display}>
-                {it.title}
-              </span>
-            </div>
-
-            {/* Panel teks: naik pelan begitu kursor menyentuh gambar, sedikit transparan */}
-            <div
-              className="absolute left-0 right-0 bottom-0 flex flex-col justify-center p-5"
-              style={{
-                height: "58%",
-                background: "linear-gradient(160deg, rgba(16,27,82,0.8), rgba(47,163,106,0.75))",
-                backdropFilter: "blur(2px)",
-                transform: isOpen ? "translateY(0)" : "translateY(100%)",
-                transition: "transform 700ms cubic-bezier(0.16,1,0.3,1)",
-              }}
-            >
-              <div className="text-white text-lg font-semibold mb-1.5" style={display}>
-                {it.title}
-              </div>
-              <p className="text-xs leading-relaxed" style={{ color: "rgba(255,255,255,0.9)" }}>
-                {it.shortDesc}
-              </p>
-            </div>
-          </button>
-        );
-      })}
-    </div>
-  );
-}
 
 // ---- Main component ---------------------------------------------------
 
@@ -740,13 +614,29 @@ export default function Dashboard() {
 
           <nav className="hidden md:flex items-center gap-1">
             {NAV_ITEMS.map((n) => {
-              const active = activeSection === n.id;
+              const active = n.type === "page" ? false : activeSection === n.id;
+              const sharedStyle = { color: active ? "#fff" : "#D9DCEE", backgroundColor: active ? C.navy700 : "transparent" };
+              const baseCls = "relative px-3.5 py-2 rounded-full text-sm font-medium transition-colors";
+              if (n.type === "page") {
+                return (
+                  <Link
+                    key={n.id}
+                    href={n.href}
+                    className={baseCls}
+                    style={{ color: "#D9DCEE" }}
+                    onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = C.navy700)}
+                    onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = "transparent")}
+                  >
+                    {n.label}
+                  </Link>
+                );
+              }
               return (
                 <button
                   key={n.id}
                   onClick={() => scrollTo(n.id)}
-                  className="relative px-3.5 py-2 rounded-full text-sm font-medium transition-colors"
-                  style={{ color: active ? "#fff" : "#D9DCEE", backgroundColor: active ? C.navy700 : "transparent" }}
+                  className={baseCls}
+                  style={sharedStyle}
                   onMouseEnter={(e) => { if (!active) e.currentTarget.style.backgroundColor = C.navy700; }}
                   onMouseLeave={(e) => { if (!active) e.currentTarget.style.backgroundColor = "transparent"; }}
                 >
@@ -771,11 +661,22 @@ export default function Dashboard() {
 
         {mobileNavOpen && (
           <div className="md:hidden px-5 pb-4 flex flex-col gap-1" style={{ backgroundColor: C.navy900 }}>
-            {NAV_ITEMS.map((n) => (
-              <button key={n.id} onClick={() => scrollTo(n.id)} className="text-left px-3 py-2.5 rounded-lg text-sm font-medium" style={{ color: activeSection === n.id ? "#fff" : "#D9DCEE", backgroundColor: activeSection === n.id ? C.navy700 : "transparent" }}>
-                {n.label}
-              </button>
-            ))}
+            {NAV_ITEMS.map((n) => {
+              const active = n.type === "page" ? false : activeSection === n.id;
+              const sharedStyle = { color: active ? "#fff" : "#D9DCEE", backgroundColor: active ? C.navy700 : "transparent" };
+              if (n.type === "page") {
+                return (
+                  <Link key={n.id} href={n.href} onClick={() => setMobileNavOpen(false)} className="text-left px-3 py-2.5 rounded-lg text-sm font-medium" style={{ color: "#D9DCEE" }}>
+                    {n.label}
+                  </Link>
+                );
+              }
+              return (
+                <button key={n.id} onClick={() => scrollTo(n.id)} className="text-left px-3 py-2.5 rounded-lg text-sm font-medium" style={sharedStyle}>
+                  {n.label}
+                </button>
+              );
+            })}
           </div>
         )}
       </header>
@@ -865,7 +766,7 @@ export default function Dashboard() {
         </div>
       </section>
 
-      {/* ---- Bagian-bagian: Pengertian, Struktur Organisasi, SOP, Alur ---- */}
+      {/* ---- Bagian-bagian: SOP, Alur, Laporan ---- */}
         <section className="max-w-6xl mx-auto px-5 sm:px-8 pt-16 sm:pt-20 pb-16">
           {MENU_DECK.map((item, i) => (
             <div
@@ -881,7 +782,7 @@ export default function Dashboard() {
                 </h2>
               </Reveal>
               <Reveal delay={80}>
-                {item.id === "pengertian" ? <PengertianContent /> : <PlaceholderPanel item={item} />}
+                <PlaceholderPanel item={item} />
               </Reveal>
             </div>
           ))}
