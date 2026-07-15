@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect, type ReactNode, type CSSProperties } from "react";
+import React, { useState, useRef, useEffect, useLayoutEffect, type ReactNode, type CSSProperties } from "react";
 import type { LucideIcon } from "lucide-react";
 import {
   Recycle,
@@ -557,11 +557,13 @@ export default function Dashboard() {
 
   const sectionRefs = useRef<Record<string, HTMLElement | null>>({});
   const newsScrollRef = useRef<HTMLDivElement | null>(null);
+  const newsTrackRef = useRef<HTMLDivElement | null>(null);
+  const newsOffsetRef = useRef(0);
 
   // Paksa halaman mulai dari atas waktu pertama kali dibuka/direload, dan
   // matikan scroll restoration bawaan browser (penyebab utama halaman
   // "lompat" ke posisi scroll terakhir waktu pertama kali dibuka).
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (typeof window !== "undefined" && "scrollRestoration" in window.history) {
       window.history.scrollRestoration = "manual";
     }
@@ -593,20 +595,21 @@ export default function Dashboard() {
   }, []);
 
   useEffect(() => {
-    const el = newsScrollRef.current;
-    if (!el) return;
-    const SPEED_PX_PER_SEC = 32; 
+    const track = newsTrackRef.current;
+    if (!track) return;
+    const SPEED_PX_PER_SEC = 32;
     let raf = 0;
     let last = performance.now();
     const step = (now: number) => {
       const dt = (now - last) / 1000;
       last = now;
-      if (!newsPaused && el) {
-        el.scrollLeft += SPEED_PX_PER_SEC * dt;
-        const singleSetWidth = el.scrollWidth / 2;
-        if (el.scrollLeft >= singleSetWidth) {
-          el.scrollLeft -= singleSetWidth;
+      if (!newsPaused && track) {
+        newsOffsetRef.current += SPEED_PX_PER_SEC * dt;
+        const singleSetWidth = track.scrollWidth / 2;
+        if (newsOffsetRef.current >= singleSetWidth) {
+          newsOffsetRef.current -= singleSetWidth;
         }
+        track.style.transform = `translateX(-${newsOffsetRef.current}px)`;
       }
       raf = requestAnimationFrame(step);
     };
@@ -672,9 +675,13 @@ export default function Dashboard() {
   const activeHero = HERO_SLIDES[heroIndex];
 
   const scrollNews = (dir: number) => {
-    if (newsScrollRef.current) {
-      newsScrollRef.current.scrollBy({ left: dir * 320, behavior: "smooth" });
-    }
+    const track = newsTrackRef.current;
+    if (!track) return;
+    const singleSetWidth = track.scrollWidth / 2;
+    newsOffsetRef.current += dir * 320;
+    if (newsOffsetRef.current < 0) newsOffsetRef.current += singleSetWidth;
+    if (newsOffsetRef.current >= singleSetWidth) newsOffsetRef.current -= singleSetWidth;
+    track.style.transform = `translateX(-${newsOffsetRef.current}px)`;
   };
 
   const setSectionRef = (key: string) => (el: HTMLElement | null) => {
@@ -689,6 +696,7 @@ export default function Dashboard() {
         @import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;0,9..40,800;1,9..40,400;1,9..40,500&display=swap');
         html { scroll-behavior: smooth; }
         .news-scroll::-webkit-scrollbar { display: none; }
+        .news-scroll { scroll-behavior: auto !important; }
         @keyframes posterProgress { from { transform: scaleX(0); } to { transform: scaleX(1); } }
         @media (prefers-reduced-motion: reduce) {
           * { transition-duration: 0.01ms !important; animation-duration: 0.01ms !important; }
@@ -885,41 +893,43 @@ export default function Dashboard() {
 
           <div
             ref={newsScrollRef}
-            className="news-scroll flex gap-5 overflow-x-auto pb-2"
-            style={{ scrollbarWidth: "none" }}
+            className="news-scroll"
+            style={{ overflow: "hidden" }}
             onMouseEnter={() => setNewsPaused(true)}
             onMouseLeave={() => setNewsPaused(false)}
           >
-            {NEWS_LOOP.map((n, i) => (
-              <Reveal key={i} delay={(i % NEWS.length) * 80} className="shrink-0 w-64 sm:w-72">
-                <div
-                  className="rounded-2xl overflow-hidden"
-                  style={{ backgroundColor: C.navy800, transition: "transform 220ms ease" }}
-                  onMouseEnter={(e) => (e.currentTarget.style.transform = "translateY(-4px)")}
-                  onMouseLeave={(e) => (e.currentTarget.style.transform = "translateY(0)")}
-                >
-                  <div className="h-36 relative overflow-hidden">
-                    <SafeImage
-                      src={n.image}
-                      alt={n.title}
-                      icon={Newspaper}
-                      gradient={`linear-gradient(135deg, ${C.navy700}, ${C.navy900})`}
-                      className="w-full h-full object-cover"
-                    />
-                    <span className="absolute top-3 left-3 text-[10px] font-semibold px-2.5 py-1 rounded-full" style={{ backgroundColor: C.leaf500, color: "#fff" }}>
-                      {n.tag}
-                    </span>
+            <div ref={newsTrackRef} className="flex gap-5 pb-2" style={{ willChange: "transform" }}>
+              {NEWS_LOOP.map((n, i) => (
+                <Reveal key={i} delay={(i % NEWS.length) * 80} className="shrink-0 w-64 sm:w-72">
+                  <div
+                    className="rounded-2xl overflow-hidden"
+                    style={{ backgroundColor: C.navy800, transition: "transform 220ms ease" }}
+                    onMouseEnter={(e) => (e.currentTarget.style.transform = "translateY(-4px)")}
+                    onMouseLeave={(e) => (e.currentTarget.style.transform = "translateY(0)")}
+                  >
+                    <div className="h-36 relative overflow-hidden">
+                      <SafeImage
+                        src={n.image}
+                        alt={n.title}
+                        icon={Newspaper}
+                        gradient={`linear-gradient(135deg, ${C.navy700}, ${C.navy900})`}
+                        className="w-full h-full object-cover"
+                      />
+                      <span className="absolute top-3 left-3 text-[10px] font-semibold px-2.5 py-1 rounded-full" style={{ backgroundColor: C.leaf500, color: "#fff" }}>
+                        {n.tag}
+                      </span>
+                    </div>
+                    <div className="p-4">
+                      <div className="text-[11px] mb-1.5" style={{ color: "#8A8FB3" }}>{n.date}</div>
+                      <div className="text-sm font-medium leading-snug text-white mb-3" style={display}>{n.title}</div>
+                      <span className="inline-flex items-center gap-1.5 text-xs font-semibold" style={{ color: C.leaf400 }}>
+                        Baca selengkapnya <ArrowRight size={13} />
+                      </span>
+                    </div>
                   </div>
-                  <div className="p-4">
-                    <div className="text-[11px] mb-1.5" style={{ color: "#8A8FB3" }}>{n.date}</div>
-                    <div className="text-sm font-medium leading-snug text-white mb-3" style={display}>{n.title}</div>
-                    <span className="inline-flex items-center gap-1.5 text-xs font-semibold" style={{ color: C.leaf400 }}>
-                      Baca selengkapnya <ArrowRight size={13} />
-                    </span>
-                  </div>
-                </div>
-              </Reveal>
-            ))}
+                </Reveal>
+              ))}
+            </div>
           </div>
         </div>
       </section>
