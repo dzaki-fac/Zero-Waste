@@ -24,7 +24,7 @@ class PilahSampahController extends Controller
         return Inertia::render('pilah-sampah/create');
     }
 
-    public function store(PilahSampahRequest $request): RedirectResponse|Response
+    public function store(PilahSampahRequest $request): RedirectResponse
     {
         $pilahSampah = PilahSampah::create([
             ...$request->validated(),
@@ -32,9 +32,7 @@ class PilahSampahController extends Controller
         ]);
 
         if ($request->input('_redirect') === '/form') {
-            return Inertia::render('form/pilah-sampah', [
-                'submitted' => $pilahSampah->toArray(),
-            ]);
+            return redirect('/form/pilah-sampah')->with('submitted', $pilahSampah->toArray());
         }
 
         return to_route('pilah-sampah.index');
