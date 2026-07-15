@@ -10,6 +10,8 @@ export const NAV_ITEMS = [
 ];
 
 export const PAGE_ROUTES: Record<string, string> = {
+  pengertian: "/pengertian",
+  struktur: "/struktur",
   sop: "/sop",
   alur: "/alur",
 };

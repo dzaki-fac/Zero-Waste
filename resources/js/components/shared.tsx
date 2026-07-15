@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect, type ReactNode, type CSSProperties } from "react";
 import type { LucideIcon } from "lucide-react";
-import { C, body } from "../layouts/layout";
+import { C, body } from "../theme";
 
 export function useInView(threshold = 0.18) {
   const ref = useRef<HTMLDivElement | null>(null);

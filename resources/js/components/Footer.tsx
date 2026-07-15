@@ -1,5 +1,5 @@
 import { Instagram, Youtube, Globe } from "lucide-react";
-import { C, body, display } from "../theme";
+import { C, body } from "../theme";
 
 function TiktokIcon({ size = 16, color = "currentColor" }: { size?: number; color?: string }) {
   return (
@@ -8,13 +8,6 @@ function TiktokIcon({ size = 16, color = "currentColor" }: { size?: number; colo
     </svg>
   );
 }
-
-const FOOTER_QUICKLINKS = [
-  { title: "UPT Perpustakaan", note: "Layanan & katalog perpustakaan pusat" },
-  { title: "UNDIP Press", note: "Penerbitan dan publikasi kampus" },
-  { title: "Portal Akademik", note: "Sistem informasi akademik mahasiswa" },
-  { title: "Lapor Sampah", note: "Formulir pelaporan titik sampah menumpuk" },
-];
 
 const SOCIALS = [
   { icon: Globe, label: "Website Resmi", handle: "digilib.undip.ac.id", href: "https://digilib.undip.ac.id/" },
@@ -29,26 +22,6 @@ export default function Footer() {
   return (
     <footer style={{ backgroundColor: C.navy900 }}>
       <div className="max-w-6xl mx-auto px-5 sm:px-8 pt-14 sm:pt-16 pb-8">
-
-        <div className="mb-10">
-          <div className="text-xs font-semibold uppercase tracking-widest mb-4" style={{ ...body, color: "#8A8FB3" }}>
-            Tautan Cepat
-          </div>
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-            {FOOTER_QUICKLINKS.map((q, i) => (
-              <button
-                key={i}
-                className="text-left rounded-xl p-4 border"
-                style={{ backgroundColor: C.navy800, borderColor: C.navy700, transition: "border-color 200ms ease" }}
-                onMouseEnter={(e) => (e.currentTarget.style.borderColor = C.leaf500)}
-                onMouseLeave={(e) => (e.currentTarget.style.borderColor = C.navy700)}
-              >
-                <div className="text-sm font-semibold text-white mb-1" style={display}>{q.title}</div>
-                <div className="text-xs leading-snug" style={{ color: "#8A8FB3" }}>{q.note}</div>
-              </button>
-            ))}
-          </div>
-        </div>
 
         <div className="mb-10">
           <div className="text-xs font-semibold uppercase tracking-widest mb-4" style={{ ...body, color: "#8A8FB3" }}>

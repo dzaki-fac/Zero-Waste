@@ -1,6 +1,8 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { Info, Scale, MapPin } from "lucide-react";
-import Layout, { C, display } from "../layouts/layout";
+import { C, display, body } from "../theme";
+import Navbar from "../components/Navbar";
+import Footer from "../components/Footer";
 import { Reveal, SafeImage } from "../components/shared";
 
 const PENGERTIAN_ITEMS = [
@@ -74,9 +76,10 @@ function PengertianContent() {
   );
 }
 
-export default function Pengertian() {
+export default function PengertianPage() {
   return (
-    <Layout activeNav="pengertian">
+    <div style={{ ...body, backgroundColor: C.paper50, color: C.ink900 }} className="min-h-screen">
+      <Navbar activeSection="pengertian" />
       <section className="max-w-6xl mx-auto px-5 sm:px-8 pt-8 sm:pt-10 pb-24">
         <Reveal>
           <h2 className="text-2xl sm:text-3xl font-semibold mb-6" style={{ ...display, color: C.navy900 }}>Pengertian</h2>
@@ -85,12 +88,7 @@ export default function Pengertian() {
           <PengertianContent />
         </Reveal>
       </section>
-    </Layout>
+      <Footer />
+    </div>
   );
 }
-
-// Halaman ini sudah punya nav & footer sendiri lewat <Layout>, jadi
-// jangan dibungkus lagi oleh layout default (yang nampilin bar hitam +
-// sidebar "Platform/Dashboard/Repository/Documentation"). Ini yang bikin
-// Beranda tampil full — pola yang sama diterapkan di sini.
-Pengertian.layout = (page: React.ReactNode) => page;
