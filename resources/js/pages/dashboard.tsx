@@ -10,6 +10,7 @@ import {
   Users,
   ClipboardList,
   Workflow,
+  BarChart3,
   ChevronLeft,
   ChevronRight,
   ChevronDown,
@@ -58,6 +59,7 @@ const NAV_ITEMS = [
   { id: "struktur", label: "Struktur" },
   { id: "sop", label: "SOP" },
   { id: "alur", label: "Alur" },
+  { id: "laporan", label: "Laporan" },
   { id: "berita", label: "Berita" },
   { id: "edukasi", label: "Edukasi" },
 ];
@@ -139,6 +141,15 @@ const MENU_DECK = [
     teaser: "Perjalanan sampah dari sub-area hingga distribusi akhir.",
     placeholder:
       "Taruh di sini: diagram alur — dari input per sub-area, pilah, sampai distribusi (TPS / pupuk / Plasticpay).",
+  },
+  {
+    id: "laporan",
+    order: "05",
+    icon: BarChart3,
+    title: "Laporan",
+    teaser: "Ringkasan capaian dan rekap data pengelolaan sampah.",
+    placeholder:
+      "Taruh di sini: laporan bulanan/tahunan, grafik capaian per lantai, dan rekap total sampah terpilah.",
   },
 ];
 
