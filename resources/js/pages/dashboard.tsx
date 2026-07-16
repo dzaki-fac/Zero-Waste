@@ -120,7 +120,7 @@ const NEWS = [
     date: "04 Apr 2026",
     title: "K3L Sosialisasikan Pemilahan Sampah Residu di TPST Kampus UNDIP",
     image:
-      "https://images.unsplash.com/photo-1532996122724-e3c354a0b15b?auto=format&fit=crop&w=800&q=80",
+      "https://i.ytimg.com/vi/ne1zRy1AOOM/hq720.jpg?sqp=-oaymwEhCK4FEIIDSFryq4qpAxMIARUAAAAAGAElAADIQj0AgKJD&rs=AOn4CLDjk6kykjZwKXx6RaQdlDsDhyqU6g",
     href: "https://kemdiktisaintek.go.id/news/article/implementasi-undip-zero-waste-k3l-sosialisasikan-pemilahan-sampah-residu",
   },
   {
@@ -128,7 +128,7 @@ const NEWS = [
     date: "Jun 2026",
     title: "SV Zero Discharge: Langkah Strategis Sekolah Vokasi UNDIP",
     image:
-      "https://images.unsplash.com/photo-1595278069441-2cf29f8005a4?auto=format&fit=crop&w=800&q=80",
+      "https://undip.ac.id/wp-content/uploads/2026/06/1-ezgif.com-jpg-to-webp-converter-5.webp",
     href: "https://undip.ac.id/post/57036/sv-zero-discharge-langkah-strategis-sekolah-vokasi-undip-menuju-kampus-berkelanjutan-berkelas-dunia.html",
   },
   {
@@ -136,7 +136,7 @@ const NEWS = [
     date: "15 Jul 2026",
     title: "UI Gandeng BRIN dan Industri Kembangkan Model Zero Waste",
     image:
-      "https://images.unsplash.com/photo-1571727153934-b9e0059b7ab2?auto=format&fit=crop&w=800&q=80",
+      "https://apakabar.co.id/uploads/2026/07/post_6a50fe5d0bca19.37943188.jpg",
     href: "https://www.kompas.com/edu/read/2026/07/15/101720771/gaet-brin-dan-industri-ui-kembangkan-pengolahan-sampah-model-zero-waste",
   },
   {
@@ -144,7 +144,7 @@ const NEWS = [
     date: "08 Jun 2026",
     title: "UMS Galakkan Zero Waste, Ikhtiar Kurangi Sampah Plastik",
     image:
-      "https://images.unsplash.com/photo-1618477388954-7852f32655ec?auto=format&fit=crop&w=800&q=80",
+      "https://www.ums.ac.id/__gambars__/uploads/LGWtScdV89eyA9wyzMSIiMvhQvXmDrUOe0ZY6B0Y.webp",
     href: "https://jateng.antaranews.com/berita/634320/ums-galakkan-zero-waste-ikhtiar-kurangi-sampah-plastik",
   },
   {
@@ -152,7 +152,7 @@ const NEWS = [
     date: "awal Jul 2026",
     title: "UNJ Resmikan TPST dan Waste Management Center",
     image:
-      "https://images.unsplash.com/photo-1584735935682-2f2b69dff9d2?auto=format&fit=crop&w=800&q=80",
+      "https://cdn2.timesmedia.co.id/cdn-times/uploads/assets/2026/07/01/unj-resmikan-tpst-dan-waste-management-center-untuk-perkuat-komitmen-menuju-kamp-x9mo7260.webp?v=7.0.0#",
     href: "https://times.co.id/unj-resmikan-tpst-dan-waste-management-center-untuk-perkuat-komitmen-menuju-kampus-zero-waste",
   },
 ];
@@ -677,7 +677,7 @@ export default function Dashboard() {
               <div>
                 <SectionLabel>Kabar Terbaru</SectionLabel>
                 <h2 className="text-2xl sm:text-3xl font-semibold text-white" style={display}>
-                  Berita Zero Waste
+                  Berita Terkini
                 </h2>
               </div>
               <div className="flex items-center gap-3">
