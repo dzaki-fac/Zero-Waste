@@ -603,7 +603,8 @@ export default function Dashboard() {
                                     Semua sudah terdistribusi
                                 </div>
                             )}
-                        </CardContent                    </Card>
+                        </CardContent>
+                    </Card>
                 </div>
 
                 <div className="grid gap-4 lg:grid-cols-3">

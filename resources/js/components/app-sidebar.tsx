@@ -1,5 +1,5 @@
 import { Link, usePage } from '@inertiajs/react';
-import { LayoutDashboard, ListTodo, Recycle, Scale, Truck, Users } from 'lucide-react';
+import { LayoutDashboard, ListTodo, Recycle, Scale, Settings, Truck, Users } from 'lucide-react';
 import AppLogo from '@/components/app-logo';
 import { NavMain } from '@/components/nav-main';
 import { NavUser } from '@/components/nav-user';
@@ -33,6 +33,7 @@ export function AppSidebar() {
     const adminNavItems: NavItem[] = [
         { title: 'Checklist Pekerjaan', href: '/admin/checklist-pekerjaan', icon: LayoutDashboard },
         { title: 'Kelola Pekerjaan', href: '/admin/kelola-pekerjaan', icon: ListTodo },
+        { title: 'Kelola Data', href: '/admin/kelola-data', icon: Settings },
         { title: 'Akun', href: '/admin/akun', icon: Users },
     ];
 
