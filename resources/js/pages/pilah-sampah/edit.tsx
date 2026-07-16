@@ -22,12 +22,19 @@ type PilahSampah = {
     jenis_sampah: string;
 };
 
+type Options = {
+    area: string[];
+    sub_area: Record<string, string[]>;
+    jenis_sampah: string[];
+    tujuan_distribusi: string[];
+};
+
 type Props = {
     pilahSampah: PilahSampah;
 };
 
 export default function PilahSampahEdit({ pilahSampah }: Props) {
-    const { auth } = usePage().props as { auth: Auth };
+    const { auth, options } = usePage().props as unknown as { auth: Auth; options: Options };
     const prefix = auth.user.role === 'admin' ? '/admin' : '/petugas';
 
     const initialTanggal = (() => {
@@ -110,17 +117,9 @@ export default function PilahSampahEdit({ pilahSampah }: Props) {
                                     <SelectValue placeholder="Pilih jenis sampah" />
                                 </SelectTrigger>
                                 <SelectContent>
-                                    <SelectItem value="Daun">Daun</SelectItem>
-                                    <SelectItem value="Ranting besar">Ranting besar</SelectItem>
-                                    <SelectItem value="Ranting kecil">Ranting kecil</SelectItem>
-                                    <SelectItem value="Sisa makanan">Sisa makanan</SelectItem>
-                                    <SelectItem value="Plastik berwarna">Plastik berwarna</SelectItem>
-                                    <SelectItem value="Plastik putih">Plastik putih</SelectItem>
-                                    <SelectItem value="Styrofoam">Styrofoam</SelectItem>
-                                    <SelectItem value="Botol">Botol</SelectItem>
-                                    <SelectItem value="Kardus dan Kertas">Kardus dan Kertas</SelectItem>
-                                    <SelectItem value="B3">B3</SelectItem>
-                                    <SelectItem value="Lainnya">Lainnya</SelectItem>
+                                    {options.jenis_sampah.map((opt) => (
+                                        <SelectItem key={opt} value={opt}>{opt}</SelectItem>
+                                    ))}
                                 </SelectContent>
                             </Select>
                             <InputError message={errors.jenis_sampah} />

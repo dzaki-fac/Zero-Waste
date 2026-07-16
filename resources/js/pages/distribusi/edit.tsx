@@ -24,12 +24,19 @@ type Distribusi = {
     lokasi: string;
 };
 
+type Options = {
+    area: string[];
+    sub_area: Record<string, string[]>;
+    jenis_sampah: string[];
+    tujuan_distribusi: string[];
+};
+
 type Props = {
     distribusi: Distribusi;
 };
 
 export default function DistribusiEdit({ distribusi }: Props) {
-    const { auth } = usePage().props as { auth: Auth };
+    const { auth, options } = usePage().props as unknown as { auth: Auth; options: Options };
     const prefix = auth.user.role === 'admin' ? '/admin' : '/petugas';
 
     const initialTanggal = (() => {
@@ -114,17 +121,9 @@ export default function DistribusiEdit({ distribusi }: Props) {
                                     <SelectValue placeholder="Pilih jenis sampah" />
                                 </SelectTrigger>
                                 <SelectContent>
-                                    <SelectItem value="Daun">Daun</SelectItem>
-                                    <SelectItem value="Ranting besar">Ranting besar</SelectItem>
-                                    <SelectItem value="Ranting kecil">Ranting kecil</SelectItem>
-                                    <SelectItem value="Sisa makanan">Sisa makanan</SelectItem>
-                                    <SelectItem value="Plastik berwarna">Plastik berwarna</SelectItem>
-                                    <SelectItem value="Plastik putih">Plastik putih</SelectItem>
-                                    <SelectItem value="Styrofoam">Styrofoam</SelectItem>
-                                    <SelectItem value="Botol">Botol</SelectItem>
-                                    <SelectItem value="Kardus dan Kertas">Kardus dan Kertas</SelectItem>
-                                    <SelectItem value="B3">B3</SelectItem>
-                                    <SelectItem value="Lainnya">Lainnya</SelectItem>
+                                    {options.jenis_sampah.map((opt) => (
+                                        <SelectItem key={opt} value={opt}>{opt}</SelectItem>
+                                    ))}
                                 </SelectContent>
                             </Select>
                             <InputError message={errors.jenis_sampah} />
@@ -137,10 +136,9 @@ export default function DistribusiEdit({ distribusi }: Props) {
                                     <SelectValue placeholder="Pilih tujuan distribusi" />
                                 </SelectTrigger>
                                 <SelectContent>
-                                    <SelectItem value="TPS">TPS</SelectItem>
-                                    <SelectItem value="Pupuk/kompos">Pupuk/kompos</SelectItem>
-                                    <SelectItem value="PlasticPay">PlasticPay</SelectItem>
-                                    <SelectItem value="Tujuan lainnya">Tujuan lainnya</SelectItem>
+                                    {options.tujuan_distribusi.map((opt) => (
+                                        <SelectItem key={opt} value={opt}>{opt}</SelectItem>
+                                    ))}
                                 </SelectContent>
                             </Select>
                             <InputError message={errors.tujuan_distribusi} />

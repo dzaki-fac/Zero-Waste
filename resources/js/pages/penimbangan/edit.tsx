@@ -23,19 +23,19 @@ type Penimbangan = {
     sub_area: string;
 };
 
+type Options = {
+    area: string[];
+    sub_area: Record<string, string[]>;
+    jenis_sampah: string[];
+    tujuan_distribusi: string[];
+};
+
 type Props = {
     penimbangan: Penimbangan;
 };
 
-const subAreaMap: Record<string, string[]> = {
-    'Lantai 1': ['Area Baca', 'Kamar Kecil'],
-    'Lantai 2': ['Area Baca', 'Kamar Kecil'],
-    'Lantai 3': ['Area Baca', 'Kamar Kecil'],
-    'Lantai 4': ['Area Pertemuan', 'Area Kantor', 'Kamar Kecil'],
-};
-
 export default function PenimbanganEdit({ penimbangan }: Props) {
-    const { auth } = usePage().props as { auth: Auth };
+    const { auth, options } = usePage().props as unknown as { auth: Auth; options: Options };
     const prefix = auth.user.role === 'admin' ? '/admin' : '/petugas';
 
     const initialTanggal = (() => {
@@ -43,6 +43,7 @@ export default function PenimbanganEdit({ penimbangan }: Props) {
         return new Date(d.getTime() - d.getTimezoneOffset() * 60000).toISOString().slice(0, 16);
     })();
 
+    const subAreaMap = options.sub_area;
     const initialSubArea = subAreaMap[penimbangan.area]?.includes(penimbangan.sub_area)
         ? penimbangan.sub_area
         : '';
@@ -55,7 +56,7 @@ export default function PenimbanganEdit({ penimbangan }: Props) {
         sub_area: initialSubArea,
     });
 
-    const subAreaOptions = subAreaMap[data.area] ?? null;
+    const subAreaOptions = data.area ? (subAreaMap[data.area] ?? null) : null;
 
     const handleAreaChange = (value: string) => {
         setData('area', value);
@@ -130,13 +131,9 @@ export default function PenimbanganEdit({ penimbangan }: Props) {
                                     <SelectValue placeholder="Pilih area" />
                                 </SelectTrigger>
                                 <SelectContent>
-                                    <SelectItem value="Lantai 1">Lantai 1</SelectItem>
-                                    <SelectItem value="Lantai 2">Lantai 2</SelectItem>
-                                    <SelectItem value="Lantai 3">Lantai 3</SelectItem>
-                                    <SelectItem value="Lantai 4">Lantai 4</SelectItem>
-                                    <SelectItem value="Area Teras">Area Teras</SelectItem>
-                                    <SelectItem value="Area Halaman">Area Halaman</SelectItem>
-                                    <SelectItem value="Area Parkir">Area Parkir</SelectItem>
+                                    {options.area.map((opt) => (
+                                        <SelectItem key={opt} value={opt}>{opt}</SelectItem>
+                                    ))}
                                 </SelectContent>
                             </Select>
                             <InputError message={errors.area} />

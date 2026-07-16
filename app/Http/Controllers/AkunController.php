@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Admin;
+namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\StoreAccountRequest;
@@ -11,7 +11,7 @@ use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
 
-class AccountController extends Controller
+class AkunController extends Controller
 {
     public function index(Request $request): Response
     {
@@ -41,7 +41,7 @@ class AccountController extends Controller
                 'role' => $user->role,
             ]);
 
-        return Inertia::render('admin/accounts/index', [
+        return Inertia::render('akun/index', [
             'users' => $users,
             'filters' => $request->only(['role', 'search']),
             'current_user_id' => $request->user()->id,

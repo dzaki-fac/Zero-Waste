@@ -3,6 +3,7 @@
 use App\Http\Controllers\ChecklistPekerjaanController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DistribusiController;
+use App\Http\Controllers\KelolaDataController;
 use App\Http\Controllers\MasterPekerjaanController;
 use App\Http\Controllers\PenimbanganController;
 use App\Http\Controllers\PilahSampahController;
@@ -14,6 +15,13 @@ Route::middleware(['auth'])->group(function () {
     Route::inertia('form/penimbangan', 'form/penimbangan')->name('form.penimbangan');
     Route::inertia('form/pilah-sampah', 'form/pilah-sampah')->name('form.pilah-sampah');
     Route::inertia('form/distribusi', 'form/distribusi')->name('form.distribusi');
+
+    Route::get('admin/dashboard', [DashboardController::class, 'index'])->name('dashboard')->middleware(['verified', CheckRole::class . ':admin']);
+
+    Route::middleware([CheckRole::class . ':admin'])->prefix('admin')->group(function () {
+        Route::get('kelola-data', [KelolaDataController::class, 'index'])->name('settings.index');
+        Route::post('kelola-data', [KelolaDataController::class, 'update'])->name('settings.update');
+    });
 });
 
 // Admin routes
@@ -67,5 +75,3 @@ Route::middleware(['auth', CheckRole::class . ':petugas'])
     ->group(function () {
         Route::inertia('/form', 'welcome')->name('petugas.form');
     });
-
-

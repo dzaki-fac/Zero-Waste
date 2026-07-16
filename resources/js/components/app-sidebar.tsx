@@ -33,7 +33,7 @@ export function AppSidebar() {
     const adminNavItems: NavItem[] = [
         { title: 'Checklist Pekerjaan', href: '/admin/checklist-pekerjaan', icon: LayoutDashboard },
         { title: 'Kelola Pekerjaan', href: '/admin/kelola-pekerjaan', icon: ListTodo },
-        { title: 'Akun', href: '/admin/accounts', icon: Users },
+        { title: 'Akun', href: '/admin/akun', icon: Users },
     ];
 
     const navItems: NavItem[] = auth.user.role === 'admin'

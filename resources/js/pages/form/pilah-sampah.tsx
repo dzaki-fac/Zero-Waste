@@ -10,33 +10,51 @@ import {
 } from '@/components/ui/dialog';
 import { useEffect, useState } from 'react';
 
-const jenisSampahOptions = [
-    'Daun', 'Ranting besar', 'Ranting kecil', 'Sisa makanan',
-    'Plastik berwarna', 'Plastik putih', 'Styrofoam', 'Botol',
-    'Kardus dan Kertas', 'B3', 'Lainnya',
-];
+type Options = {
+    area: Array<{ value: string; label: string; icon: string }>;
+    sub_area: Record<string, string[]>;
+    jenis_sampah: string[];
+    tujuan_distribusi: string[];
+};
 
 export default function FormPilahSampah() {
-    const { auth, submitted } = usePage().props as {
+    const { auth, submitted, options } = usePage().props as unknown as {
         auth: { user: { name: string } };
-        submitted: Record<string, string | number | null> | null;
+        submitted: Record<string, unknown> | null;
+        options: Options;
     };
+
+    const jenisSampahOptions = options.jenis_sampah;
     const { data, setData, post, processing, errors } = useForm({
         _redirect: '/form',
         nama: auth.user.name,
         tanggal: new Date(Date.now() - new Date().getTimezoneOffset() * 60000).toISOString().slice(0, 16),
-        berat: '',
-        jenis_sampah: '',
+        items: jenisSampahOptions.map((jenis) => ({ jenis_sampah: jenis, berat: '' })),
     });
 
     const [showSuccess, setShowSuccess] = useState(false);
+    const [submitError, setSubmitError] = useState('');
 
     useEffect(() => {
         if (submitted) setShowSuccess(true);
     }, [submitted]);
 
+    const totalBerat = data.items.reduce((sum, item) => sum + (parseFloat(item.berat) || 0), 0);
+    const filledCount = data.items.filter((item) => parseFloat(item.berat) > 0).length;
+
+    const scrollTo = (id: string) => {
+        document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    };
+
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
+        const filledCount = data.items.filter((item) => parseFloat(item.berat) > 0).length;
+        if (!filledCount) {
+            setSubmitError('Minimal isi berat pada 1 jenis sampah');
+            scrollTo('section-jenis-berat');
+            return;
+        }
+        setSubmitError('');
         post('/admin/pilah-sampah');
     };
 
@@ -44,15 +62,17 @@ export default function FormPilahSampah() {
     const todayDate = now.slice(0, 10);
     const todayTime = now.slice(11, 16);
 
+    const submittedItems = submitted?.items as Array<Record<string, string | number>> | undefined;
+
     return (
         <>
             <Head title="Tambah Pilah Sampah" />
 
-            <div className="mx-auto flex min-h-dvh w-full max-w-lg flex-col bg-gradient-to-b from-green-50/50 to-white">
-                <div className="flex-1 px-4 pb-32 pt-6">
+            <div className="mx-auto flex min-h-dvh w-full max-w-lg flex-col bg-linear-to-b from-green-50/50 to-white">
+                <div className="flex-1 px-4 pb-36 pt-6">
                     <Heading
                         title="Tambah Pilah Sampah"
-                        description="Masukkan data pilah sampah baru"
+                        description="Isi berat pada jenis sampah yang akan dicatat"
                     />
 
                     <form onSubmit={handleSubmit} className="mt-6 space-y-6" noValidate>
@@ -116,63 +136,50 @@ export default function FormPilahSampah() {
                             </div>
                         </div>
 
-                        <div className="rounded-2xl border border-green-100 bg-white p-5 shadow-sm">
-                            <div className="mb-4 flex items-center gap-2 text-sm font-medium text-green-700">
-                                <Weight className="h-4 w-4" />
-                                Berat Sampah
-                            </div>
-
-                            <div className="grid gap-2">
-                                <Label htmlFor="berat" className="text-xs font-medium text-gray-600">Berat (kg)</Label>
-                                <div className="relative">
-                                    <Input
-                                        id="berat"
-                                        name="berat"
-                                        type="number"
-                                        step="0.01"
-                                        min="0"
-                                        value={data.berat}
-                                        onChange={(e) => setData('berat', e.target.value)}
-                                        required
-                                        placeholder="0.00"
-                                        inputMode="decimal"
-                                        onWheel={(e) => e.currentTarget.blur()}
-                                        className="h-12 border-green-200 pe-8 text-lg [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
-                                    />
-                                    <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-sm font-medium text-green-600">kg</span>
-                                </div>
-                                <InputError message={errors.berat} />
-                            </div>
-                        </div>
-
-                        <div className="rounded-2xl border border-green-100 bg-white p-5 shadow-sm">
+                        <div id="section-jenis-berat" className="rounded-2xl border border-green-100 bg-white p-5 shadow-sm">
                             <div className="mb-4 flex items-center gap-2 text-sm font-medium text-green-700">
                                 <Trash2 className="h-4 w-4" />
-                                Jenis Sampah
+                                Jenis & Berat Sampah
+                            </div>
+                            <p className="-mt-2 mb-3 text-xs text-gray-500">Isi berat pada minimal 1 jenis sampah (boleh lebih dari satu)</p>
+
+                            <div className="divide-y divide-green-100 rounded-xl border border-green-100 overflow-hidden">
+                                {data.items.map((item, i) => (
+                                    <div key={item.jenis_sampah} className="flex items-center gap-3 px-4 py-2.5 bg-white even:bg-green-50/30">
+                                        <span className="min-w-0 flex-1 text-sm font-medium text-gray-700">{item.jenis_sampah}</span>
+                                        <div className="relative w-32 shrink-0">
+                                            <Input
+                                                type="number"
+                                                step="0.01"
+                                                min="0"
+                                                value={item.berat}
+                                                onChange={(e) => {
+                                                    const items = data.items.map((it, idx) =>
+                                                        idx === i ? { ...it, berat: e.target.value } : it
+                                                    );
+                                                    setData('items', items);
+                                                    setSubmitError('');
+                                                }}
+                                                placeholder="0.00"
+                                                inputMode="decimal"
+                                                onWheel={(e) => e.currentTarget.blur()}
+                                                className="h-10 border-green-200 pe-8 text-sm [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
+                                            />
+                                            <span className="pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 text-xs text-green-600">kg</span>
+                                        </div>
+                                    </div>
+                                ))}
                             </div>
 
-                            <div className="grid gap-2">
-                                <Label className="text-xs font-medium text-gray-600">Pilih jenis sampah</Label>
-                                <div className="grid grid-cols-2 gap-2">
-                                    {jenisSampahOptions.map((opt) => {
-                                        const isSelected = data.jenis_sampah === opt;
-                                        return (
-                                            <button
-                                                key={opt}
-                                                type="button"
-                                                onClick={() => setData('jenis_sampah', opt)}
-                                                className={`rounded-xl border-2 px-4 py-3 text-sm font-medium transition-all active:scale-95 ${
-                                                    isSelected
-                                                        ? 'border-green-500 bg-green-50 text-green-700 shadow-sm'
-                                                        : 'border-gray-100 bg-gray-50 text-gray-600 hover:border-green-200 hover:bg-green-50/50'
-                                                }`}
-                                            >
-                                                {opt}
-                                            </button>
-                                        );
-                                    })}
-                                </div>
-                                <InputError message={errors.jenis_sampah} />
+                            {submitError && (
+                                <p className="mt-2 text-sm text-red-500">{submitError}</p>
+                            )}
+
+                            <div className="mt-3 flex items-center justify-between rounded-lg bg-green-100 px-4 py-2.5">
+                                <span className="text-sm font-medium text-green-700">
+                                    Total{filledCount > 0 ? ` (${filledCount} jenis)` : ''}
+                                </span>
+                                <span className="text-sm font-bold text-green-800">{totalBerat.toFixed(2)} kg</span>
                             </div>
                         </div>
                     </form>
@@ -211,7 +218,7 @@ export default function FormPilahSampah() {
                         </div>
                         <DialogTitle className="text-center text-green-800">Data Berhasil Disimpan</DialogTitle>
                         <DialogDescription className="text-center">
-                            oleh <span className="font-medium text-green-700">{submitted?.nama}</span>
+                            oleh <span className="font-medium text-green-700">{submitted?.nama as string}</span>
                         </DialogDescription>
                     </DialogHeader>
 
@@ -227,13 +234,17 @@ export default function FormPilahSampah() {
                                     : '-'}
                             </span>
                         </div>
-                        <div className="flex items-center justify-between px-4 py-2.5 text-sm">
-                            <span className="text-gray-500">Berat</span>
-                            <span className="font-medium text-gray-800">{String(submitted?.berat ?? '-')} kg</span>
-                        </div>
-                        <div className="flex items-center justify-between px-4 py-2.5 text-sm">
-                            <span className="text-gray-500">Jenis Sampah</span>
-                            <span className="font-medium text-gray-800">{String(submitted?.jenis_sampah ?? '-')}</span>
+
+                        {submittedItems?.map((item, i) => (
+                            <div key={i} className="flex items-center justify-between px-4 py-2 text-sm">
+                                <span className="text-gray-500">{item.jenis_sampah as string}</span>
+                                <span className="font-medium text-gray-800">{Number(item.berat).toFixed(2)} kg</span>
+                            </div>
+                        ))}
+
+                        <div className="flex items-center justify-between bg-green-100/50 px-4 py-2.5 text-sm font-semibold">
+                            <span className="text-green-700">Total</span>
+                            <span className="text-green-800">{Number(submitted?.total_berat ?? 0).toFixed(2)} kg</span>
                         </div>
                     </div>
 
