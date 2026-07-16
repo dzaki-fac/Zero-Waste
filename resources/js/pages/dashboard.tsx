@@ -42,14 +42,7 @@ const HERO_SLIDES = [
       "https://images.unsplash.com/photo-1521587760476-6c12a4b040da?auto=format&fit=crop&w=900&q=80",
     icon: Recycle,
   },
-  {
-    tab: "Pemilahan dari Sumber",
-    title: "Sampah dipilah dari sub-area",
-    desc: "Setiap ruang baca, toilet, dan ruang kerja menimbang serta mencatat sampahnya masing-masing sebelum diserahkan ke titik pilah pertama.",
-    image:
-      "https://images.unsplash.com/photo-1532996122724-e3c354a0b15b?auto=format&fit=crop&w=1600&q=80",
-    icon: Layers,
-  },
+  
   {
     tab: "Kompos & Daur Ulang",
     title: "Sisa makanan dan ranting jadi kompos",
