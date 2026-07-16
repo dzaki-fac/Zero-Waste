@@ -37,7 +37,6 @@ export const NAV_ITEMS: NavItem[] = [
   { id: "pengertian", label: "Pengertian", type: "page", href: "/pengertian" },
   { id: "struktur", label: "Struktur", type: "page", href: "/struktur" },
   { id: "sop", label: "SOP", type: "anchor" },
-  { id: "alur", label: "Alur", type: "anchor" },
   { id: "laporan", label: "Laporan", type: "anchor" },
   { id: "berita", label: "Berita", type: "anchor" },
   { id: "edukasi", label: "Edukasi", type: "anchor" },

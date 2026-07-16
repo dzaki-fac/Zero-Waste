@@ -7,7 +7,6 @@ import {
   Layers,
   MapPin,
   ClipboardList,
-  Workflow,
   BarChart3,
   ChevronLeft,
   ChevronRight,
@@ -21,7 +20,6 @@ import {
   Globe,
 } from "lucide-react";
 import { C, display, body } from "../theme";
-import { NAV_ITEMS, PAGE_ROUTES } from "../navData";
 import Navbar from "../components/Navbar";
 
 // ---- Tiktok Icon --------------------------------------------------------
@@ -104,15 +102,7 @@ const MENU_DECK = [
     placeholder:
       "Taruh di sini: dokumen SOP per tahap — pemilahan, penimbangan, pencatatan, dan distribusi akhir.",
   },
-  {
-    id: "alur",
-    order: "04",
-    icon: Workflow,
-    title: "Alur",
-    teaser: "Perjalanan sampah dari sub-area hingga distribusi akhir.",
-    placeholder:
-      "Taruh di sini: diagram alur — dari input per sub-area, pilah, sampai distribusi (TPS / pupuk / Plasticpay).",
-  },
+
   {
     id: "laporan",
     order: "05",
@@ -303,11 +293,11 @@ function StatCounter({ stat, delay }: { stat: (typeof HERO_STATS)[number]; delay
   const value = useCountUp(stat.value, started);
   return (
     <div>
-      <div className="text-2xl sm:text-3xl font-semibold text-white" style={display}>
+      <div className="text-xl sm:text-2xl font-semibold text-white" style={display}>
         {value}
         {stat.suffix}
       </div>
-      <div className="text-xs" style={{ color: "#9FA4C4" }}>
+      <div className="text-[11px]" style={{ color: "#9FA4C4" }}>
         {stat.label}
       </div>
     </div>
@@ -386,9 +376,20 @@ export default function Dashboard() {
   const newsOffsetRef = useRef(0);
   const suppressObserverUntilRef = useRef(0);
 
-  const NAV_HEIGHT = 64;
-  const NAV_OFFSET = NAV_HEIGHT + 8;
-  const NAV_OFFSET_TIGHT: Record<string, number> = { berita: NAV_HEIGHT, edukasi: NAV_HEIGHT };
+  // Navbar tingginya bisa beda-beda antara desktop dan mobile (mis. wrapping
+  // logo/teks, hamburger, dsb), jadi jangan pakai angka tetap — ukur langsung
+  // elemen <nav>-nya tiap kali mau scroll, supaya offset selalu akurat di
+  // semua ukuran layar dan section (termasuk "Edukasi") tidak ke-crop.
+  // PENTING: root Navbar-nya adalah <header>, sementara <nav> di dalamnya
+  // cuma dipakai untuk menu desktop (className "hidden md:flex") — artinya
+  // di mobile <nav> itu display:none alias tingginya 0px. Makanya harus
+  // ukur <header>, bukan <nav>, supaya offset di mobile akurat.
+  const getNavOffset = (id: string) => {
+    const headerEl = document.querySelector("header");
+    const navHeight = headerEl ? headerEl.getBoundingClientRect().height : 64;
+    const EXTRA_BUFFER: Record<string, number> = { berita: 0, edukasi: 0, laporan: 0 };
+    return navHeight + (EXTRA_BUFFER[id] ?? 8);
+  };
 
   // Paksa halaman mulai dari atas waktu pertama kali dibuka/direload, dan
   // matikan scroll restoration bawaan browser (penyebab utama halaman
@@ -399,12 +400,16 @@ export default function Dashboard() {
     }
     const scrollToId = (location.state as { scrollTo?: string })?.scrollTo;
     if (scrollToId) {
-      const el = sectionRefs.current[scrollToId];
-      if (el) {
-        const offset = NAV_OFFSET_TIGHT[scrollToId] ?? NAV_OFFSET;
+      const align = () => {
+        const el = sectionRefs.current[scrollToId];
+        if (!el) return;
+        const offset = getNavOffset(scrollToId);
         const top = el.getBoundingClientRect().top + window.scrollY - offset;
         window.scrollTo({ top, behavior: "instant" });
-      }
+      };
+      align();
+      window.setTimeout(align, 400);
+      window.setTimeout(align, 900);
       setActiveSection(scrollToId);
     }
   }, []);
@@ -437,8 +442,36 @@ export default function Dashboard() {
   }, [posterIndex, posterPaused]);
 
   useEffect(() => {
-    const onScroll = () => setScrollY(window.scrollY);
+    // Deteksi section aktif pakai pola scrollspy klasik: cek posisi tiap
+    // section relatif ke garis referensi tepat di bawah navbar, lalu pilih
+    // section TERAKHIR yang batas atasnya sudah lewat garis itu (urut sesuai
+    // urutan section di halaman). Ini jauh lebih stabil dibanding cara lama
+    // (IntersectionObserver berbasis rasio kemunculan), yang gampang salah
+    // pilih kalau dua section pendek berdekatan (mis. Beranda ↔ Laporan).
+    const SECTION_ORDER = ["beranda", "laporan", "berita", "edukasi"];
+
+    const onScroll = () => {
+      setScrollY(window.scrollY);
+      if (Date.now() < suppressObserverUntilRef.current) return;
+
+      const headerEl = document.querySelector("header");
+      const headerHeight = headerEl ? headerEl.getBoundingClientRect().height : 64;
+      const referenceLine = headerHeight + 4;
+
+      let current = SECTION_ORDER[0];
+      for (const id of SECTION_ORDER) {
+        const el = sectionRefs.current[id];
+        if (!el) continue;
+        const top = el.getBoundingClientRect().top;
+        if (top <= referenceLine) {
+          current = id;
+        }
+      }
+      setActiveSection(current);
+    };
+
     window.addEventListener("scroll", onScroll, { passive: true });
+    onScroll();
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
@@ -465,38 +498,29 @@ export default function Dashboard() {
     return () => cancelAnimationFrame(raf);
   }, [newsPaused]);
 
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        if (Date.now() < suppressObserverUntilRef.current) return;
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            const id = (entry.target as HTMLElement).dataset.navid;
-            if (id) setActiveSection(id);
-          }
-        });
-      },
-      { rootMargin: "-40% 0px -50% 0px", threshold: 0 }
-    );
-    NAV_ITEMS.forEach((n) => {
-      const el = sectionRefs.current[n.id];
-      if (el) {
-        el.dataset.navid = n.id;
-        observer.observe(el);
-      }
-    });
-    return () => observer.disconnect();
-  }, []);
-
   const scrollTo = (id: string) => {
     setActiveSection(id);
-    suppressObserverUntilRef.current = Date.now() + 900;
+    suppressObserverUntilRef.current = Date.now() + 1900;
     const el = sectionRefs.current[id];
-    if (el) {
-      const offset = NAV_OFFSET_TIGHT[id] ?? NAV_OFFSET;
-      const top = el.getBoundingClientRect().top + window.scrollY - offset;
-      window.scrollTo({ top, behavior: "smooth" });
-    }
+    if (!el) return;
+
+    const align = (behavior: ScrollBehavior) => {
+      const target = sectionRefs.current[id];
+      if (!target) return;
+      const offset = getNavOffset(id);
+      const top = target.getBoundingClientRect().top + window.scrollY - offset;
+      window.scrollTo({ top, behavior });
+      // Tegaskan lagi section aktifnya tiap kali posisi dikoreksi, supaya
+      // highlight nav tetap sesuai section yang diklik sampai scroll benar-benar selesai.
+      setActiveSection(id);
+    };
+
+    align("smooth");
+    // Koreksi ulang setelah animasi scroll kelar dan setelah gambar-gambar
+    // (poster/berita) kemungkinan sudah selesai load — supaya posisi akhir
+    // selalu presisi walau navbar/tinggi konten berubah di tengah jalan.
+    window.setTimeout(() => align("instant"), 550);
+    window.setTimeout(() => align("instant"), 1100);
   };
 
   const nextHero = () => setHeroIndex((i) => (i + 1) % HERO_SLIDES.length);
@@ -527,8 +551,11 @@ export default function Dashboard() {
     <div style={{ ...body, backgroundColor: C.paper50, color: C.ink900 }} className="min-h-screen">
       <style>{`
         html { scroll-behavior: smooth; }
+        * { overflow-anchor: none; }
         .news-scroll::-webkit-scrollbar { display: none; }
         .news-scroll { scroll-behavior: auto !important; }
+        .poster-thumbs::-webkit-scrollbar { display: none; }
+        .poster-thumbs { -ms-overflow-style: none; scrollbar-width: none; }
         @keyframes posterProgress { from { transform: scaleX(0); } to { transform: scaleX(1); } }
         @media (prefers-reduced-motion: reduce) {
           * { transition-duration: 0.01ms !important; animation-duration: 0.01ms !important; }
@@ -540,7 +567,7 @@ export default function Dashboard() {
 
       {/* ---- Hero ---- */}
       <section id="beranda" ref={setSectionRef("beranda")}>
-        <div className="relative w-full overflow-hidden" style={{ height: "100dvh", minHeight: 560 }}>
+        <div className="relative w-full overflow-hidden" style={{ height: "33dvh", minHeight: 320 }}>
           {HERO_SLIDES.map((s, i) => (
             <div
               key={i}
@@ -572,39 +599,41 @@ export default function Dashboard() {
           <button
             onClick={prevHero}
             aria-label="Slide sebelumnya"
-            className="absolute left-4 top-1/2 -translate-y-1/2 z-50 w-10 h-10 rounded-full flex items-center justify-center"
+            className="absolute left-4 top-1/2 -translate-y-1/2 z-50 w-8 h-8 rounded-full flex items-center justify-center"
             style={{ backgroundColor: "rgba(10,20,64,0.45)", border: "1px solid rgba(255,255,255,0.25)" }}
           >
-            <ChevronLeft size={18} color="#fff" />
+            <ChevronLeft size={14} color="#fff" />
           </button>
           <button
             onClick={nextHero}
             aria-label="Slide berikutnya"
-            className="absolute right-4 top-1/2 -translate-y-1/2 z-50 w-10 h-10 rounded-full flex items-center justify-center"
+            className="absolute right-4 top-1/2 -translate-y-1/2 z-50 w-8 h-8 rounded-full flex items-center justify-center"
             style={{ backgroundColor: "rgba(10,20,64,0.45)", border: "1px solid rgba(255,255,255,0.25)" }}
           >
-            <ChevronRight size={18} color="#fff" />
+            <ChevronRight size={14} color="#fff" />
           </button>
 
-          <div className="relative h-full max-w-6xl mx-auto px-5 sm:px-8 flex flex-col justify-end pb-24 sm:pb-28">
-            <SectionLabel hideLine>
-              <span style={{ color: C.gold500 }}>Sistem Informasi Pengelolaan Sampah</span>
-            </SectionLabel>
-            <h1 key={activeHero.title} className="text-2xl sm:text-4xl lg:text-5xl font-semibold max-w-4xl leading-tight text-white mb-4 hero-fade whitespace-normal sm:whitespace-nowrap" style={display}>
-              {activeHero.title}
-            </h1>
-            <p className="max-w-xl text-sm sm:text-base mb-7" style={{ color: "#C3C6DE" }}>
-              {activeHero.desc}
-            </p>
+          <div className="relative h-full max-w-6xl mx-auto px-5 sm:px-8 flex flex-col justify-between pt-8 sm:pt-10 pb-6 sm:pb-8">
+            <div>
+              <SectionLabel hideLine>
+                <span style={{ color: C.gold500, fontSize: "0.7rem" }}>Sistem Informasi Pengelolaan Sampah</span>
+              </SectionLabel>
+              <h1 key={activeHero.title} className="text-2xl sm:text-3xl lg:text-4xl font-semibold max-w-4xl leading-tight text-white mb-3 hero-fade whitespace-normal sm:whitespace-nowrap" style={display}>
+                {activeHero.title}
+              </h1>
+              <p className="max-w-xl text-sm sm:text-base" style={{ color: "#C3C6DE" }}>
+                {activeHero.desc}
+              </p>
+            </div>
 
-            <div className="flex flex-wrap gap-6 sm:gap-10">
+            <div className="flex flex-wrap gap-4 sm:gap-8">
               {HERO_STATS.map((st, i) => (
                 <StatCounter key={i} stat={st} delay={300 + i * 180} />
               ))}
             </div>
           </div>
 
-          <div className="absolute bottom-6 left-0 right-0 flex justify-center gap-2">
+          <div className="absolute bottom-3 left-0 right-0 flex justify-center gap-2">
             {HERO_SLIDES.map((_, i) => (
               <button
                 key={i}
@@ -773,14 +802,14 @@ export default function Dashboard() {
 
             {/* Thumbnail strip — overlay penanda di thumbnail aktif tumbuh dari kiri
                 ke kanan selama 7 detik (pakai transform, jadi mulus/GPU-accelerated) */}
-            <div className="flex flex-wrap justify-center gap-2 overflow-x-auto pb-1">
+            <div className="flex flex-nowrap sm:flex-wrap justify-start sm:justify-center gap-2 overflow-x-auto sm:overflow-visible pb-1 poster-thumbs snap-x snap-mandatory sm:snap-none">
               {POSTERS.map((p, i) => {
                 const isActive = i === posterIndex;
                 return (
                   <button
                     key={i}
                     onClick={() => setPosterIndex(i)}
-                    className="shrink-0 w-20 h-16 rounded-lg overflow-hidden relative"
+                    className="shrink-0 w-20 h-16 rounded-lg overflow-hidden relative snap-start"
                     style={{
                       outline: isActive ? `2px solid ${C.leaf500}` : "none",
                       outlineOffset: "2px",

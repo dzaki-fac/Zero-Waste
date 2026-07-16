@@ -10,21 +10,32 @@ const PENGERTIAN_ITEMS = [
     key: "definisi",
     icon: Info,
     title: "Definisi",
-    shortDesc: "Meminimalkan dampak sampah terhadap lingkungan, bukan sekadar daur ulang — mengutamakan perbaikan, pemakaian ulang, dan bahan berkelanjutan.",
+    shortDesc:
+      "Zero Waste merupakan pendekatan pengelolaan sumber daya yang berupaya mencegah timbulnya sampah melalui pengurangan, penggunaan kembali, perbaikan, dan daur ulang material. Pendekatan ini menempatkan konservasi sumber daya sebagai prioritas utama demi keberlanjutan lingkungan dan masyarakat.",
     image: "https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?auto=format&fit=crop&w=700&q=80",
   },
   {
-    key: "tujuan",
+    key: "prinsip",
     icon: Scale,
-    title: "Tujuan",
-    shortDesc: "Menekan sampah yang berakhir di TPA lewat kebiasaan reduce, reuse, dan recycle di seluruh unit.",
+    title: "Prinsip",
+    shortDesc:
+      "Penerapan Zero Waste didasarkan pada prinsip Refuse, Reduce, Reuse, Repair, Recycle, dan Recovery. Hierarki ini menempatkan pencegahan sampah sebagai prioritas utama sebelum pengolahan atau pembuangan akhir, sehingga penggunaan sumber daya dapat menjadi lebih efisien dan berkelanjutan.",
     image: "https://images.unsplash.com/photo-1532996122724-e3c354a0b15b?auto=format&fit=crop&w=700&q=80",
+  },
+  {
+    key: "manfaat",
+    icon: Info,
+    title: "Manfaat",
+    shortDesc:
+      "Penerapan Zero Waste membantu mengurangi volume sampah yang berakhir di tempat pemrosesan akhir, meningkatkan efisiensi pemanfaatan sumber daya, menekan pencemaran lingkungan, serta membangun budaya konsumsi dan pengelolaan sampah yang lebih bertanggung jawab di lingkungan institusi.",
+    image: "https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?auto=format&fit=crop&w=700&q=80",
   },
   {
     key: "ruang-lingkup",
     icon: MapPin,
     title: "Ruang Lingkup",
-    shortDesc: "Lantai 1-4, teras, halaman, parkir, hingga UNDIP Press.",
+    shortDesc:
+      "Ruang lingkup program mencakup seluruh area Perpustakaan Universitas Diponegoro, meliputi lantai satu hingga empat, area baca, ruang kantor, ruang pertemuan, toilet, teras, halaman, area parkir, dan Undip Press sebagai bagian dari lingkungan operasional perpustakaan.",
     image: "https://images.unsplash.com/photo-1497366811353-6870744d04b2?auto=format&fit=crop&w=700&q=80",
   },
 ];
@@ -33,7 +44,7 @@ function PengertianContent() {
   const [activeKey, setActiveKey] = useState<string | null>(null);
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
       {PENGERTIAN_ITEMS.map((it) => {
         const Icon = it.icon;
         const isOpen = activeKey === it.key;
@@ -55,7 +66,7 @@ function PengertianContent() {
               className="absolute inset-0 w-full h-full object-cover"
               style={{ transform: isOpen ? "scale(1.06)" : "scale(1)", transition: "transform 450ms cubic-bezier(0.16,1,0.3,1)" }}
             />
-            <div className="absolute inset-0" style={{ background: "linear-gradient(0deg, rgba(10,20,64,0.55) 0%, rgba(10,20,64,0) 35%)", opacity: isOpen ? 0 : 1, transition: "opacity 250ms ease" }} />
+            <div className="absolute inset-0" style={{ background: "linear-gradient(0deg, rgba(10,20,64,0.65) 0%, rgba(10,20,64,0) 40%)", opacity: isOpen ? 0 : 1, transition: "opacity 250ms ease" }} />
             <div className="absolute left-4 right-4 bottom-4 flex items-center gap-2" style={{ opacity: isOpen ? 0 : 1, transition: "opacity 200ms ease" }}>
               <span className="w-8 h-8 rounded-full flex items-center justify-center shrink-0" style={{ backgroundColor: "rgba(255,255,255,0.15)", backdropFilter: "blur(4px)" }}>
                 <Icon size={15} color="#fff" strokeWidth={2} />
@@ -64,10 +75,15 @@ function PengertianContent() {
             </div>
             <div
               className="absolute left-0 right-0 bottom-0 flex flex-col justify-center p-5"
-              style={{ height: "58%", background: "linear-gradient(160deg, rgba(16,27,82,0.8), rgba(47,163,106,0.75))", backdropFilter: "blur(2px)", transform: isOpen ? "translateY(0)" : "translateY(100%)", transition: "transform 700ms cubic-bezier(0.16,1,0.3,1)" }}
+              style={{ height: "72%", background: "linear-gradient(160deg, rgba(16,27,82,0.92), rgba(47,163,106,0.88))", backdropFilter: "blur(3px)", transform: isOpen ? "translateY(0)" : "translateY(100%)", transition: "transform 700ms cubic-bezier(0.16,1,0.3,1)" }}
             >
-              <div className="text-white text-lg font-semibold mb-1.5" style={display}>{it.title}</div>
-              <p className="text-xs leading-relaxed" style={{ color: "rgba(255,255,255,0.9)" }}>{it.shortDesc}</p>
+              <div className="text-white text-lg font-semibold mb-2" style={display}>{it.title}</div>
+              <p
+                className="text-xs leading-relaxed"
+                style={{ color: "rgba(255,255,255,0.92)", textAlign: "justify", textJustify: "inter-word" }}
+              >
+                {it.shortDesc}
+              </p>
             </div>
           </button>
         );
