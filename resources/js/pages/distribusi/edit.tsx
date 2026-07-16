@@ -1,4 +1,4 @@
-import { Head, Link, useForm } from '@inertiajs/react';
+import { Head, Link, useForm, usePage } from '@inertiajs/react';
 import { ArrowLeft, Save } from 'lucide-react';
 import Heading from '@/components/heading';
 import InputError from '@/components/input-error';
@@ -12,6 +12,7 @@ import {
     SelectTrigger,
     SelectValue,
 } from '@/components/ui/select';
+import type { Auth } from '@/types';
 
 type Distribusi = {
     id: number;
@@ -28,6 +29,9 @@ type Props = {
 };
 
 export default function DistribusiEdit({ distribusi }: Props) {
+    const { auth } = usePage().props as { auth: Auth };
+    const prefix = auth.user.role === 'admin' ? '/admin' : '/petugas';
+
     const initialTanggal = (() => {
         const d = new Date(distribusi.tanggal);
         return new Date(d.getTime() - d.getTimezoneOffset() * 60000).toISOString().slice(0, 16);
@@ -44,7 +48,7 @@ export default function DistribusiEdit({ distribusi }: Props) {
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        put(`/admin/distribusi/${distribusi.id}`);
+        put(`${prefix}/distribusi/${distribusi.id}`);
     };
 
     return (
@@ -162,7 +166,7 @@ export default function DistribusiEdit({ distribusi }: Props) {
                                 Perbarui
                             </Button>
                             <Button variant="outline" asChild className="border-green-200 text-green-700 hover:bg-green-50">
-                                <Link href="/admin/distribusi" className="flex items-center gap-1">
+                                <Link href={`${prefix}/distribusi`} className="flex items-center gap-1">
                                     <ArrowLeft className="h-4 w-4" />
                                     Batal
                                 </Link>

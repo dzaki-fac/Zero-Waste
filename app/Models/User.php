@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
@@ -28,6 +29,21 @@ class User extends Authenticatable
     use HasFactory, Notifiable;
 
     protected $fillable = ['name', 'email', 'password', 'nip', 'role'];
+
+    public function penimbangans(): HasMany
+    {
+        return $this->hasMany(Penimbangan::class);
+    }
+
+    public function pilahSampahs(): HasMany
+    {
+        return $this->hasMany(PilahSampah::class);
+    }
+
+    public function distribusis(): HasMany
+    {
+        return $this->hasMany(Distribusi::class);
+    }
 
     protected $hidden = ['password', 'two_factor_secret', 'two_factor_recovery_codes', 'remember_token'];
 

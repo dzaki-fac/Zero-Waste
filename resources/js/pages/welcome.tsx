@@ -1,8 +1,9 @@
 import { Head, Link, usePage, router } from '@inertiajs/react';
-import { Leaf, LogOut, Recycle, TreePine, User } from 'lucide-react';
+import { Leaf, LogOut, Recycle, Scale, Truck, User } from 'lucide-react';
+import type { Auth } from '@/types';
 
 export default function Welcome() {
-    const { auth } = usePage().props as { auth: { user: { id: number; name: string; email: string } | null } };
+    const { auth } = usePage().props as { auth: Auth };
 
     const handleLogout = () => {
         router.post('/logout');
@@ -10,33 +11,22 @@ export default function Welcome() {
 
     return (
         <>
-            <Head title="Welcome" />
+            <Head title="Beranda" />
 
             <div className="relative flex min-h-screen flex-col items-center justify-center bg-linear-to-b from-green-50 to-white p-6">
                 <div className="absolute right-6 top-6 flex items-center gap-3">
-                    {auth.user ? (
-                        <>
-                            <span className="flex items-center gap-1.5 text-sm font-medium text-green-700">
-                                <User className="h-4 w-4" />
-                                {auth.user.name}
-                            </span>
-                            <button
-                                type="button"
-                                onClick={handleLogout}
-                                className="inline-flex items-center gap-2 rounded-lg border border-green-200 bg-white px-4 py-2.5 text-sm font-medium text-green-700 shadow-sm hover:bg-green-50"
-                            >
-                                <LogOut className="h-4 w-4" />
-                                Logout
-                            </button>
-                        </>
-                    ) : (
-                        <Link
-                            href="/login"
-                            className="inline-flex items-center gap-2 rounded-lg border border-green-200 bg-white px-6 py-2.5 text-sm font-medium text-green-700 shadow-sm hover:bg-green-50"
-                        >
-                            Login
-                        </Link>
-                    )}
+                    <span className="flex items-center gap-1.5 text-sm font-medium text-green-700">
+                        <User className="h-4 w-4" />
+                        {auth.user.name}
+                    </span>
+                    <button
+                        type="button"
+                        onClick={handleLogout}
+                        className="inline-flex items-center gap-2 rounded-lg border border-green-200 bg-white px-4 py-2.5 text-sm font-medium text-green-700 shadow-sm hover:bg-green-50"
+                    >
+                        <LogOut className="h-4 w-4" />
+                        Logout
+                    </button>
                 </div>
 
                 <div className="flex flex-col items-center gap-8 text-center">
@@ -50,40 +40,29 @@ export default function Welcome() {
                     </div>
 
                     <p className="max-w-md text-lg text-green-700/70">
-                        Sistem pengelolaan sampah untuk lingkungan yang lebih bersih dan berkelanjutan.
+                        Selamat datang, {auth.user.name}. Silakan pilih modul operasional:
                     </p>
-
-                    <div className="flex gap-3">
-                        <div className="flex items-center gap-2 rounded-full bg-green-100 px-4 py-2 text-sm text-green-700">
-                            <Recycle className="h-4 w-4" />
-                            <span>Daur Ulang</span>
-                        </div>
-                        <div className="flex items-center gap-2 rounded-full bg-green-100 px-4 py-2 text-sm text-green-700">
-                            <TreePine className="h-4 w-4" />
-                            <span>Lestari</span>
-                        </div>
-                    </div>
 
                     <div className="flex flex-wrap justify-center gap-3">
                         <Link
-                            href="/form/penimbangan"
+                            href="/petugas/penimbangan"
                             className="inline-flex items-center gap-2 rounded-lg bg-green-600 px-6 py-2.5 text-sm font-medium text-white shadow-sm hover:bg-green-700"
                         >
-                            <Leaf className="h-4 w-4" />
+                            <Scale className="h-4 w-4" />
                             Penimbangan
                         </Link>
                         <Link
-                            href="/form/pilah-sampah"
+                            href="/petugas/pilah-sampah"
                             className="inline-flex items-center gap-2 rounded-lg bg-green-600 px-6 py-2.5 text-sm font-medium text-white shadow-sm hover:bg-green-700"
                         >
-                            <Leaf className="h-4 w-4" />
+                            <Recycle className="h-4 w-4" />
                             Pilah Sampah
                         </Link>
                         <Link
-                            href="/form/distribusi"
+                            href="/petugas/distribusi"
                             className="inline-flex items-center gap-2 rounded-lg bg-green-600 px-6 py-2.5 text-sm font-medium text-white shadow-sm hover:bg-green-700"
                         >
-                            <Leaf className="h-4 w-4" />
+                            <Truck className="h-4 w-4" />
                             Distribusi
                         </Link>
                     </div>
