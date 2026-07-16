@@ -64,21 +64,6 @@ function getCategoryColor(name: string): string {
     return color;
 }
 
-const AMBER_PALETTE = [
-    '#f59e0b', '#fbbf24', '#f97316', '#fcd34d', '#fb923c',
-    '#fde68a', '#d97706', '#facc15', '#ea580c', '#fef3c7',
-];
-
-const siapColorMap = new Map<string, string>();
-function getSiapColor(name: string): string {
-    let color = siapColorMap.get(name);
-    if (!color) {
-        color = AMBER_PALETTE[siapColorMap.size % AMBER_PALETTE.length];
-        siapColorMap.set(name, color);
-    }
-    return color;
-}
-
 function CustomTooltip({ active, payload }: { active?: boolean; payload?: Array<{ name: string; value: number; payload: { percent?: number } }> }) {
     if (active && payload && payload.length) {
         const data = payload[0];
@@ -568,13 +553,13 @@ export default function Dashboard() {
                         </CardContent>
                     </Card>
 
-                    <Card className="border-amber-200 bg-amber-50/40">
+                    <Card className="border-green-200">
                         <CardHeader className="pb-2">
-                            <CardTitle className="flex items-center gap-2 text-base text-amber-900">
-                                <Send className="size-5 text-amber-600" />
+                            <CardTitle className="flex items-center gap-2 text-base text-green-900">
+                                <Send className="size-5 text-green-600" />
                                 Siap Didistribusikan
                             </CardTitle>
-                            <p className="text-xs text-amber-700/80">
+                            <p className="text-xs text-green-700">
                                 Berat terpilah belum didistribusikan per jenis
                             </p>
                         </CardHeader>
@@ -600,7 +585,7 @@ export default function Dashboard() {
                                                     stroke="none"
                                                 >
                                                     {siapSortedData.map((entry) => (
-                                                        <Cell key={`cell-${entry.name}`} fill={getSiapColor(entry.name)} />
+                                                        <Cell key={`cell-${entry.name}`} fill={getCategoryColor(entry.name)} />
                                                     ))}
                                                 </Pie>
                                                 <Tooltip content={<CustomTooltip />} />
@@ -615,7 +600,7 @@ export default function Dashboard() {
                                                     <div key={item.name} className="flex items-center gap-2">
                                                         <span
                                                             className="size-2.5 shrink-0 rounded-full"
-                                                            style={{ backgroundColor: getSiapColor(item.name) }}
+                                                            style={{ backgroundColor: getCategoryColor(item.name) }}
                                                         />
                                                         <span className="min-w-0 flex-1 truncate text-xs text-gray-700">
                                                             {item.name}
