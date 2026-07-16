@@ -14,7 +14,7 @@ class AkunSeeder extends Seeder
             [
                 'name' => 'Admin',
                 'nip' => '111111111111111110',
-                'password' => bcrypt('admin123'),
+                'password' => bcrypt('password'),
                 'role' => 'admin',
             ]
         );
