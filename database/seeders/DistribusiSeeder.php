@@ -12,7 +12,7 @@ class DistribusiSeeder extends Seeder
 {
     public function run(): void
     {
-        $names = User::pluck('name')->toArray();
+        $petugas = User::where('role', 'petugas')->get()->keyBy('name');
         $tujuan = ['TPS', 'Pupuk/kompos', 'PlasticPay', 'Tujuan lainnya'];
         $lokasi = ['Bandung', 'Jakarta', 'Surabaya', 'Semarang', 'Yogyakarta', 'Malang', 'Bogor', 'Depok'];
 
@@ -33,8 +33,12 @@ class DistribusiSeeder extends Seeder
             $weights = array_map(fn ($w) => round($w * $scale, 2), $raw);
 
             foreach ($weights as $weight) {
+                $petugasName = fake()->randomElement($petugas->keys()->toArray());
+                $petugasUser = $petugas[$petugasName];
+
                 Distribusi::create([
-                    'nama' => fake()->randomElement($names),
+                    'nama' => $petugasName,
+                    'user_id' => $petugasUser->id,
                     'tanggal' => fake()->dateTimeBetween('-3 months', 'now'),
                     'berat' => $weight,
                     'jenis_sampah' => $jenis,

@@ -11,7 +11,7 @@ class PilahSampahSeeder extends Seeder
 {
     public function run(): void
     {
-        $names = User::pluck('name')->toArray();
+        $petugas = User::where('role', 'petugas')->get()->keyBy('name');
         $jenisSampah = [
             'Daun', 'Ranting besar', 'Ranting kecil', 'Sisa makanan',
             'Plastik berwarna', 'Plastik putih', 'Styrofoam', 'Botol',
@@ -30,8 +30,12 @@ class PilahSampahSeeder extends Seeder
         $weights = array_map(fn ($w) => round($w * $scale, 2), $raw);
 
         for ($i = 0; $i < 20; $i++) {
+            $petugasName = fake()->randomElement($petugas->keys()->toArray());
+            $petugasUser = $petugas[$petugasName];
+
             PilahSampah::create([
-                'nama' => fake()->randomElement($names),
+                'nama' => $petugasName,
+                'user_id' => $petugasUser->id,
                 'tanggal' => fake()->dateTimeBetween('-3 months', 'now'),
                 'berat' => $weights[$i],
                 'jenis_sampah' => fake()->randomElement($jenisSampah),

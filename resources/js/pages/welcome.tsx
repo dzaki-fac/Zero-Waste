@@ -45,7 +45,7 @@ export default function Welcome() {
                             <Leaf className="h-7 w-7 text-green-600" />
                         </div>
                         <h1 className="text-4xl font-bold tracking-tight text-green-900">
-                            Zero Waste
+                            ZeroLib
                         </h1>
                     </div>
 
