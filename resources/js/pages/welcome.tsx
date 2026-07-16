@@ -1,13 +1,10 @@
-import { Head, Link, usePage, router } from '@inertiajs/react';
+import { Head, Link, usePage } from '@inertiajs/react';
 import { Leaf, LogOut, Recycle, Scale, Truck, User } from 'lucide-react';
+import LogoutButton from '@/components/logout-button';
 import type { Auth } from '@/types';
 
 export default function Welcome() {
     const { auth } = usePage().props as { auth: Auth };
-
-    const handleLogout = () => {
-        router.post('/logout');
-    };
 
     return (
         <>
@@ -19,14 +16,10 @@ export default function Welcome() {
                         <User className="h-4 w-4" />
                         {auth.user.name}
                     </span>
-                    <button
-                        type="button"
-                        onClick={handleLogout}
-                        className="inline-flex items-center gap-2 rounded-lg border border-green-200 bg-white px-4 py-2.5 text-sm font-medium text-green-700 shadow-sm hover:bg-green-50"
-                    >
+                    <LogoutButton className="inline-flex items-center gap-2 rounded-lg border border-green-200 bg-white px-4 py-2.5 text-sm font-medium text-green-700 shadow-sm hover:bg-green-50">
                         <LogOut className="h-4 w-4" />
                         Logout
-                    </button>
+                    </LogoutButton>
                 </div>
 
                 <div className="flex flex-col items-center gap-8 text-center">
