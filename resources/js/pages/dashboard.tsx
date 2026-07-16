@@ -129,7 +129,7 @@ function PieChartCard({ title, icon: Icon, data, totalLabel }: {
             </CardHeader>
             <CardContent>
                 {data.length > 0 ? (
-                    <div className="h-[300px]">
+                    <div className="h-75">
                         <ResponsiveContainer width="100%" height="100%">
                             <PieChart>
                                 <defs>
@@ -156,7 +156,7 @@ function PieChartCard({ title, icon: Icon, data, totalLabel }: {
                         </ResponsiveContainer>
                     </div>
                 ) : (
-                    <div className="flex h-[300px] items-center justify-center text-sm text-gray-400">
+                    <div className="flex h-75 items-center justify-center text-sm text-gray-400">
                         Belum ada data
                     </div>
                 )}
@@ -339,7 +339,7 @@ function SimpleDatePicker({ value, onChange, placeholder }: { value: string; onC
                 onChange={(e) => { setInputValue(e.target.value); setTyping(true); }}
                 onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); commitTypedValue(); setOpen(false); } if (e.key === 'Escape') { setInputValue(value ? formatDisplayDate(value) : ''); setTyping(false); setOpen(false); } }}
                 onBlur={() => { if (typing) commitTypedValue(); }}
-                className="w-[130px] border-0 bg-transparent text-xs text-gray-700 outline-none hover:text-gray-900 cursor-text placeholder:text-gray-400"
+                className="w-32.5 border-0 bg-transparent text-xs text-gray-700 outline-none hover:text-gray-900 cursor-text placeholder:text-gray-400"
             />
             {open && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40" onMouseDown={(e) => { if (e.target === e.currentTarget) { commitTypedValue(); setOpen(false); } }}>

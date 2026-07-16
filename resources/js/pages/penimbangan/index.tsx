@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Head, Link, router } from '@inertiajs/react';
+import { Head, Link, router, usePage } from '@inertiajs/react';
 import { CalendarDays, FileDown, Leaf, Plus, Trash2, Pencil, Search } from 'lucide-react';
 import Heading from '@/components/heading';
 import { Button } from '@/components/ui/button';
@@ -33,13 +33,15 @@ type Props = {
     penimbangan: Penimbangan[];
 };
 
-const areaOptions = ['Lantai 1', 'Lantai 2', 'Lantai 3', 'Lantai 4', 'Area Teras', 'Area Halaman', 'Area Parkir'];
+const areaOptions: string[] = [];
 
 const months = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
 const currentYear = new Date().getFullYear();
 const years = Array.from({ length: 11 }, (_, i) => currentYear - i);
 
 export default function PenimbanganIndex({ penimbangan }: Props) {
+    const { options: pageOptions } = usePage().props as { options?: { area: string[] } };
+    const areaOptions = pageOptions?.area ?? [];
     const [search, setSearch] = useState('');
     const [filterArea, setFilterArea] = useState('all');
     const [filterPeriod, setFilterPeriod] = useState('all');

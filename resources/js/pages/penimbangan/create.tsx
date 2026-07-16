@@ -13,11 +13,18 @@ import {
 import { Head, Link, useForm, usePage } from '@inertiajs/react';
 import { ArrowLeft, Save } from 'lucide-react';
 
-const subAreaOptions = ['Area Baca', 'Area Kantor', 'Area Pertemuan', 'Kamar Kecil'];
-const nonLantaiAreas = ['Area Teras', 'Area Halaman', 'Area Parkir'];
+type Options = {
+    area: string[];
+    sub_area: Record<string, string[]>;
+    jenis_sampah: string[];
+    tujuan_distribusi: string[];
+};
 
 export default function PenimbanganCreate() {
-    const { auth } = usePage().props as { auth: { user: { name: string } } };
+    const { auth, options } = usePage().props as unknown as {
+        auth: { user: { name: string } };
+        options: Options;
+    };
     const { data, setData, post, processing, errors } = useForm({
         nama: auth.user.name,
         tanggal: new Date(Date.now() - new Date().getTimezoneOffset() * 60000).toISOString().slice(0, 16),
@@ -26,15 +33,11 @@ export default function PenimbanganCreate() {
         sub_area: '',
     });
 
-    const isLantai = !nonLantaiAreas.includes(data.area);
+    const subAreaOptions = data.area ? (options.sub_area[data.area] ?? null) : null;
 
     const handleAreaChange = (value: string) => {
         setData('area', value);
-        if (!['Lantai 1', 'Lantai 2', 'Lantai 3', 'Lantai 4'].includes(value)) {
-            setData('sub_area', '-');
-        } else {
-            setData('sub_area', '');
-        }
+        setData('sub_area', '');
     };
 
     const handleSubmit = (e: React.FormEvent) => {
@@ -105,13 +108,9 @@ export default function PenimbanganCreate() {
                                     <SelectValue placeholder="Pilih area" />
                                 </SelectTrigger>
                                 <SelectContent>
-                                    <SelectItem value="Lantai 1">Lantai 1</SelectItem>
-                                    <SelectItem value="Lantai 2">Lantai 2</SelectItem>
-                                    <SelectItem value="Lantai 3">Lantai 3</SelectItem>
-                                    <SelectItem value="Lantai 4">Lantai 4</SelectItem>
-                                    <SelectItem value="Area Teras">Area Teras</SelectItem>
-                                    <SelectItem value="Area Halaman">Area Halaman</SelectItem>
-                                    <SelectItem value="Area Parkir">Area Parkir</SelectItem>
+                                    {options.area.map((opt) => (
+                                        <SelectItem key={opt} value={opt}>{opt}</SelectItem>
+                                    ))}
                                 </SelectContent>
                             </Select>
                             <InputError message={errors.area} />
@@ -119,7 +118,7 @@ export default function PenimbanganCreate() {
 
                         <div className="grid gap-2">
                             <Label htmlFor="sub_area" className="text-green-700">Sub Area</Label>
-                            {isLantai ? (
+                            {subAreaOptions ? (
                                 <Select name="sub_area" value={data.sub_area} onValueChange={(v) => setData('sub_area', v)}>
                                     <SelectTrigger className="w-full border-green-200 focus-visible:border-green-500 focus-visible:ring-green-500/20">
                                         <SelectValue placeholder="Pilih sub area" />
@@ -134,9 +133,10 @@ export default function PenimbanganCreate() {
                                 <Input
                                     id="sub_area"
                                     name="sub_area"
-                                    value="-"
+                                    value=""
                                     disabled
-                                    className="border-green-200 bg-green-50 text-green-500"
+                                    placeholder="Sub area tidak tersedia"
+                                    className="border-green-200 bg-green-50 text-green-500 placeholder:text-green-500"
                                 />
                             )}
                             <InputError message={errors.sub_area} />

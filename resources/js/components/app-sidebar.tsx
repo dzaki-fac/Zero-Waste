@@ -1,5 +1,5 @@
 import { Link, usePage } from '@inertiajs/react';
-import { LayoutDashboard, Recycle, Scale, Truck, Users } from 'lucide-react';
+import { LayoutDashboard, Recycle, Scale, Settings, Truck, Users } from 'lucide-react';
 import AppLogo from '@/components/app-logo';
 import { NavMain } from '@/components/nav-main';
 import { NavUser } from '@/components/nav-user';
@@ -40,8 +40,8 @@ const mainNavItems: NavItem[] = [
 export function AppSidebar() {
     const { auth } = usePage().props as { auth: Auth };
 
-    const navItems: NavItem[] = auth.user.role === 'admin'
-        ? [...mainNavItems, { title: 'Akun', href: '/admin/accounts', icon: Users }]
+    const navItems: NavItem[] = auth.user?.role === 'admin'
+        ? [...mainNavItems, { title: 'Akun', href: '/admin/akun', icon: Users }, { title: 'Kelola Data', href: '/admin/kelola-data', icon: Settings }]
         : mainNavItems;
 
     return (
