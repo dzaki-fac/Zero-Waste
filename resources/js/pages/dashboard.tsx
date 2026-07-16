@@ -37,15 +37,15 @@ const HERO_SLIDES = [
   {
     tab: "Zero Waste UNDIP",
     title: "Menuju kampus tanpa sampah tersisa",
-    desc: "Satu sistem untuk memahami, menjalankan, dan memantau pengelolaan sampah kampus — dari pemilahan di tiap sub-area sampai distribusi akhirnya.",
+    desc: "Satu sistem yang membantu memahami, menjalankan, dan memantau pengelolaan sampah kampus, mulai dari pemilahan di tiap sub-area sampai ke distribusi akhirnya.",
     image:
       "https://images.unsplash.com/photo-1521587760476-6c12a4b040da?auto=format&fit=crop&w=900&q=80",
     icon: Recycle,
   },
   {
     tab: "Pemilahan dari Sumber",
-    title: "Sampah dipilah sejak dari sub-area",
-    desc: "Setiap area baca, kamar kecil, hingga ruang kantor menimbang dan mencatat sampahnya sendiri sebelum masuk ke tempat pilah pertama.",
+    title: "Sampah dipilah dari sub-area",
+    desc: "Setiap ruang baca, toilet, dan ruang kerja menimbang serta mencatat sampahnya masing-masing sebelum diserahkan ke titik pilah pertama.",
     image:
       "https://images.unsplash.com/photo-1532996122724-e3c354a0b15b?auto=format&fit=crop&w=1600&q=80",
     icon: Layers,
@@ -53,7 +53,7 @@ const HERO_SLIDES = [
   {
     tab: "Kompos & Daur Ulang",
     title: "Sisa makanan dan ranting jadi kompos",
-    desc: "Ranting kecil dan sisa makanan dikembalikan ke tanah, sementara kertas dan kardus disalurkan jadi karya kreativitas atau daur ulang.",
+    desc: "Ranting kecil dan sisa makanan dikembalikan ke tanah, sementara kertas dan kardus disalurkan menjadi karya kreativitas atau bahan daur ulang.",
     image:
       "https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?auto=format&fit=crop&w=1600&q=80",
     icon: Leaf,
@@ -61,7 +61,7 @@ const HERO_SLIDES = [
   {
     tab: "Distribusi Akhir",
     title: "Dari TPS sampai Plasticpay",
-    desc: "Sampah yang sudah dipilah didistribusikan ke tujuan akhirnya — ditimbun jadi pupuk, dikirim ke TPS, atau disetor lewat Plasticpay.",
+    desc: "Sampah yang sudah dipilah lalu didistribusikan ke tujuan akhirnya, ada yang ditimbun jadi pupuk, dikirim ke TPS, atau disetor lewat Plasticpay.",
     image:
       "https://images.unsplash.com/photo-1611284446314-60a58ac0deb9?auto=format&fit=crop&w=1600&q=80",
     icon: MapPin,
@@ -431,7 +431,7 @@ export default function Dashboard() {
   useEffect(() => {
     const t = setInterval(() => {
       setHeroIndex((i) => (i + 1) % HERO_SLIDES.length);
-    }, 6000);
+    }, 8000);
     return () => clearInterval(t);
   }, []);
 
@@ -743,9 +743,6 @@ export default function Dashboard() {
           <h2 className="text-2xl sm:text-3xl font-semibold mb-2" style={{ ...display, color: C.navy900 }}>
             Poster Edukasi
           </h2>
-          <p className="text-sm mb-5 max-w-lg" style={{ color: C.ink500 }}>
-            Geser kartu poster untuk edukasi pemilahan sampah. Gambar bisa diganti kapan saja dengan poster resmi.
-          </p>
         </Reveal>
 
         <Reveal delay={120}>
