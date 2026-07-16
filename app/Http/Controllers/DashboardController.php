@@ -115,10 +115,28 @@ class DashboardController extends Controller
             });
 
         $statusBerat = [
-            'belum_dipilah' => max(0, $totalPenimbangan - $totalPilah),
-            'belum_didistribusikan' => max(0, $totalPilah - $totalDistribusi),
+            'menunggu_pemilahan' => max(0, $totalPenimbangan - $totalPilah),
+            'siap_didistribusikan' => max(0, $totalPilah - $totalDistribusi),
             'sudah_didistribusikan' => $totalDistribusi,
         ];
+
+        $distribusiByJenis = Distribusi::query()
+            ->when($startDate, fn ($q) => $q->where('tanggal', '>=', $startDate))
+            ->when($endDate, fn ($q) => $q->where('tanggal', '<=', $endDate))
+            ->select('jenis_sampah', DB::raw('SUM(berat) as total'))
+            ->groupBy('jenis_sampah')
+            ->pluck('total', 'jenis_sampah')
+            ->map(fn ($total) => (float) $total)
+            ->toArray();
+
+        $siapDidistribusikanByJenis = collect($pilahByJenis)
+            ->map(fn ($item) => [
+                'name' => $item['name'],
+                'value' => max(0, $item['value'] - ($distribusiByJenis[$item['name']] ?? 0)),
+            ])
+            ->filter(fn ($item) => $item['value'] > 0)
+            ->values()
+            ->toArray();
 
         return Inertia::render('dashboard', [
             'penimbanganByArea' => $penimbanganByArea,
@@ -126,6 +144,7 @@ class DashboardController extends Controller
             'distribusiByTujuan' => $distribusiByTujuan,
             'petugasStats' => $petugasStats,
             'statusBerat' => $statusBerat,
+            'siapDidistribusikanByJenis' => $siapDidistribusikanByJenis,
             'filters' => [
                 'start_date' => $startDate,
                 'end_date' => $endDate,

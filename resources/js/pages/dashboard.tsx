@@ -3,7 +3,7 @@ import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from 'recharts';
 import type { PieLabelRenderProps } from 'recharts';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Scale, Recycle, Truck, Users, CalendarIcon, Clock, Package, CheckCircle, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Scale, Recycle, Truck, Users, CalendarIcon, Clock, Package, CheckCircle, ChevronLeft, ChevronRight, Send } from 'lucide-react';
 import { useState, useRef, useEffect } from 'react';
 import type { Auth } from '@/types';
 
@@ -30,10 +30,11 @@ type PageProps = {
     distribusiByTujuan: ChartData;
     petugasStats: PetugasStat[];
     statusBerat: {
-        belum_dipilah: number;
-        belum_didistribusikan: number;
+        menunggu_pemilahan: number;
+        siap_didistribusikan: number;
         sudah_didistribusikan: number;
     };
+    siapDidistribusikanByJenis: ChartData;
     filters: {
         start_date: string | null;
         end_date: string | null;
@@ -162,10 +163,11 @@ function PieChartCard({ title, icon: Icon, data, totalLabel }: {
     );
 }
 
-type PresetKey = 'all' | '7d' | '30d' | '3m';
+type PresetKey = 'all' | 'today' | '7d' | '30d' | '3m';
 
 const PRESETS: { key: PresetKey; label: string; days: number | null }[] = [
     { key: 'all', label: 'Semua', days: null },
+    { key: 'today', label: 'Hari Ini', days: 0 },
     { key: '7d', label: '7 Hari', days: 7 },
     { key: '30d', label: '30 Hari', days: 30 },
     { key: '3m', label: '3 Bulan', days: 90 },
@@ -174,6 +176,7 @@ const PRESETS: { key: PresetKey; label: string; days: number | null }[] = [
 function getPresetKey(start: string | null, end: string | null): PresetKey {
     if (!start && !end) return 'all';
     if (start && end) {
+        if (start === end) return 'today';
         const diff = Math.round((new Date(end).getTime() - new Date(start).getTime()) / 86400000);
         if (diff === 6) return '7d';
         if (diff === 29) return '30d';
@@ -356,7 +359,7 @@ function SimpleDatePicker({ value, onChange, placeholder }: { value: string; onC
 }
 
 export default function Dashboard() {
-    const { penimbanganByArea, pilahByJenis, distribusiByTujuan, petugasStats, statusBerat, filters } = usePage<PageProps>().props;
+    const { penimbanganByArea, pilahByJenis, distribusiByTujuan, petugasStats, statusBerat, siapDidistribusikanByJenis, filters } = usePage<PageProps>().props;
     const { auth } = usePage().props as { auth: Auth };
     const prefix = auth.user.role === 'admin' ? '/admin' : '/petugas';
 
@@ -379,6 +382,11 @@ export default function Dashboard() {
             setStartDate('');
             setEndDate('');
             applyFilter({});
+        } else if (preset.days === 0) {
+            const today = formatDateInput(new Date());
+            setStartDate(today);
+            setEndDate(today);
+            applyFilter({ start_date: today, end_date: today });
         } else {
             const s = daysAgo(preset.days);
             const e = formatDateInput(new Date());
@@ -443,90 +451,160 @@ export default function Dashboard() {
                     </div>
                 </div>
 
-                <Card className="border-green-200">
-                    <CardHeader className="pb-2">
-                        <CardTitle className="flex items-center gap-2 text-base text-green-900">
-                            <Package className="size-5 text-green-600" />
-                            Status Berat Sampah
-                        </CardTitle>
-                        <p className="text-xs text-green-600/70">
-                            Alur berat sampah dari penimbangan hingga distribusi
-                        </p>
-                    </CardHeader>
-                    <CardContent>
-                        {(() => {
-                            const STATUS_COLORS = ['#ef4444', '#f59e0b', '#22c55e'];
-                            const STATUS_ICONS = [Clock, Package, CheckCircle];
-                            const chartData = [
-                                { key: 'belum_dipilah', name: 'Tahap Pemilahan', value: statusBerat.belum_dipilah },
-                                { key: 'belum_didistribusikan', name: 'Tahap Distribusi', value: statusBerat.belum_didistribusikan },
-                                { key: 'sudah_didistribusikan', name: 'Selesai', value: statusBerat.sudah_didistribusikan },
-                            ];
-                            const total = chartData.reduce((s, d) => s + d.value, 0);
+                <div className="grid gap-4 lg:grid-cols-2">
+                    <Card className="border-green-200">
+                        <CardHeader className="pb-2">
+                            <CardTitle className="flex items-center gap-2 text-base text-green-900">
+                                <Package className="size-5 text-green-600" />
+                                Status Berat Sampah
+                            </CardTitle>
+                            <p className="text-xs text-green-600/70">
+                                Alur berat sampah dari penimbangan hingga distribusi
+                            </p>
+                        </CardHeader>
+                        <CardContent>
+                            {(() => {
+                                const STATUS_COLORS = ['#ef4444', '#f59e0b', '#22c55e'];
+                                const STATUS_ICONS = [Clock, Package, CheckCircle];
+                                const chartData = [
+                                    { key: 'menunggu_pemilahan', name: 'Menunggu Pemilahan', value: statusBerat.menunggu_pemilahan },
+                                    { key: 'siap_didistribusikan', name: 'Siap Didistribusikan', value: statusBerat.siap_didistribusikan },
+                                    { key: 'sudah_didistribusikan', name: 'Sudah Didistribusikan', value: statusBerat.sudah_didistribusikan },
+                                ];
+                                const total = chartData.reduce((s, d) => s + d.value, 0);
 
-                            return (
-                                <div className="flex flex-col items-center gap-6 md:flex-row md:items-start">
-                                    <div className="relative h-60 w-60 shrink-0">
+                                return (
+                                    <div className="flex flex-col items-center gap-6 lg:flex-row lg:items-start">
+                                        <div className="relative h-[240px] w-[240px] shrink-0">
+                                            <ResponsiveContainer width="100%" height="100%">
+                                                <PieChart>
+                                                    <Pie
+                                                        data={chartData}
+                                                        cx="50%"
+                                                        cy="50%"
+                                                        innerRadius={65}
+                                                        outerRadius={105}
+                                                        paddingAngle={3}
+                                                        dataKey="value"
+                                                        stroke="none"
+                                                    >
+                                                        {chartData.map((_, index) => (
+                                                            <Cell key={`cell-${index}`} fill={STATUS_COLORS[index]} />
+                                                        ))}
+                                                    </Pie>
+                                                    <Tooltip content={<CustomTooltip />} />
+                                                    <text x="50%" y="46%" textAnchor="middle" dominantBaseline="middle" className="fill-gray-900 text-2xl font-bold tabular-nums">
+                                                        {total.toLocaleString('id-ID', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                                                    </text>
+                                                    <text x="50%" y="58%" textAnchor="middle" dominantBaseline="middle" className="fill-gray-500 text-xs">
+                                                        kg total
+                                                    </text>
+                                                </PieChart>
+                                            </ResponsiveContainer>
+                                        </div>
+
+                                        <div className="flex w-full flex-col gap-3">
+                                            {chartData.map((item, index) => {
+                                                const pct = total > 0 ? (item.value / total) * 100 : 0;
+                                                const Icon = STATUS_ICONS[index];
+                                                return (
+                                                    <div key={item.key} className="flex items-center gap-3 rounded-lg border border-gray-100 bg-gray-50 p-3">
+                                                        <div className="flex size-9 shrink-0 items-center justify-center rounded-lg" style={{ backgroundColor: `${STATUS_COLORS[index]}15` }}>
+                                                            <Icon className="size-4" style={{ color: STATUS_COLORS[index] }} />
+                                                        </div>
+                                                        <div className="min-w-0 flex-1">
+                                                            <p className="text-xs font-medium text-gray-700">{item.name}</p>
+                                                            <div className="mt-1 h-1.5 w-full overflow-hidden rounded-full bg-gray-200">
+                                                                <div
+                                                                    className="h-full rounded-full transition-all"
+                                                                    style={{ width: `${pct}%`, backgroundColor: STATUS_COLORS[index] }}
+                                                                />
+                                                            </div>
+                                                        </div>
+                                                        <div className="shrink-0 text-right">
+                                                            <p className="text-sm font-bold tabular-nums text-gray-900">
+                                                                {item.value.toLocaleString('id-ID', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                                                            </p>
+                                                            <p className="text-[10px] text-gray-500">kg &middot; {pct.toFixed(1)}%</p>
+                                                        </div>
+                                                    </div>
+                                                );
+                                            })}
+                                        </div>
+                                    </div>
+                                );
+                            })()}
+                        </CardContent>
+                    </Card>
+
+                    <Card className="border-green-200">
+                        <CardHeader className="pb-2">
+                            <CardTitle className="flex items-center gap-2 text-base text-green-900">
+                                <Send className="size-5 text-green-600" />
+                                Siap Didistribusikan
+                            </CardTitle>
+                            <p className="text-xs text-green-600/70">
+                                Berat terpilah belum didistribusikan per jenis
+                            </p>
+                        </CardHeader>
+                        <CardContent>
+                            {siapDidistribusikanByJenis.length > 0 ? (
+                                <div className="flex flex-col items-center gap-6 lg:flex-row lg:items-start">
+                                    <div className="relative h-[220px] w-[220px] shrink-0">
                                         <ResponsiveContainer width="100%" height="100%">
                                             <PieChart>
                                                 <Pie
-                                                    data={chartData}
+                                                    data={siapDidistribusikanByJenis}
                                                     cx="50%"
                                                     cy="50%"
-                                                    innerRadius={65}
-                                                    outerRadius={105}
-                                                    paddingAngle={3}
+                                                    labelLine={false}
+                                                    label={renderCustomLabel}
+                                                    outerRadius={95}
                                                     dataKey="value"
                                                     stroke="none"
                                                 >
-                                                    {chartData.map((_, index) => (
-                                                        <Cell key={`cell-${index}`} fill={STATUS_COLORS[index]} />
+                                                    {siapDidistribusikanByJenis.map((item, index) => (
+                                                        <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                                                     ))}
                                                 </Pie>
                                                 <Tooltip content={<CustomTooltip />} />
                                             </PieChart>
                                         </ResponsiveContainer>
-                                        <div className="absolute inset-0 flex flex-col items-center justify-center">
-                                            <p className="text-2xl font-bold tabular-nums text-gray-900">
-                                                {total.toLocaleString('id-ID', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                                            </p>
-                                            <p className="text-xs text-gray-500">kg total</p>
-                                        </div>
                                     </div>
-
-                                    <div className="flex w-full flex-col gap-3">
-                                        {chartData.map((item, index) => {
-                                            const pct = total > 0 ? (item.value / total) * 100 : 0;
-                                            const Icon = STATUS_ICONS[index];
-                                            return (
-                                                <div key={item.key} className="flex items-center gap-3 rounded-lg border border-gray-100 bg-gray-50 p-3">
-                                                    <div className="flex size-9 shrink-0 items-center justify-center rounded-lg" style={{ backgroundColor: `${STATUS_COLORS[index]}15` }}>
-                                                        <Icon className="size-4" style={{ color: STATUS_COLORS[index] }} />
+                                    <div className="flex w-full flex-col gap-2">
+                                        {siapDidistribusikanByJenis
+                                            .slice()
+                                            .sort((a, b) => b.value - a.value)
+                                            .map((item, index) => {
+                                                const total = siapDidistribusikanByJenis.reduce((s, d) => s + d.value, 0);
+                                                const percent = total > 0 ? (item.value / total) * 100 : 0;
+                                                return (
+                                                    <div key={item.name} className="flex items-center gap-2">
+                                                        <span
+                                                            className="size-2.5 shrink-0 rounded-full"
+                                                            style={{ backgroundColor: COLORS[index % COLORS.length] }}
+                                                        />
+                                                        <span className="min-w-0 flex-1 truncate text-xs text-gray-700">
+                                                            {item.name}
+                                                        </span>
+                                                        <span className="shrink-0 text-xs font-medium tabular-nums text-gray-900">
+                                                            {item.value.toLocaleString('id-ID', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} kg
+                                                        </span>
+                                                        <span className="shrink-0 text-xs tabular-nums text-gray-500">
+                                                            ({percent.toFixed(1)}%)
+                                                        </span>
                                                     </div>
-                                                    <div className="min-w-0 flex-1">
-                                                        <p className="text-xs font-medium text-gray-700">{item.name}</p>
-                                                        <div className="mt-1 h-1.5 w-full overflow-hidden rounded-full bg-gray-200">
-                                                            <div
-                                                                className="h-full rounded-full transition-all"
-                                                                style={{ width: `${pct}%`, backgroundColor: STATUS_COLORS[index] }}
-                                                            />
-                                                        </div>
-                                                    </div>
-                                                    <div className="shrink-0 text-right">
-                                                        <p className="text-sm font-bold tabular-nums text-gray-900">
-                                                            {item.value.toLocaleString('id-ID', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                                                        </p>
-                                                        <p className="text-[10px] text-gray-500">kg &middot; {pct.toFixed(1)}%</p>
-                                                    </div>
-                                                </div>
-                                            );
-                                        })}
+                                                );
+                                            })}
                                     </div>
                                 </div>
-                            );
-                        })()}
-                    </CardContent>
-                </Card>
+                            ) : (
+                                <div className="flex h-[220px] items-center justify-center text-sm text-gray-400">
+                                    Semua sudah terdistribusi
+                                </div>
+                            )}
+                        </CardContent                    </Card>
+                </div>
 
                 <div className="grid gap-4 lg:grid-cols-3">
                     <PieChartCard
