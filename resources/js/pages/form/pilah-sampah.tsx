@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Head, Link, router, useForm, usePage } from '@inertiajs/react';
+import { route } from 'ziggy-js';
 import { ArrowLeft, Send, Calendar, Weight, User, Trash2, CheckCircle2 } from 'lucide-react';
 import {
     Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle,
@@ -46,7 +47,7 @@ export default function FormPilahSampah() {
         document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'center' });
     };
 
-    const handleSubmit = (e: React.FormEvent) => {
+const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
         const filledCount = data.items.filter((item) => parseFloat(item.berat) > 0).length;
         if (!filledCount) {
@@ -55,7 +56,7 @@ export default function FormPilahSampah() {
             return;
         }
         setSubmitError('');
-        post('/admin/pilah-sampah');
+        post(route('petugas.pilah-sampah.store'));
     };
 
     const now = new Date(Date.now() - new Date().getTimezoneOffset() * 60000).toISOString().slice(0, 16);

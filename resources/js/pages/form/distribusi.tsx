@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Head, Link, router, useForm, usePage } from '@inertiajs/react';
+import { route } from 'ziggy-js';
 import { ArrowLeft, Send, Calendar, User, Trash2, MapPin, Ship, CheckCircle2 } from 'lucide-react';
 import {
     Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle,
@@ -87,7 +88,7 @@ export default function FormDistribusi() {
             scrollTo('section-jenis-berat');
             return;
         }
-        router.post('/admin/distribusi', {
+        router.post(route('petugas.distribusi.store'), {
             ...data,
             tujuan_distribusi: data.tujuan_distribusi === 'Tujuan lainnya' ? data.tujuan_lainnya : data.tujuan_distribusi,
         });
