@@ -13,6 +13,7 @@ class ChecklistPekerjaan extends Model
         'nip',
         'tanggal',
         'tugas',
+        'area',
         'status',
         'jenis_pekerjaan',
         'master_pekerjaan_id',

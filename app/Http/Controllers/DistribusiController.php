@@ -56,6 +56,7 @@ class DistribusiController extends Controller
                     'berat' => $berat,
                     'tujuan_distribusi' => $request->input('tujuan_distribusi'),
                     'lokasi' => $request->input('lokasi'),
+                    'user_id' => auth()->id(),
                 ]);
                 $created[] = $distribusi->toArray();
             }

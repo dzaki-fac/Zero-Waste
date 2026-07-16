@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Helpers\OptionHelper;
 use App\Models\ChecklistPekerjaan;
 use App\Models\MasterPekerjaan;
 use App\Models\User;
@@ -31,11 +32,19 @@ class ChecklistPekerjaanController extends Controller
             $filter = null;
         }
 
+        $areaFilter = $request->query('area');
+
         $masterTasks = MasterPekerjaan::active()->ordered()->get();
-        $checklist = ChecklistPekerjaan::where('nip', $nip)
-            ->where('tanggal', $tanggal)
-            ->get()
-            ->keyBy('master_pekerjaan_id');
+
+        $checklist = $areaFilter
+            ? ChecklistPekerjaan::where('nip', $nip)
+                ->where('tanggal', $tanggal)
+                ->where('area', $areaFilter)
+                ->get()
+                ->keyBy('master_pekerjaan_id')
+            : collect();
+
+        $areas = OptionHelper::get('area');
 
         return Inertia::render('checklist-pekerjaan/show', [
             'petugas' => $petugas,
@@ -43,6 +52,8 @@ class ChecklistPekerjaanController extends Controller
             'masterTasks' => $masterTasks,
             'checklist' => $checklist,
             'filter' => $filter,
+            'areaFilter' => $areaFilter,
+            'areas' => $areas,
         ]);
     }
 
@@ -62,6 +73,10 @@ class ChecklistPekerjaanController extends Controller
 
         if ($request->query('status')) {
             $query->where('status', $request->query('status'));
+        }
+
+        if ($request->query('area')) {
+            $query->where('area', $request->query('area'));
         }
 
         $records = $query->orderBy('tanggal', 'desc')
@@ -93,6 +108,7 @@ class ChecklistPekerjaanController extends Controller
         $startDate = $request->query('start_date');
         $endDate = $request->query('end_date');
         $status = $request->query('status');
+        $area = $request->query('area');
 
         $petugas = User::where('role', 'petugas')->where('nip', $nip)->firstOrFail();
 
@@ -110,6 +126,10 @@ class ChecklistPekerjaanController extends Controller
             $query->where('status', $status);
         }
 
+        if ($area) {
+            $query->where('checklist_pekerjaan.area', $area);
+        }
+
         $rows = $query->join('master_pekerjaan', 'checklist_pekerjaan.master_pekerjaan_id', '=', 'master_pekerjaan.id')
             ->select('checklist_pekerjaan.*')
             ->orderBy('tanggal', 'desc')
@@ -118,7 +138,7 @@ class ChecklistPekerjaanController extends Controller
 
         $filename = 'checklist_' . str_replace(' ', '_', $petugas->name) . '_' . $petugas->nip . '_' . now()->toDateString() . '.csv';
 
-        $headers = ['No', 'Tanggal', 'Jenis Pekerjaan', 'Tugas', 'Status', 'Dibuat Pada', 'Diperbarui Pada'];
+        $headers = ['No', 'Tanggal', 'Area', 'Jenis Pekerjaan', 'Tugas', 'Status', 'Dibuat Pada', 'Diperbarui Pada'];
 
         $callback = function () use ($rows, $headers) {
             $file = fopen('php://output', 'w');
@@ -130,6 +150,7 @@ class ChecklistPekerjaanController extends Controller
                 fputcsv($file, [
                     $index++,
                     $row->tanggal,
+                    $row->area ?? 'Belum ditentukan',
                     ucfirst($row->jenis_pekerjaan),
                     $row->tugas,
                     $row->status === 'sudah' ? 'Sudah' : 'Belum',
@@ -152,6 +173,7 @@ class ChecklistPekerjaanController extends Controller
         $startDate = $request->query('start_date');
         $endDate = $request->query('end_date');
         $status = $request->query('status');
+        $area = $request->query('area');
 
         $query = ChecklistPekerjaan::join('users', 'users.nip', '=', 'checklist_pekerjaan.nip')
             ->join('master_pekerjaan', 'checklist_pekerjaan.master_pekerjaan_id', '=', 'master_pekerjaan.id')
@@ -173,6 +195,10 @@ class ChecklistPekerjaanController extends Controller
             $query->where('checklist_pekerjaan.status', $status);
         }
 
+        if ($area) {
+            $query->where('checklist_pekerjaan.area', $area);
+        }
+
         $rows = $query->orderBy('tanggal', 'desc')
             ->orderBy('users.name')
             ->orderBy('master_pekerjaan.urutan')
@@ -184,7 +210,7 @@ class ChecklistPekerjaanController extends Controller
             $filename = 'checklist_semua_petugas_' . now()->toDateString() . '.csv';
         }
 
-        $headers = ['No', 'Nama Petugas', 'NIP', 'Tanggal', 'Jenis Pekerjaan', 'Tugas', 'Status', 'Dibuat Pada', 'Diperbarui Pada'];
+        $headers = ['No', 'Nama Petugas', 'NIP', 'Tanggal', 'Area', 'Jenis Pekerjaan', 'Tugas', 'Status', 'Dibuat Pada', 'Diperbarui Pada'];
 
         $callback = function () use ($rows, $headers) {
             $file = fopen('php://output', 'w');
@@ -198,6 +224,7 @@ class ChecklistPekerjaanController extends Controller
                     $row->nama_petugas,
                     "\t" . $row->nip,
                     $row->tanggal,
+                    $row->area ?? 'Belum ditentukan',
                     ucfirst($row->jenis_pekerjaan),
                     $row->tugas,
                     $row->status === 'sudah' ? 'Sudah' : 'Belum',
@@ -219,6 +246,7 @@ class ChecklistPekerjaanController extends Controller
         $validated = $request->validate([
             'nip' => ['required', 'exists:users,nip'],
             'tanggal' => ['required', 'date'],
+            'area' => ['required', 'string', 'max:255'],
             'items' => ['required', 'array'],
             'items.*.master_pekerjaan_id' => ['required', 'exists:master_pekerjaan,id'],
             'items.*.status' => ['required', 'in:sudah,belum'],
@@ -229,14 +257,18 @@ class ChecklistPekerjaanController extends Controller
         $masterIds = collect($validated['items'])->pluck('master_pekerjaan_id')->unique();
         $masterTasks = MasterPekerjaan::whereIn('id', $masterIds)->get()->keyBy('id');
 
+        $area = $validated['area'];
         $now = now();
+
         $existingRecords = ChecklistPekerjaan::where('nip', $petugas->nip)
             ->where('tanggal', $validated['tanggal'])
+            ->where('area', $area)
             ->get()
             ->keyBy('master_pekerjaan_id');
 
         ChecklistPekerjaan::where('nip', $petugas->nip)
             ->where('tanggal', $validated['tanggal'])
+            ->where('area', $area)
             ->delete();
 
         $rows = array_map(fn ($item) => [
@@ -244,6 +276,7 @@ class ChecklistPekerjaanController extends Controller
             'tanggal' => $validated['tanggal'],
             'master_pekerjaan_id' => $item['master_pekerjaan_id'],
             'tugas' => $masterTasks[$item['master_pekerjaan_id']]->nama_pekerjaan,
+            'area' => $area,
             'jenis_pekerjaan' => $masterTasks[$item['master_pekerjaan_id']]->jenis_pekerjaan,
             'status' => $item['status'],
             'created_at' => $existingRecords[$item['master_pekerjaan_id']]->created_at ?? $now,

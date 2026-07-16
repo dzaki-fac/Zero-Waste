@@ -54,6 +54,7 @@ class PilahSampahController extends Controller
                     'tanggal' => $request->input('tanggal'),
                     'jenis_sampah' => $item['jenis_sampah'],
                     'berat' => $berat,
+                    'user_id' => auth()->id(),
                 ]);
                 $created[] = $pilahSampah->toArray();
             }

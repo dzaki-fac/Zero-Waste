@@ -23,7 +23,7 @@ type MasterTask = {
 type ChecklistRecord = {
     id: number;
     status: 'sudah' | 'belum';
-    jenis_pekerjaan: string;
+    area: string | null;
 };
 
 type ChecklistItem = {
@@ -43,6 +43,8 @@ type Props = {
     masterTasks: MasterTask[];
     checklist: Record<number, ChecklistRecord>;
     filter: string | null;
+    areaFilter: string | null;
+    areas: string[];
 };
 
 const GROUP_ORDER = ['harian', 'mingguan', 'bulanan'] as const;
@@ -91,10 +93,21 @@ const FILTERS = [
     { value: 'bulanan', label: 'Bulanan' },
 ];
 
-export default function ChecklistPekerjaanShow({ petugas, tanggal, masterTasks, checklist, filter }: Props) {
+const COLGROUP = (
+    <colgroup>
+        <col className="w-[48px]" />
+        <col />
+        <col className="w-[140px]" />
+        <col className="w-[150px]" />
+        <col className="w-[170px]" />
+    </colgroup>
+);
+
+export default function ChecklistPekerjaanShow({ petugas, tanggal, masterTasks, checklist, filter, areaFilter, areas }: Props) {
     const dateInputRef = useRef<HTMLInputElement>(null);
     const [selectedDate, setSelectedDate] = useState(tanggal);
     const [activeFilter, setActiveFilter] = useState<string | null>(filter);
+    const [activeArea, setActiveArea] = useState<string>(areaFilter ?? '');
 
     const [items, setItems] = useState<ChecklistItem[]>(() =>
         masterTasks.map((task) => ({
@@ -106,8 +119,10 @@ export default function ChecklistPekerjaanShow({ petugas, tanggal, masterTasks, 
     );
 
     const [saving, setSaving] = useState(false);
+    const areaSelected = activeArea !== '';
 
     const toggleStatus = (masterId: number) => {
+        if (!areaSelected) return;
         setItems((prev) =>
             prev.map((item) =>
                 item.master_pekerjaan_id === masterId
@@ -124,6 +139,7 @@ export default function ChecklistPekerjaanShow({ petugas, tanggal, masterTasks, 
             {
                 nip: petugas.nip,
                 tanggal: selectedDate,
+                area: activeArea || undefined,
                 items: items.map((item) => ({
                     master_pekerjaan_id: item.master_pekerjaan_id,
                     status: item.status,
@@ -140,7 +156,7 @@ export default function ChecklistPekerjaanShow({ petugas, tanggal, masterTasks, 
         setSelectedDate(newDate);
         router.get(
             `/admin/checklist-pekerjaan/${petugas.nip}`,
-            { tanggal: newDate, jenis: activeFilter ?? undefined },
+            { tanggal: newDate, jenis: activeFilter ?? undefined, area: activeArea || undefined },
             {
                 preserveState: false,
                 preserveScroll: true,
@@ -152,8 +168,17 @@ export default function ChecklistPekerjaanShow({ petugas, tanggal, masterTasks, 
         setActiveFilter(value);
         router.get(
             `/admin/checklist-pekerjaan/${petugas.nip}`,
-            { tanggal: selectedDate, jenis: value ?? undefined },
+            { tanggal: selectedDate, jenis: value ?? undefined, area: activeArea || undefined },
             { preserveState: true, preserveScroll: true },
+        );
+    };
+
+    const handleAreaChange = (value: string) => {
+        setActiveArea(value);
+        router.get(
+            `/admin/checklist-pekerjaan/${petugas.nip}`,
+            { tanggal: selectedDate, jenis: activeFilter ?? undefined, area: value || undefined },
+            { preserveState: false, preserveScroll: true },
         );
     };
 
@@ -252,9 +277,25 @@ export default function ChecklistPekerjaanShow({ petugas, tanggal, masterTasks, 
                         </div>
                     </div>
 
-                    <div className="rounded-lg border border-green-200 bg-green-50 px-4 py-2 text-sm">
-                        <span className="text-green-600">Sudah dikerjakan: </span>
-                        <span className="font-semibold text-green-800">{counterText()}</span>
+                    <div className="grid gap-2">
+                        <span className="text-sm font-medium text-green-700">Area</span>
+                        <select
+                            value={activeArea}
+                            onChange={(e) => handleAreaChange(e.target.value)}
+                            className="h-9 rounded-md border border-green-200 bg-white px-3 text-sm text-green-700 shadow-sm transition-[color,box-shadow] outline-none focus-visible:border-green-500 focus-visible:ring-[3px] focus-visible:ring-green-500/20"
+                        >
+                            <option value="">Pilih Area</option>
+                            {areas.map((area) => (
+                                <option key={area} value={area}>{area}</option>
+                            ))}
+                        </select>
+                    </div>
+
+                    <div className={`rounded-lg border px-4 py-2 text-sm ${areaSelected ? 'border-green-200 bg-green-50' : 'border-gray-200 bg-gray-100'}`}>
+                        <span className={areaSelected ? 'text-green-600' : 'text-gray-400'}>Sudah dikerjakan: </span>
+                        <span className={`font-semibold ${areaSelected ? 'text-green-800' : 'text-gray-400'}`}>
+                            {areaSelected ? counterText() : 'pilih area'}
+                        </span>
                     </div>
                 </div>
 
@@ -262,7 +303,7 @@ export default function ChecklistPekerjaanShow({ petugas, tanggal, masterTasks, 
                     const groupItems = grouped[key];
                     if (groupItems.length === 0 && activeFilter !== null && activeFilter !== key) return null;
 
-                    if (groupItems.length === 0 && activeFilter === key) {
+                    if (groupItems.length === 0) {
                         return (
                             <div key={key} className="rounded-xl border border-green-200 bg-white shadow-sm overflow-hidden">
                                 <div className={`border-l-4 px-4 py-3 ${groupHeaderClass[key]}`}>
@@ -272,13 +313,11 @@ export default function ChecklistPekerjaanShow({ petugas, tanggal, masterTasks, 
                                     </div>
                                 </div>
                                 <div className="p-8 text-center text-sm text-green-600/70">
-                                    Belum ada pekerjaan {key}.
+                                    Belum ada pekerjaan {key}{activeArea ? ` di area "${activeArea}"` : ''}.
                                 </div>
                             </div>
                         );
                     }
-
-                    if (groupItems.length === 0) return null;
 
                     return (
                         <div key={key} className="rounded-xl border border-green-200 bg-white shadow-sm overflow-hidden">
@@ -291,63 +330,69 @@ export default function ChecklistPekerjaanShow({ petugas, tanggal, masterTasks, 
                                     </span>
                                 </div>
                             </div>
-                            <div className="overflow-x-auto">
-                                <Table>
-                                    <TableHeader>
-                                        <TableRow className="border-green-100 bg-green-50/30">
-                                            <TableHead className="text-green-700 w-12">No</TableHead>
-                                            <TableHead className="text-green-700">Tugas</TableHead>
-                                            <TableHead className="text-green-700 w-32">Jenis Pekerjaan</TableHead>
-                                            <TableHead className="text-green-700 w-40">Status</TableHead>
-                                        </TableRow>
-                                    </TableHeader>
-                                    <TableBody>
-                                        {groupItems.map((item) => {
-                                            const task = masterTasks.find((t) => t.id === item.master_pekerjaan_id);
-                                            return (
-                                                <TableRow key={item.master_pekerjaan_id} className="border-green-100">
-                                                    <TableCell className="align-top pt-4">
-                                                        <span className="flex h-6 w-6 items-center justify-center rounded-full bg-green-100 text-xs font-medium text-green-700">
-                                                            {task?.urutan ?? '-'}
-                                                        </span>
-                                                    </TableCell>
-                                                    <TableCell className="text-sm text-green-900 pt-4">
-                                                        {item.tugas}
-                                                    </TableCell>
-                                                    <TableCell className="align-top pt-4">
-                                                        <span className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-medium min-w-[90px] justify-center ${jenisBadgeClass[jenisLabel(item.jenis_pekerjaan)] ?? 'bg-gray-50 text-gray-600 border-gray-200'}`}>
-                                                            <span className={`h-1.5 w-1.5 rounded-full ${jenisLabel(item.jenis_pekerjaan) === 'Tidak Diketahui' ? 'bg-gray-400' : 'bg-current'}`} />
-                                                            {jenisLabel(item.jenis_pekerjaan)}
-                                                        </span>
-                                                    </TableCell>
-                                                    <TableCell className="align-top pt-3">
-                                                        <button
-                                                            type="button"
-                                                            onClick={() => toggleStatus(item.master_pekerjaan_id)}
-                                                            className={`rounded-full px-4 py-1.5 text-xs font-medium transition-colors ${
-                                                                item.status === 'sudah'
+                            <Table className="table-fixed">
+                                {COLGROUP}
+                                <TableHeader>
+                                    <TableRow className="border-green-100 bg-green-50/30">
+                                        <TableHead className="text-green-700">No</TableHead>
+                                        <TableHead className="text-green-700">Tugas</TableHead>
+                                        <TableHead className="text-green-700">Area</TableHead>
+                                        <TableHead className="text-green-700 text-center">Jenis Pekerjaan</TableHead>
+                                        <TableHead className="text-green-700 text-center">Status</TableHead>
+                                    </TableRow>
+                                </TableHeader>
+                                <TableBody>
+                                    {groupItems.map((item) => {
+                                        const task = masterTasks.find((t) => t.id === item.master_pekerjaan_id);
+                                        return (
+                                            <TableRow key={item.master_pekerjaan_id} className="border-green-100">
+                                                <TableCell className="align-top pt-4">
+                                                    <span className="flex h-6 w-6 items-center justify-center rounded-full bg-green-100 text-xs font-medium text-green-700">
+                                                        {task?.urutan ?? '-'}
+                                                    </span>
+                                                </TableCell>
+                                                <TableCell className="align-top pt-4 text-sm text-green-900 whitespace-normal break-words">
+                                                    {item.tugas}
+                                                </TableCell>
+                                                <TableCell className="align-top pt-4 text-sm text-green-600">
+                                                    {activeArea || '-'}
+                                                </TableCell>
+                                                <TableCell className="align-top pt-4 text-center">
+                                                    <span className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-medium min-w-[90px] justify-center ${jenisBadgeClass[jenisLabel(item.jenis_pekerjaan)] ?? 'bg-gray-50 text-gray-600 border-gray-200'}`}>
+                                                        <span className={`h-1.5 w-1.5 rounded-full ${jenisLabel(item.jenis_pekerjaan) === 'Tidak Diketahui' ? 'bg-gray-400' : 'bg-current'}`} />
+                                                        {jenisLabel(item.jenis_pekerjaan)}
+                                                    </span>
+                                                </TableCell>
+                                                <TableCell className="align-top pt-3 text-center">
+                                                    <button
+                                                        type="button"
+                                                        disabled={!areaSelected}
+                                                        onClick={() => toggleStatus(item.master_pekerjaan_id)}
+                                                        className={`rounded-full px-4 py-1.5 text-xs font-medium transition-colors inline-block min-w-[140px] ${
+                                                            !areaSelected
+                                                                ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                                                                : item.status === 'sudah'
                                                                     ? 'bg-green-600 text-white hover:bg-green-700'
                                                                     : 'bg-gray-100 text-gray-500 hover:bg-gray-200'
-                                                            }`}
-                                                        >
-                                                            {item.status === 'sudah' ? 'Sudah Dikerjakan' : 'Belum Dikerjakan'}
-                                                        </button>
-                                                    </TableCell>
-                                                </TableRow>
-                                            );
-                                        })}
-                                    </TableBody>
-                                </Table>
-                            </div>
+                                                        }`}
+                                                    >
+                                                        {!areaSelected ? 'Pilih Area' : item.status === 'sudah' ? 'Sudah Dikerjakan' : 'Belum Dikerjakan'}
+                                                    </button>
+                                                </TableCell>
+                                            </TableRow>
+                                        );
+                                    })}
+                                </TableBody>
+                            </Table>
                         </div>
                     );
                 })}
 
                 <div className="flex items-center gap-3 pt-2">
                     <Button
-                        disabled={saving}
+                        disabled={saving || !areaSelected}
                         onClick={handleSave}
-                        className="bg-green-600 hover:bg-green-700"
+                        className="bg-green-600 hover:bg-green-700 disabled:opacity-50"
                     >
                         <Save className="h-4 w-4" />
                         Simpan Checklist

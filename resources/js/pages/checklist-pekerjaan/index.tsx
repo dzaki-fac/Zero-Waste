@@ -140,21 +140,21 @@ export default function ChecklistPekerjaanIndex({ petugas }: Props) {
                                         <TableCell>{item.nip ?? '-'}</TableCell>
                                         <TableCell className="text-right">
                                             <div className="flex justify-end gap-2">
-                                                <Button asChild className="bg-green-600 hover:bg-green-700">
+                                                <Button asChild className="h-9 w-[110px] bg-green-600 hover:bg-green-700 text-xs">
                                                     <Link
                                                         href={`/admin/checklist-pekerjaan/${item.nip}`}
-                                                        className="flex items-center gap-2"
+                                                        className="flex items-center justify-center gap-1"
                                                     >
-                                                        <ClipboardCheck className="h-4 w-4" />
+                                                        <ClipboardCheck className="h-3.5 w-3.5" />
                                                         Checklist
                                                     </Link>
                                                 </Button>
-                                                <Button variant="outline" asChild className="border-green-200 text-green-700 hover:bg-green-50">
+                                                <Button variant="outline" asChild className="h-9 w-[110px] border-green-200 text-green-700 hover:bg-green-50 text-xs">
                                                     <Link
                                                         href={`/admin/checklist-pekerjaan/${item.nip}/history`}
-                                                        className="flex items-center gap-2"
+                                                        className="flex items-center justify-center gap-1"
                                                     >
-                                                        <History className="h-4 w-4" />
+                                                        <History className="h-3.5 w-3.5" />
                                                         Riwayat
                                                     </Link>
                                                 </Button>
@@ -162,10 +162,10 @@ export default function ChecklistPekerjaanIndex({ petugas }: Props) {
                                                     variant="outline"
                                                     disabled={exportingNip === item.nip}
                                                     onClick={() => handleExport(item.nip!)}
-                                                    className="border-green-200 text-green-700 hover:bg-green-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                                                    className="h-9 w-[110px] border-green-200 text-green-700 hover:bg-green-50 disabled:opacity-50 disabled:cursor-not-allowed text-xs"
                                                 >
-                                                    <Download className={`h-4 w-4 ${exportingNip === item.nip ? 'animate-pulse' : ''}`} />
-                                                    {exportingNip === item.nip ? 'Mengunduh...' : 'Ekspor Data'}
+                                                    <Download className={`h-3.5 w-3.5 ${exportingNip === item.nip ? 'animate-pulse' : ''}`} />
+                                                    {exportingNip === item.nip ? 'Mengunduh' : 'Ekspor Data'}
                                                 </Button>
                                             </div>
                                         </TableCell>
