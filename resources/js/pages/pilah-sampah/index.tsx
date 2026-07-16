@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Head, Link, router } from '@inertiajs/react';
+import { Head, Link, router, usePage } from '@inertiajs/react';
 import { CalendarDays, FileDown, Leaf, Plus, Trash2, Pencil, Search } from 'lucide-react';
 import Heading from '@/components/heading';
 import { Button } from '@/components/ui/button';
@@ -19,6 +19,7 @@ import {
     TableHeader,
     TableRow,
 } from '@/components/ui/table';
+import type { Auth } from '@/types';
 
 type PilahSampah = {
     id: number;
@@ -53,6 +54,8 @@ const currentYear = new Date().getFullYear();
 const years = Array.from({ length: 11 }, (_, i) => currentYear - i);
 
 export default function PilahSampahIndex({ pilahSampah }: Props) {
+    const { auth } = usePage().props as { auth: Auth };
+    const prefix = auth.user.role === 'admin' ? '/admin' : '/petugas';
     const [search, setSearch] = useState('');
     const [filterJenis, setFilterJenis] = useState('all');
     const [filterPeriod, setFilterPeriod] = useState('all');
@@ -118,29 +121,9 @@ export default function PilahSampahIndex({ pilahSampah }: Props) {
 
     const isEmpty = pilahSampah.length === 0;
 
-    const exportCSV = () => {
-        const cell = (v: any) => `"${String(v).replace(/"/g, '""')}"`;
-        const headers = ['No', 'Nama', 'Tanggal', 'Berat (kg)', 'Jenis Sampah'];
-        const rows = filtered.map((item, index) => [
-            cell(index + 1),
-            cell(item.nama),
-            cell(new Date(item.tanggal).toLocaleString('id-ID')),
-            cell(item.berat),
-            cell(item.jenis_sampah),
-        ]);
-        const csv = [headers.map(cell).join(','), ...rows.map(r => r.join(','))].join('\n');
-        const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = 'pilah-sampah.csv';
-        a.click();
-        URL.revokeObjectURL(url);
-    };
-
     const handleDelete = (id: number) => {
         if (confirm('Yakin ingin menghapus data ini?')) {
-            router.delete(`/admin/pilah-sampah/${id}`);
+            router.delete(`${prefix}/pilah-sampah/${id}`);
         }
     };
 
@@ -156,12 +139,14 @@ export default function PilahSampahIndex({ pilahSampah }: Props) {
                     />
 
                     <div className="flex items-center gap-2">
-                        <Button onClick={exportCSV} variant="outline" className="border-green-200 text-green-700 hover:bg-green-50">
-                            <FileDown className="h-4 w-4" />
-                            Export CSV
+                        <Button asChild variant="outline" className="border-green-200 text-green-700 hover:bg-green-50">
+                            <a href={`${prefix}/pilah-sampah/export`}>
+                                <FileDown className="h-4 w-4" />
+                                Export CSV
+                            </a>
                         </Button>
                         <Button asChild className="bg-green-600 hover:bg-green-700">
-                            <Link href="/admin/pilah-sampah/create" className="flex items-center gap-2">
+                            <Link href={`${prefix}/pilah-sampah/create`} className="flex items-center gap-2">
                                 <Plus className="h-4 w-4" />
                                 Tambah Baru
                             </Link>
@@ -189,7 +174,7 @@ export default function PilahSampahIndex({ pilahSampah }: Props) {
                             Mulai catat data pemilahan sampah untuk membantu pengelolaan lingkungan yang lebih baik.
                         </p>
                         <Button asChild className="mt-6 bg-green-600 hover:bg-green-700">
-                            <Link href="/admin/pilah-sampah/create" className="flex items-center gap-2">
+                            <Link href={`${prefix}/pilah-sampah/create`} className="flex items-center gap-2">
                                 <Plus className="h-4 w-4" />
                                 Tambah Pilah Sampah
                             </Link>
@@ -363,7 +348,7 @@ export default function PilahSampahIndex({ pilahSampah }: Props) {
                                                 <TableCell className="text-right">
                                                     <div className="flex justify-end gap-2">
                                                         <Button variant="outline" size="sm" asChild className="border-green-200 text-green-700 hover:bg-green-50 hover:text-green-800">
-                                                            <Link href={`/admin/pilah-sampah/${item.id}/edit`} className="flex items-center gap-1">
+                                                            <Link href={`${prefix}/pilah-sampah/${item.id}/edit`} className="flex items-center gap-1">
                                                                 <Pencil className="h-3.5 w-3.5" />
                                                                 Edit
                                                             </Link>

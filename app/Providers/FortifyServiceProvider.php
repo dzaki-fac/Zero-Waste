@@ -27,16 +27,24 @@ class FortifyServiceProvider extends ServiceProvider
         $this->app->singleton(LogoutResponse::class, fn () => new class implements LogoutResponse {
             public function toResponse($request)
             {
-                return redirect('/form');
+                return redirect('/login');
             }
         });
 
         $this->app->singleton(LoginResponse::class, fn () => new class implements LoginResponse {
             public function toResponse($request)
             {
-                return $request->user()?->role === 'petugas'
-                    ? redirect('/form')
-                    : redirect('/admin/dashboard');
+                $user = $request->user();
+
+                if ($user->role === 'admin') {
+                    return redirect()->intended(route('admin.dashboard'));
+                }
+
+                if ($user->role === 'petugas') {
+                    return redirect()->route('petugas.form');
+                }
+
+                abort(403);
             }
         });
     }

@@ -229,6 +229,12 @@ class ChecklistPekerjaanController extends Controller
         $masterIds = collect($validated['items'])->pluck('master_pekerjaan_id')->unique();
         $masterTasks = MasterPekerjaan::whereIn('id', $masterIds)->get()->keyBy('id');
 
+        $now = now();
+        $existingRecords = ChecklistPekerjaan::where('nip', $petugas->nip)
+            ->where('tanggal', $validated['tanggal'])
+            ->get()
+            ->keyBy('master_pekerjaan_id');
+
         ChecklistPekerjaan::where('nip', $petugas->nip)
             ->where('tanggal', $validated['tanggal'])
             ->delete();
@@ -240,10 +246,12 @@ class ChecklistPekerjaanController extends Controller
             'tugas' => $masterTasks[$item['master_pekerjaan_id']]->nama_pekerjaan,
             'jenis_pekerjaan' => $masterTasks[$item['master_pekerjaan_id']]->jenis_pekerjaan,
             'status' => $item['status'],
+            'created_at' => $existingRecords[$item['master_pekerjaan_id']]->created_at ?? $now,
+            'updated_at' => $now,
         ], $validated['items']);
 
         ChecklistPekerjaan::insert($rows);
 
-        return to_route('checklist-pekerjaan.index');
+        return to_route('admin.checklist-pekerjaan.index');
     }
 }

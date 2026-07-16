@@ -7,12 +7,18 @@ return new class extends Migration
 {
     public function up(): void
     {
-        DB::statement('
-            UPDATE checklist_pekerjaan c
-            INNER JOIN users u ON u.id = c.nip
-            SET c.nip = u.nip
-            WHERE u.role = ?
-        ', ['petugas']);
+        $records = DB::table('checklist_pekerjaan')
+            ->whereNotNull('nip')
+            ->get();
+
+        foreach ($records as $record) {
+            $user = DB::table('users')->where('id', $record->nip)->where('role', 'petugas')->first();
+            if ($user && $user->nip) {
+                DB::table('checklist_pekerjaan')
+                    ->where('id', $record->id)
+                    ->update(['nip' => $user->nip]);
+            }
+        }
     }
 
     public function down(): void

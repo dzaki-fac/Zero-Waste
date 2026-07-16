@@ -33,9 +33,9 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('checklist_pekerjaan', function (Blueprint $table) {
-            $table->foreignId('master_pekerjaan_id')->nullable()->after('id')->constrained('master_pekerjaan')->nullOnDelete();
-            $table->string('nama_pekerjaan_snapshot')->nullable()->after('tugas');
-            $table->string('jenis_pekerjaan_snapshot', 20)->nullable()->after('nama_pekerjaan_snapshot');
+            $table->foreignId('master_pekerjaan_id')->nullable()->constrained('master_pekerjaan')->nullOnDelete();
+            $table->string('nama_pekerjaan_snapshot')->nullable();
+            $table->string('jenis_pekerjaan_snapshot', 20)->nullable();
         });
 
         $insert = [];
@@ -52,19 +52,25 @@ return new class extends Migration
         }
         DB::table('master_pekerjaan')->insert($insert);
 
-        DB::statement('
-            UPDATE checklist_pekerjaan c
-            JOIN master_pekerjaan m ON m.nama_pekerjaan = c.tugas
-            SET c.master_pekerjaan_id = m.id,
-                c.nama_pekerjaan_snapshot = c.tugas,
-                c.jenis_pekerjaan_snapshot = c.jenis_pekerjaan
-        ');
+        $records = DB::table('checklist_pekerjaan')->whereNull('master_pekerjaan_id')->get();
+        foreach ($records as $record) {
+            $master = DB::table('master_pekerjaan')->where('nama_pekerjaan', $record->tugas)->first();
+            if ($master) {
+                DB::table('checklist_pekerjaan')
+                    ->where('id', $record->id)
+                    ->update([
+                        'master_pekerjaan_id' => $master->id,
+                        'nama_pekerjaan_snapshot' => $record->tugas,
+                        'jenis_pekerjaan_snapshot' => $record->jenis_pekerjaan,
+                    ]);
+            }
+        }
     }
 
     public function down(): void
     {
         Schema::table('checklist_pekerjaan', function (Blueprint $table) {
-            $table->dropConstrainedForeignId('master_pekerjaan_id');
+            $table->dropColumn('master_pekerjaan_id');
             $table->dropColumn('nama_pekerjaan_snapshot');
             $table->dropColumn('jenis_pekerjaan_snapshot');
         });

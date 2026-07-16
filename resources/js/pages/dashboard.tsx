@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Scale, Recycle, Truck, Users, CalendarIcon, Clock, Package, CheckCircle, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useState, useRef, useEffect } from 'react';
+import type { Auth } from '@/types';
 
 type ChartData = {
     name: string;
@@ -356,6 +357,8 @@ function SimpleDatePicker({ value, onChange, placeholder }: { value: string; onC
 
 export default function Dashboard() {
     const { penimbanganByArea, pilahByJenis, distribusiByTujuan, petugasStats, statusBerat, filters } = usePage<PageProps>().props;
+    const { auth } = usePage().props as { auth: Auth };
+    const prefix = auth.user.role === 'admin' ? '/admin' : '/petugas';
 
     const [activePreset, setActivePreset] = useState<PresetKey>(
         getPresetKey(filters.start_date, filters.end_date)
@@ -367,7 +370,7 @@ export default function Dashboard() {
         const query: Record<string, string> = {};
         if (params.start_date) query.start_date = params.start_date;
         if (params.end_date) query.end_date = params.end_date;
-        router.get('/admin/dashboard', query, { preserveState: true, replace: true });
+        router.get(`${prefix}/dashboard`, query, { preserveState: true, replace: true });
     }
 
     function handlePreset(preset: typeof PRESETS[number]) {

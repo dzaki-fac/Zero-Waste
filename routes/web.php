@@ -9,32 +9,58 @@ use App\Http\Controllers\PilahSampahController;
 use App\Http\Middleware\CheckRole;
 use Illuminate\Support\Facades\Route;
 
-Route::inertia('/form', 'welcome')->name('home');
-
+// Shared routes (accessible by both roles, no role check)
 Route::middleware(['auth'])->group(function () {
-    Route::resource('admin/penimbangan', PenimbanganController::class)->names('penimbangan');
-    Route::resource('admin/pilah-sampah', PilahSampahController::class)->names('pilah-sampah');
-    Route::resource('admin/distribusi', DistribusiController::class)->names('distribusi');
-
     Route::inertia('form/penimbangan', 'form/penimbangan')->name('form.penimbangan');
     Route::inertia('form/pilah-sampah', 'form/pilah-sampah')->name('form.pilah-sampah');
     Route::inertia('form/distribusi', 'form/distribusi')->name('form.distribusi');
+});
 
-    Route::get('admin/dashboard', [DashboardController::class, 'index'])->name('dashboard')->middleware(['verified', CheckRole::class . ':admin']);
+// Admin routes
+Route::middleware(['auth', CheckRole::class . ':admin'])
+    ->prefix('admin')
+    ->name('admin.')
+    ->group(function () {
+        Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
-    Route::middleware([CheckRole::class . ':admin'])->group(function () {
-        Route::get('admin/checklist-pekerjaan/export', [ChecklistPekerjaanController::class, 'export'])->name('checklist-pekerjaan.export');
-        Route::get('admin/checklist-pekerjaan/export-all', [ChecklistPekerjaanController::class, 'exportAll'])->name('checklist-pekerjaan.export-all');
-        Route::get('admin/checklist-pekerjaan/{petugas}/history', [ChecklistPekerjaanController::class, 'history'])->name('checklist-pekerjaan.history');
-        Route::resource('admin/checklist-pekerjaan', ChecklistPekerjaanController::class)
+        Route::get('penimbangan/export', [PenimbanganController::class, 'export'])->name('penimbangan.export');
+        Route::resource('penimbangan', PenimbanganController::class)->names('penimbangan');
+
+        Route::get('pilah-sampah/export', [PilahSampahController::class, 'export'])->name('pilah-sampah.export');
+        Route::resource('pilah-sampah', PilahSampahController::class)->names('pilah-sampah');
+
+        Route::get('distribusi/export', [DistribusiController::class, 'export'])->name('distribusi.export');
+        Route::resource('distribusi', DistribusiController::class)->names('distribusi');
+
+        Route::get('checklist-pekerjaan/export', [ChecklistPekerjaanController::class, 'export'])->name('checklist-pekerjaan.export');
+        Route::get('checklist-pekerjaan/export-all', [ChecklistPekerjaanController::class, 'exportAll'])->name('checklist-pekerjaan.export-all');
+        Route::get('checklist-pekerjaan/{petugas}/history', [ChecklistPekerjaanController::class, 'history'])->name('checklist-pekerjaan.history');
+        Route::resource('checklist-pekerjaan', ChecklistPekerjaanController::class)
             ->only(['index', 'show', 'store'])
             ->names('checklist-pekerjaan');
 
-        Route::resource('admin/kelola-pekerjaan', MasterPekerjaanController::class)
+        Route::resource('kelola-pekerjaan', MasterPekerjaanController::class)
             ->only(['index', 'store', 'update', 'destroy'])
             ->parameters(['kelola-pekerjaan' => 'masterPekerjaan'])
-            ->names('admin.kelola-pekerjaan');
+            ->names('kelola-pekerjaan');
     });
-});
+
+// Petugas routes
+Route::middleware(['auth', CheckRole::class . ':petugas'])
+    ->prefix('petugas')
+    ->name('petugas.')
+    ->group(function () {
+        Route::inertia('/', 'welcome')->name('form');
+        Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard');
+
+        Route::get('penimbangan/export', [PenimbanganController::class, 'export'])->name('penimbangan.export');
+        Route::resource('penimbangan', PenimbanganController::class)->names('penimbangan');
+
+        Route::get('pilah-sampah/export', [PilahSampahController::class, 'export'])->name('pilah-sampah.export');
+        Route::resource('pilah-sampah', PilahSampahController::class)->names('pilah-sampah');
+
+        Route::get('distribusi/export', [DistribusiController::class, 'export'])->name('distribusi.export');
+        Route::resource('distribusi', DistribusiController::class)->names('distribusi');
+    });
 
 
