@@ -39,7 +39,7 @@ const HERO_SLIDES = [
     title: "Menuju kampus tanpa sampah tersisa",
     desc: "Satu sistem yang membantu memahami, menjalankan, dan memantau pengelolaan sampah kampus, mulai dari pemilahan di tiap sub-area sampai ke distribusi akhirnya.",
     image:
-      "https://images.unsplash.com/photo-1521587760476-6c12a4b040da?auto=format&fit=crop&w=900&q=80",
+      "https://cdn.pixabay.com/photo/2017/08/06/22/01/books-2596809_1280.jpg",
     icon: Recycle,
   },
   {
@@ -47,7 +47,7 @@ const HERO_SLIDES = [
     title: "Sampah dipilah dari sub-area",
     desc: "Setiap ruang baca, toilet, dan ruang kerja menimbang serta mencatat sampahnya masing-masing sebelum diserahkan ke titik pilah pertama.",
     image:
-      "https://images.unsplash.com/photo-1532996122724-e3c354a0b15b?auto=format&fit=crop&w=1600&q=80",
+      "https://images.pexels.com/photos/16891089/pexels-photo-16891089.jpeg?_gl=1*1coyoxh*_ga*NTQyMDQ0NzI0LjE3ODQxNzA0MDc.*_ga_8JE65Q40S6*czE3ODQxNzA0MDckbzEkZzEkdDE3ODQxNzE0MjQkajQ3JGwwJGgw",
     icon: Layers,
   },
   {
@@ -63,7 +63,7 @@ const HERO_SLIDES = [
     title: "Dari TPS sampai Plasticpay",
     desc: "Sampah yang sudah dipilah lalu didistribusikan ke tujuan akhirnya, ada yang ditimbun jadi pupuk, dikirim ke TPS, atau disetor lewat Plasticpay.",
     image:
-      "https://images.unsplash.com/photo-1611284446314-60a58ac0deb9?auto=format&fit=crop&w=1600&q=80",
+      "https://images.pexels.com/photos/5433124/pexels-photo-5433124.jpeg?_gl=1*ztn08z*_ga*NTQyMDQ0NzI0LjE3ODQxNzA0MDc.*_ga_8JE65Q40S6*czE3ODQxNzA0MDckbzEkZzEkdDE3ODQxNzEwMTQkajU5JGwwJGgw",
     icon: MapPin,
   },
 ];
