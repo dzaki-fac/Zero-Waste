@@ -32,6 +32,6 @@ class SettingController extends Controller
 
         OptionHelper::save($validated);
 
-        return redirect()->route('settings.index')->with('success', 'Pengaturan berhasil disimpan.');
+        return redirect()->route('settings.index');
     }
 }

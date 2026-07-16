@@ -10,7 +10,7 @@ class PenimbanganRequest extends FormRequest
 {
     public function rules(): array
     {
-        $areaValues = collect(OptionHelper::get('area'))->pluck('value')->toArray();
+        $areaValues = OptionHelper::get('area');
 
         return [
             'nama' => ['required', 'string', 'max:255'],
