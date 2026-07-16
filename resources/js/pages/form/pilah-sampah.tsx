@@ -46,7 +46,7 @@ export default function FormPilahSampah() {
         document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'center' });
     };
 
-    const handleSubmit = (e: React.FormEvent) => {
+const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
         const filledCount = data.items.filter((item) => parseFloat(item.berat) > 0).length;
         if (!filledCount) {
@@ -55,7 +55,7 @@ export default function FormPilahSampah() {
             return;
         }
         setSubmitError('');
-        post('/admin/pilah-sampah');
+        post('/petugas/pilah-sampah');
     };
 
     const now = new Date(Date.now() - new Date().getTimezoneOffset() * 60000).toISOString().slice(0, 16);

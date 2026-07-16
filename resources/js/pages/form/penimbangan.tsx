@@ -67,7 +67,7 @@ export default function FormPenimbangan() {
         document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'center' });
     };
 
-    const handleSubmit = (e: React.FormEvent) => {
+const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
         if (!data.berat_sampah) {
             setBeratError('Masukkan berat sampah');
@@ -84,7 +84,7 @@ export default function FormPenimbangan() {
             scrollTo('section-lokasi');
             return;
         }
-        post('/admin/penimbangan');
+        post('/petugas/penimbangan');
     };
 
     const now = new Date(Date.now() - new Date().getTimezoneOffset() * 60000).toISOString().slice(0, 16);

@@ -19,6 +19,7 @@ import {
     TableHeader,
     TableRow,
 } from '@/components/ui/table';
+import type { Auth } from '@/types';
 
 type Penimbangan = {
     id: number;
@@ -33,15 +34,16 @@ type Props = {
     penimbangan: Penimbangan[];
 };
 
-const areaOptions: string[] = [];
-
 const months = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
 const currentYear = new Date().getFullYear();
 const years = Array.from({ length: 11 }, (_, i) => currentYear - i);
 
 export default function PenimbanganIndex({ penimbangan }: Props) {
+    const { auth } = usePage().props as { auth: Auth };
+    const prefix = auth.user.role === 'admin' ? '/admin' : '/petugas';
     const { options: pageOptions } = usePage().props as { options?: { area: string[] } };
     const areaOptions = pageOptions?.area ?? [];
+
     const [search, setSearch] = useState('');
     const [filterArea, setFilterArea] = useState('all');
     const [filterPeriod, setFilterPeriod] = useState('all');
@@ -107,30 +109,9 @@ export default function PenimbanganIndex({ penimbangan }: Props) {
 
     const isEmpty = penimbangan.length === 0;
 
-    const exportCSV = () => {
-        const cell = (v: any) => `"${String(v).replace(/"/g, '""')}"`;
-        const headers = ['No', 'Nama', 'Tanggal', 'Berat (kg)', 'Area', 'Sub Area'];
-        const rows = filtered.map((item, index) => [
-            cell(index + 1),
-            cell(item.nama),
-            cell(new Date(item.tanggal).toLocaleString('id-ID')),
-            cell(item.berat_sampah),
-            cell(item.area),
-            cell(item.sub_area),
-        ]);
-        const csv = [headers.map(cell).join(','), ...rows.map(r => r.join(','))].join('\n');
-        const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = 'penimbangan.csv';
-        a.click();
-        URL.revokeObjectURL(url);
-    };
-
     const handleDelete = (id: number) => {
         if (confirm('Yakin ingin menghapus data ini?')) {
-            router.delete(`/admin/penimbangan/${id}`);
+            router.delete(`${prefix}/penimbangan/${id}`);
         }
     };
 
@@ -146,12 +127,14 @@ export default function PenimbanganIndex({ penimbangan }: Props) {
                     />
 
                     <div className="flex items-center gap-2">
-                        <Button onClick={exportCSV} variant="outline" className="border-green-200 text-green-700 hover:bg-green-50">
-                            <FileDown className="h-4 w-4" />
-                            Export CSV
+                        <Button asChild variant="outline" className="border-green-200 text-green-700 hover:bg-green-50">
+                            <a href={`${prefix}/penimbangan/export`}>
+                                <FileDown className="h-4 w-4" />
+                                Export CSV
+                            </a>
                         </Button>
                         <Button asChild className="bg-green-600 hover:bg-green-700">
-                            <Link href="/admin/penimbangan/create" className="flex items-center gap-2">
+                            <Link href={`${prefix}/penimbangan/create`} className="flex items-center gap-2">
                                 <Plus className="h-4 w-4" />
                                 Tambah Baru
                             </Link>
@@ -179,7 +162,7 @@ export default function PenimbanganIndex({ penimbangan }: Props) {
                             Mulai catat data penimbangan sampah untuk membantu pengelolaan lingkungan yang lebih baik.
                         </p>
                         <Button asChild className="mt-6 bg-green-600 hover:bg-green-700">
-                            <Link href="/admin/penimbangan/create" className="flex items-center gap-2">
+                            <Link href={`${prefix}/penimbangan/create`} className="flex items-center gap-2">
                                 <Plus className="h-4 w-4" />
                                 Tambah Penimbangan
                             </Link>
@@ -355,7 +338,7 @@ export default function PenimbanganIndex({ penimbangan }: Props) {
                                                 <TableCell className="text-right">
                                                     <div className="flex justify-end gap-2">
                                                         <Button variant="outline" size="sm" asChild className="border-green-200 text-green-700 hover:bg-green-50 hover:text-green-800">
-                                                            <Link href={`/admin/penimbangan/${item.id}/edit`} className="flex items-center gap-1">
+                                                            <Link href={`${prefix}/penimbangan/${item.id}/edit`} className="flex items-center gap-1">
                                                                 <Pencil className="h-3.5 w-3.5" />
                                                                 Edit
                                                             </Link>

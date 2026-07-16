@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Scale, Recycle, Truck, Users, CalendarIcon, Clock, Package, CheckCircle, ChevronLeft, ChevronRight, Send } from 'lucide-react';
 import { useState, useRef, useEffect } from 'react';
+import type { Auth } from '@/types';
 
 type ChartData = {
     name: string;
@@ -390,6 +391,8 @@ function SimpleDatePicker({ value, onChange, placeholder }: { value: string; onC
 
 export default function Dashboard() {
     const { penimbanganByArea, pilahByJenis, distribusiByTujuan, petugasStats, statusBerat, siapDidistribusikanByJenis, filters } = usePage<PageProps>().props;
+    const { auth } = usePage().props as { auth: Auth };
+    const prefix = auth.user.role === 'admin' ? '/admin' : '/petugas';
 
     const siapSortedData = siapDidistribusikanByJenis.slice().sort((a, b) => b.value - a.value);
     const siapTotal = siapDidistribusikanByJenis.reduce((s, d) => s + d.value, 0);
@@ -404,7 +407,7 @@ export default function Dashboard() {
         const query: Record<string, string> = {};
         if (params.start_date) query.start_date = params.start_date;
         if (params.end_date) query.end_date = params.end_date;
-        router.get('/admin/dashboard', query, { preserveState: true, replace: true });
+        router.get(`${prefix}/dashboard`, query, { preserveState: true, replace: true });
     }
 
     function handlePreset(preset: typeof PRESETS[number]) {

@@ -10,12 +10,23 @@ use Inertia\Response;
 
 class DistribusiController extends Controller
 {
+    private function routePrefix(): string
+    {
+        return auth()->user()->role === 'admin' ? 'admin' : 'petugas';
+    }
+
     public function index(): Response
     {
-        $distribusi = Distribusi::latest('tanggal')->get();
+        $distribusi = Distribusi::visibleTo(auth()->user())
+            ->latest('tanggal')
+            ->get();
+
+        $totalWeight = (float) Distribusi::visibleTo(auth()->user())
+            ->sum('berat');
 
         return Inertia::render('distribusi/index', [
             'distribusi' => $distribusi,
+            'totalWeight' => $totalWeight,
         ]);
     }
 
@@ -45,6 +56,7 @@ class DistribusiController extends Controller
                     'berat' => $berat,
                     'tujuan_distribusi' => $request->input('tujuan_distribusi'),
                     'lokasi' => $request->input('lokasi'),
+                    'user_id' => auth()->id(),
                 ]);
                 $created[] = $distribusi->toArray();
             }
@@ -66,13 +78,16 @@ class DistribusiController extends Controller
         $distribusi = Distribusi::create([
             ...$request->validated(),
             'nama' => $nama,
+            'user_id' => auth()->id(),
         ]);
 
-        return to_route('distribusi.index');
+        return to_route($this->routePrefix() . '.distribusi.index');
     }
 
     public function edit(Distribusi $distribusi): Response
     {
+        $this->authorize('view', $distribusi);
+
         return Inertia::render('distribusi/edit', [
             'distribusi' => $distribusi,
         ]);
@@ -80,15 +95,56 @@ class DistribusiController extends Controller
 
     public function update(DistribusiRequest $request, Distribusi $distribusi): RedirectResponse
     {
+        $this->authorize('update', $distribusi);
+
         $distribusi->update($request->validated());
 
-        return to_route('distribusi.index');
+        return to_route($this->routePrefix() . '.distribusi.index');
     }
 
     public function destroy(Distribusi $distribusi): RedirectResponse
     {
+        $this->authorize('delete', $distribusi);
+
         $distribusi->delete();
 
-        return to_route('distribusi.index');
+        return to_route($this->routePrefix() . '.distribusi.index');
+    }
+
+    public function export(): \Symfony\Component\HttpFoundation\StreamedResponse
+    {
+        $user = auth()->user();
+        $records = Distribusi::visibleTo($user)
+            ->latest('tanggal')
+            ->get();
+
+        $filename = 'distribusi_' . now()->toDateString() . '.csv';
+
+        $headers = ['No', 'Nama', 'Tanggal', 'Berat (kg)', 'Jenis Sampah', 'Tujuan', 'Lokasi'];
+
+        $callback = function () use ($records, $headers) {
+            $file = fopen('php://output', 'w');
+            fprintf($file, chr(0xEF) . chr(0xBB) . chr(0xBF));
+            fputcsv($file, $headers);
+
+            $index = 1;
+            foreach ($records as $record) {
+                fputcsv($file, [
+                    $index++,
+                    $record->nama,
+                    $record->tanggal,
+                    $record->berat,
+                    $record->jenis_sampah,
+                    $record->tujuan_distribusi,
+                    $record->lokasi,
+                ]);
+            }
+
+            fclose($file);
+        };
+
+        return response()->streamDownload($callback, $filename, [
+            'Content-Type' => 'text/csv; charset=UTF-8',
+        ]);
     }
 }
