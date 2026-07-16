@@ -51,7 +51,7 @@ const HERO_SLIDES = [
     icon: Layers,
   },
   {
-    tab: "Kompos & Daur Ulang",
+    tab: "Kompos dan Daur Ulang",
     title: "Sisa makanan dan ranting jadi kompos",
     desc: "Ranting kecil dan sisa makanan dikembalikan ke tanah, sementara kertas dan kardus disalurkan menjadi karya kreativitas atau bahan daur ulang.",
     image:
