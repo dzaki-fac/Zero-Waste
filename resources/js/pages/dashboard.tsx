@@ -18,6 +18,8 @@ import {
   Instagram,
   Youtube,
   Globe,
+  Phone,
+  Mail,
 } from "lucide-react";
 import { C, display, body } from "../theme";
 import Navbar from "../components/Navbar";
@@ -208,13 +210,24 @@ const POSTERS = [
 const NEWS_LOOP = [...NEWS, ...NEWS];
 
 const SOCIALS = [
-  { icon: Globe, label: "Website Resmi", handle: "digilib.undip.ac.id", href: "https://digilib.undip.ac.id/" },
-  { icon: Youtube, label: "YouTube", handle: "@perpustakaanundip", href: "https://youtube.com/@perpustakaanundip?si=RgDQgwp-UlPD7ryq" },
-  { icon: Instagram, label: "Instagram", handle: "@perpus.undip", href: "https://www.instagram.com/perpus.undip?igsh=MTh4bXFtd3AzbmRmdQ==" },
-  { icon: TiktokIcon, label: "TikTok", handle: "@perpus.undip.press", href: "https://www.tiktok.com/@perpus.undip.press?_r=1&_t=ZS-97okoKr4q4S" },
+  { icon: Globe, label: "Website Resmi", href: "https://digilib.undip.ac.id/" },
+  { icon: Youtube, label: "YouTube", href: "https://youtube.com/@perpustakaanundip?si=RgDQgwp-UlPD7ryq" },
+  { icon: Instagram, label: "Instagram", href: "https://www.instagram.com/perpus.undip?igsh=MTh4bXFtd3AzbmRmdQ==" },
+  { icon: TiktokIcon, label: "TikTok", href: "https://www.tiktok.com/@perpus.undip.press?_r=1&_t=ZS-97okoKr4q4S" },
 ];
 
-const FOOTER_LINKS = ["Tentang", "Kontak", "Kebijakan Privasi", "Bantuan"];
+const KONTAK = [
+  { icon: MapPin, text: "Jl. Prof. Soedarto, SH, Gedung Widya Puraya, Tembalang, Semarang" },
+  { icon: Phone, text: "(024) 7460042" },
+  { icon: Mail, text: "perpustakaanundip@gmail.com" },
+];
+
+const JAM_LAYANAN = [
+  { hari: "Senin – Kamis", jam: "07.30 – 19.00 WIB" },
+  { hari: "Jumat", jam: "07.30 – 19.00 WIB" },
+  { hari: "Sabtu", jam: "08.00 – 14.00 WIB" },
+  { hari: "Minggu & Hari Libur", jam: "Tutup" },
+];
 
 // Durasi autoplay poster edukasi (ms) — dipakai untuk timer & animasi progress bar
 const POSTER_AUTOPLAY_MS = 7000;
@@ -437,9 +450,15 @@ export default function Dashboard() {
   }, []);
 
   useEffect(() => {
-  const t = requestAnimationFrame(() => setHeroMounted(true));
-  return () => cancelAnimationFrame(t);
-}, []);
+    let raf2 = 0;
+    const raf1 = requestAnimationFrame(() => {
+      raf2 = requestAnimationFrame(() => setHeroMounted(true));
+    });
+    return () => {
+      cancelAnimationFrame(raf1);
+      cancelAnimationFrame(raf2);
+    };
+  }, []);
 
   // Autoplay poster edukasi setiap 7 detik — timer ini dipakai ulang tiap kali
   // posterIndex berubah (baik otomatis maupun diklik manual), jadi hitungan
@@ -873,44 +892,71 @@ export default function Dashboard() {
       </section>
 
       {/* ---- Footer ---- */}
+      {/* ---- Footer ---- */}
       <footer style={{ backgroundColor: C.navy900 }}>
         <div className="max-w-6xl mx-auto px-5 sm:px-8 pt-14 sm:pt-16 pb-8">
 
-          <div className="mb-10">
-            <div className="text-xs font-semibold uppercase tracking-widest mb-4" style={{ ...body, color: "#8A8FB3" }}>
-              Media &amp; Kanal Resmi
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-10 mb-10">
+            <div>
+              <div className="text-xs font-semibold uppercase tracking-widest mb-4" style={{ ...body, color: "#8A8FB3" }}>
+                Kontak
+              </div>
+              <div className="flex flex-col gap-3">
+                {KONTAK.map((k, i) => {
+                  const KIcon = k.icon;
+                  return (
+                    <div key={i} className="flex items-start gap-3">
+                      <span className="w-8 h-8 rounded-full flex items-center justify-center shrink-0" style={{ backgroundColor: C.navy800 }}>
+                        <KIcon size={15} color={C.leaf400} />
+                      </span>
+                      <span className="text-sm pt-1.5" style={{ color: "#D9DCEE" }}>{k.text}</span>
+                    </div>
+                  );
+                })}
+              </div>
             </div>
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-              {SOCIALS.map((s, i) => {
-                const SIcon = s.icon;
-                return (
-                  <a
-                    key={i}
-                    href={s.href}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex items-center gap-3 rounded-xl p-4 border"
-                    style={{ backgroundColor: C.navy800, borderColor: C.navy700 }}
-                  >
-                    <span className="w-9 h-9 rounded-full flex items-center justify-center shrink-0" style={{ backgroundColor: C.navy700 }}>
+
+            <div>
+              <div className="text-xs font-semibold uppercase tracking-widest mb-4" style={{ ...body, color: "#8A8FB3" }}>
+                Jam Layanan
+              </div>
+              <div className="flex flex-col gap-2">
+                {JAM_LAYANAN.map((j, i) => (
+                  <div key={i} className="text-sm" style={{ color: "#D9DCEE" }}>
+                    {j.hari} : {j.jam}
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div>
+              <div className="text-xs font-semibold uppercase tracking-widest mb-4" style={{ ...body, color: "#8A8FB3" }}>
+                Media Sosial
+              </div>
+              <div className="flex items-center gap-3">
+                {SOCIALS.map((s, i) => {
+                  const SIcon = s.icon;
+                  return (
+                    <a
+                      key={i}
+                      href={s.href}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      aria-label={s.label}
+                      className="w-10 h-10 rounded-full flex items-center justify-center shrink-0 border transition-colors"
+                      style={{ backgroundColor: C.navy800, borderColor: C.navy700 }}
+                      onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = C.navy700; e.currentTarget.style.borderColor = C.leaf500; }}
+                      onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = C.navy800; e.currentTarget.style.borderColor = C.navy700; }}
+                    >
                       <SIcon size={16} color={C.leaf400} />
-                    </span>
-                    <span className="text-left">
-                      <div className="text-xs font-semibold text-white">{s.label}</div>
-                      <div className="text-[11px]" style={{ color: "#8A8FB3" }}>{s.handle}</div>
-                    </span>
-                  </a>
-                );
-              })}
+                    </a>
+                  );
+                })}
+              </div>
             </div>
           </div>
 
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pt-6 border-t" style={{ borderColor: C.navy700 }}>
-            <div className="flex flex-wrap gap-x-6 gap-y-2">
-              {FOOTER_LINKS.map((l, i) => (
-                <span key={i} className="text-xs" style={{ color: "#9FA4C4" }}>{l}</span>
-              ))}
-            </div>
+          <div className="pt-6 border-t text-center" style={{ borderColor: C.navy700 }}>
             <span className="text-[11px]" style={{ color: "#6E7396" }}>
               © 2026 UPT Perpustakaan Universitas Diponegoro. Semua hak dilindungi.
             </span>
