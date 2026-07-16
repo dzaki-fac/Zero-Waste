@@ -42,9 +42,16 @@ const HERO_SLIDES = [
       "https://cdn.pixabay.com/photo/2017/08/06/22/01/books-2596809_1280.jpg",
     icon: Recycle,
   },
-  
   {
-    tab: "Kompos & Daur Ulang",
+    tab: "Pemilahan dari Sumber",
+    title: "Sampah dipilah dari sub-area",
+    desc: "Setiap ruang baca, toilet, dan ruang kerja menimbang serta mencatat sampahnya masing-masing sebelum diserahkan ke titik pilah pertama.",
+    image:
+      "https://images.pexels.com/photos/16891089/pexels-photo-16891089.jpeg?_gl=1*1coyoxh*_ga*NTQyMDQ0NzI0LjE3ODQxNzA0MDc.*_ga_8JE65Q40S6*czE3ODQxNzA0MDckbzEkZzEkdDE3ODQxNzE0MjQkajQ3JGwwJGgw",
+    icon: Layers,
+  },
+  {
+    tab: "Kompos dan Daur Ulang",
     title: "Sisa makanan dan ranting jadi kompos",
     desc: "Ranting kecil dan sisa makanan dikembalikan ke tanah, sementara kertas dan kardus disalurkan menjadi karya kreativitas atau bahan daur ulang.",
     image:
