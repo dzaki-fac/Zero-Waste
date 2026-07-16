@@ -116,39 +116,44 @@ const MENU_DECK = [
 
 const NEWS = [
   {
-    tag: "Sosialisasi",
-    date: "02 Jul 2026",
-    title: "Sosialisasi Zero Waste dimulai di seluruh unit gedung",
-    image:
-      "https://images.unsplash.com/photo-1571727153934-b9e0059b7ab2?auto=format&fit=crop&w=800&q=80",
-  },
-  {
-    tag: "Capaian",
-    date: "24 Jun 2026",
-    title: "Rekap pemilahan sampah minggu ke-3: sampah organik turun 12%",
-    image:
-      "https://images.unsplash.com/photo-1618477388954-7852f32655ec?auto=format&fit=crop&w=800&q=80",
-  },
-  {
-    tag: "Kegiatan",
-    date: "15 Jun 2026",
-    title: "Pelatihan penimbangan & pencatatan untuk petugas unit",
-    image:
-      "https://images.unsplash.com/photo-1584735935682-2f2b69dff9d2?auto=format&fit=crop&w=800&q=80",
-  },
-  {
-    tag: "Kemitraan",
-    date: "05 Jun 2026",
-    title: "Kerja sama distribusi plastik lewat dropbox Plasticpay",
-    image:
-      "https://images.unsplash.com/photo-1611284446314-60a58ac0deb9?auto=format&fit=crop&w=800&q=80",
-  },
-  {
-    tag: "Pengumuman",
-    date: "28 Mei 2026",
-    title: "Jadwal pengambilan sampah per sub-area diperbarui",
+    tag: "UNDIP",
+    date: "04 Apr 2026",
+    title: "K3L Sosialisasikan Pemilahan Sampah Residu di TPST Kampus UNDIP",
     image:
       "https://images.unsplash.com/photo-1532996122724-e3c354a0b15b?auto=format&fit=crop&w=800&q=80",
+    href: "https://kemdiktisaintek.go.id/news/article/implementasi-undip-zero-waste-k3l-sosialisasikan-pemilahan-sampah-residu",
+  },
+  {
+    tag: "UNDIP",
+    date: "Jun 2026",
+    title: "SV Zero Discharge: Langkah Strategis Sekolah Vokasi UNDIP",
+    image:
+      "https://images.unsplash.com/photo-1595278069441-2cf29f8005a4?auto=format&fit=crop&w=800&q=80",
+    href: "https://undip.ac.id/post/57036/sv-zero-discharge-langkah-strategis-sekolah-vokasi-undip-menuju-kampus-berkelanjutan-berkelas-dunia.html",
+  },
+  {
+    tag: "Nasional",
+    date: "15 Jul 2026",
+    title: "UI Gandeng BRIN dan Industri Kembangkan Model Zero Waste",
+    image:
+      "https://images.unsplash.com/photo-1571727153934-b9e0059b7ab2?auto=format&fit=crop&w=800&q=80",
+    href: "https://www.kompas.com/edu/read/2026/07/15/101720771/gaet-brin-dan-industri-ui-kembangkan-pengolahan-sampah-model-zero-waste",
+  },
+  {
+    tag: "Nasional",
+    date: "08 Jun 2026",
+    title: "UMS Galakkan Zero Waste, Ikhtiar Kurangi Sampah Plastik",
+    image:
+      "https://images.unsplash.com/photo-1618477388954-7852f32655ec?auto=format&fit=crop&w=800&q=80",
+    href: "https://jateng.antaranews.com/berita/634320/ums-galakkan-zero-waste-ikhtiar-kurangi-sampah-plastik",
+  },
+  {
+    tag: "Nasional",
+    date: "awal Jul 2026",
+    title: "UNJ Resmikan TPST dan Waste Management Center",
+    image:
+      "https://images.unsplash.com/photo-1584735935682-2f2b69dff9d2?auto=format&fit=crop&w=800&q=80",
+    href: "https://times.co.id/unj-resmikan-tpst-dan-waste-management-center-untuk-perkuat-komitmen-menuju-kampus-zero-waste",
   },
 ];
 
@@ -653,7 +658,7 @@ export default function Dashboard() {
       </section>
 
       {/* ---- Laporan ---- */}
-      <section id="laporan" ref={setSectionRef("laporan")} className="max-w-6xl mx-auto px-5 sm:px-8 pt-16 sm:pt-20 pb-20" style={{ scrollMarginTop: 72 }}>
+      <section id="laporan" ref={setSectionRef("laporan")} className="max-w-6xl mx-auto px-5 sm:px-8 pt-6 sm:pt-8 pb-8 sm:pb-10" style={{ scrollMarginTop: 72 }}>
         <Reveal>
           <h2 className="text-2xl sm:text-3xl font-semibold mb-2" style={{ ...display, color: C.navy900 }}>
             Laporan
@@ -696,8 +701,11 @@ export default function Dashboard() {
             <div ref={newsTrackRef} className="flex gap-5 pb-2" style={{ willChange: "transform" }}>
               {NEWS_LOOP.map((n, i) => (
                 <Reveal key={i} delay={(i % NEWS.length) * 80} className="shrink-0 w-64 sm:w-72">
-                  <div
-                    className="rounded-2xl overflow-hidden"
+                  <a
+                    href={n.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="rounded-2xl overflow-hidden block"
                     style={{ backgroundColor: C.navy800, transition: "transform 220ms ease" }}
                     onMouseEnter={(e) => (e.currentTarget.style.transform = "translateY(-4px)")}
                     onMouseLeave={(e) => (e.currentTarget.style.transform = "translateY(0)")}
@@ -721,7 +729,7 @@ export default function Dashboard() {
                         Baca selengkapnya <ArrowRight size={13} />
                       </span>
                     </div>
-                  </div>
+                  </a>
                 </Reveal>
               ))}
             </div>
