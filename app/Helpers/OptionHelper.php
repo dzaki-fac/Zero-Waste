@@ -2,7 +2,7 @@
 
 namespace App\Helpers;
 
-use Illuminate\Support\Facades\Storage;
+use App\Models\KelolaData;
 
 class OptionHelper
 {
@@ -14,17 +14,14 @@ class OptionHelper
             return self::$cache;
         }
 
-        $path = Storage::disk('local')->path('settings/options.json');
+        $rows = KelolaData::all()->keyBy('key');
 
-        if (file_exists($path)) {
-            $data = json_decode(file_get_contents($path), true);
-            if (is_array($data)) {
-                self::$cache = $data;
-                return self::$cache;
-            }
+        if ($rows->isNotEmpty()) {
+            self::$cache = $rows->map(fn ($r) => $r->value)->toArray();
+            return self::$cache;
         }
 
-        self::$cache = config('options');
+        self::$cache = config('kelola-data');
         return self::$cache;
     }
 
@@ -35,14 +32,9 @@ class OptionHelper
 
     public static function save(array $data): void
     {
-        $path = Storage::disk('local')->path('settings/options.json');
-        $dir = dirname($path);
-
-        if (!is_dir($dir)) {
-            mkdir($dir, 0755, true);
+        foreach ($data as $key => $value) {
+            KelolaData::updateOrCreate(['key' => $key], ['value' => $value]);
         }
-
-        file_put_contents($path, json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
         self::$cache = $data;
     }
 

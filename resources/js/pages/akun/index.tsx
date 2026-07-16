@@ -140,7 +140,7 @@ export default function AdminAccounts() {
 
         debounceRef.current = setTimeout(() => {
             router.get(
-                '/admin/accounts',
+                '/admin/akun',
                 {
                     search: value || undefined,
                     role: activeFilter !== 'all' ? activeFilter : undefined,
@@ -167,7 +167,7 @@ export default function AdminAccounts() {
 
     function handleAdd(e: React.FormEvent) {
         e.preventDefault();
-        addForm.post('/admin/accounts', {
+        addForm.post('/admin/akun', {
             preserveScroll: true,
             onSuccess: () => {
                 setAddOpen(false);
@@ -184,7 +184,7 @@ export default function AdminAccounts() {
             return;
         }
 
-        editForm.patch(`/admin/accounts/${editingUser.id}`, {
+        editForm.patch(`/akun/${editingUser.id}`, {
             preserveScroll: true,
             onSuccess: () => {
                 setEditOpen(false);
@@ -199,7 +199,7 @@ export default function AdminAccounts() {
         }
 
         setDeleteProcessing(true);
-        router.delete(`/admin/accounts/${deletingUser.id}`, {
+        router.delete(`/akun/${deletingUser.id}`, {
             preserveScroll: true,
             onSuccess: () => {
                 setDeleteOpen(false);
@@ -212,7 +212,7 @@ export default function AdminAccounts() {
 
     function handleFilterChange(value: string) {
         router.get(
-            '/admin/accounts',
+            '/admin/akun',
             {
                 role: value === 'all' ? undefined : value,
                 search: searchInput || undefined,
@@ -223,7 +223,7 @@ export default function AdminAccounts() {
 
     function goToPage(page: number) {
         router.get(
-            '/admin/accounts',
+            '/admin/akun',
             { page, ...filters },
             { preserveScroll: true },
         );

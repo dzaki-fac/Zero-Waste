@@ -41,7 +41,7 @@ export function AppSidebar() {
     const { auth } = usePage().props as { auth: Auth };
 
     const navItems: NavItem[] = auth.user.role === 'admin'
-        ? [...mainNavItems, { title: 'Akun', href: '/admin/accounts', icon: Users }, { title: 'Pengaturan', href: '/admin/settings', icon: Settings }]
+        ? [...mainNavItems, { title: 'Akun', href: '/admin/akun', icon: Users }, { title: 'Kelola Data', href: '/admin/kelola-data', icon: Settings }]
         : mainNavItems;
 
     return (

@@ -40,7 +40,7 @@ export default function Settings() {
     });
 
     const save = (next: Options) => {
-        router.post('/admin/settings', next, { preserveScroll: true });
+        router.post('/admin/kelola-data', next, { preserveScroll: true });
     };
 
     const addArea = () => {

@@ -1,19 +1,18 @@
 <?php
 
-namespace App\Http\Controllers\Admin;
+namespace App\Http\Controllers;
 
 use App\Helpers\OptionHelper;
-use App\Http\Controllers\Controller;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
 
-class SettingController extends Controller
+class KelolaDataController extends Controller
 {
     public function index(): Response
     {
-        return Inertia::render('admin/settings', [
+        return Inertia::render('kelola-data/index', [
             'options' => OptionHelper::all(),
         ]);
     }
