@@ -371,6 +371,7 @@ export default function Dashboard() {
   const [newsPaused, setNewsPaused] = useState(false);
   const [activeSection, setActiveSection] = useState("beranda");
   const [scrollY, setScrollY] = useState(0);
+  const [heroMounted, setHeroMounted] = useState(false);
 
   const location = useLocation();
   const navigate = useNavigate();
@@ -434,6 +435,11 @@ export default function Dashboard() {
     }, 8000);
     return () => clearInterval(t);
   }, []);
+
+  useEffect(() => {
+  const t = requestAnimationFrame(() => setHeroMounted(true));
+  return () => cancelAnimationFrame(t);
+}, []);
 
   // Autoplay poster edukasi setiap 7 detik — timer ini dipakai ulang tiap kali
   // posterIndex berubah (baik otomatis maupun diklik manual), jadi hitungan
@@ -619,7 +625,13 @@ export default function Dashboard() {
           </button>
 
           <div className="relative h-full max-w-6xl mx-auto px-5 sm:px-8 flex flex-col justify-between pt-8 sm:pt-10 pb-6 sm:pb-8">
-            <div>
+            <div
+              style={{
+                opacity: heroMounted ? 1 : 0,
+                transform: heroMounted ? "translateY(0)" : "translateY(16px)",
+                transition: "opacity 700ms cubic-bezier(0.16,1,0.3,1) 100ms, transform 700ms cubic-bezier(0.16,1,0.3,1) 100ms",
+              }}
+            >
               <SectionLabel hideLine>
                 <span style={{ color: C.gold500, fontSize: "0.7rem" }}>Sistem Informasi Pengelolaan Sampah</span>
               </SectionLabel>
@@ -631,7 +643,14 @@ export default function Dashboard() {
               </p>
             </div>
 
-            <div className="flex flex-wrap gap-4 sm:gap-8">
+            <div
+              className="flex flex-wrap gap-4 sm:gap-8"
+              style={{
+                opacity: heroMounted ? 1 : 0,
+                transform: heroMounted ? "translateY(0)" : "translateY(16px)",
+                transition: "opacity 700ms cubic-bezier(0.16,1,0.3,1) 250ms, transform 700ms cubic-bezier(0.16,1,0.3,1) 250ms",
+              }}
+            >
               {HERO_STATS.map((st, i) => (
                 <StatCounter key={i} stat={st} delay={300 + i * 180} />
               ))}
