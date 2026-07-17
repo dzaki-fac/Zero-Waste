@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\DataDasarController;
 use App\Http\Controllers\ChecklistPekerjaanController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DistribusiController;
@@ -10,18 +11,18 @@ use App\Http\Controllers\PilahSampahController;
 use App\Http\Middleware\CheckRole;
 use Illuminate\Support\Facades\Route;
 
-// Shared routes (accessible by both roles, no role check)
+// Public static pages (handled by BrowserRouter in React)
+Route::inertia('/', 'home')->name('home');
+Route::inertia('/sop', 'SOPPage');
+Route::inertia('/pengertian', 'pengertian');
+Route::inertia('/struktur', 'struktur');
+
+// Shared form routes (accessible by both roles)
 Route::middleware(['auth'])->group(function () {
     Route::inertia('form/penimbangan', 'form/penimbangan')->name('form.penimbangan');
     Route::inertia('form/pilah-sampah', 'form/pilah-sampah')->name('form.pilah-sampah');
     Route::inertia('form/distribusi', 'form/distribusi')->name('form.distribusi');
 
-    Route::get('admin/dashboard', [DashboardController::class, 'index'])->name('dashboard')->middleware(['verified', CheckRole::class . ':admin']);
-
-    Route::middleware([CheckRole::class . ':admin'])->prefix('admin')->group(function () {
-        Route::get('kelola-data', [KelolaDataController::class, 'index'])->name('settings.index');
-        Route::post('kelola-data', [KelolaDataController::class, 'update'])->name('settings.update');
-    });
 });
 
 // Admin routes
@@ -29,7 +30,12 @@ Route::middleware(['auth', CheckRole::class . ':admin'])
     ->prefix('admin')
     ->name('admin.')
     ->group(function () {
-        Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard');
+        Route::get('/', [DashboardController::class, 'index'])->name('dashboard')->middleware(['verified']);
+
+        Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard')->middleware(['verified']);
+
+        Route::get('kelola-data', [KelolaDataController::class, 'index'])->name('kelola-data.index');
+        Route::post('kelola-data', [KelolaDataController::class, 'update'])->name('kelola-data.update');
 
         Route::get('penimbangan/export', [PenimbanganController::class, 'export'])->name('penimbangan.export');
         Route::resource('penimbangan', PenimbanganController::class)->names('penimbangan');
@@ -51,6 +57,9 @@ Route::middleware(['auth', CheckRole::class . ':admin'])
             ->only(['index', 'store', 'update', 'destroy'])
             ->parameters(['kelola-pekerjaan' => 'masterPekerjaan'])
             ->names('kelola-pekerjaan');
+
+        Route::get('data-dasar', [DataDasarController::class, 'index'])->name('data-dasar.index');
+        Route::post('data-dasar', [DataDasarController::class, 'update'])->name('data-dasar.update');
     });
 
 // Petugas routes
