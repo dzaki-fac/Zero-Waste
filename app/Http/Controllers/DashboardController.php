@@ -141,7 +141,7 @@ class DashboardController extends Controller
 
         $dataDasar = DataDasar::where('user_id', auth()->id())->first();
 
-        return Inertia::render('dashboard', [
+        return Inertia::render('admin/dashboard', [
             'dataDasar' => $dataDasar,
             'penimbanganByArea' => $penimbanganByArea,
             'pilahByJenis' => $pilahByJenis,
