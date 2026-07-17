@@ -1,27 +1,21 @@
-const appName = import.meta.env.VITE_APP_NAME || 'Universitas Diponegoro ZeroLib';
-
 export default function AppLogo() {
     return (
         <>
-            <img
-                src="/images/undip-logo.png"
-                alt="Logo Universitas Diponegoro"
-                className="h-12 w-12 shrink-0 object-contain"
-            />
-            <img
-                src="/images/logo UPT.png"
-                alt="Logo UPT Perpustakaan dan UNDIP Press"
-                className="h-20 w-20 shrink-0 object-contain ml-2"
-            />
-            <img
-                src="/images/LOGO ZeroLib.png"
-                alt="ZeroLib — UPT Perpustakaan dan UNDIP Press"
-                className="h-20 w-20 shrink-0 object-contain ml-2"
-            />
-            <div className="ml-2 grid flex-1 text-left text-sm">
-                <span className="whitespace-normal break-words leading-tight font-semibold tracking-tight">
-                    {appName}
-                </span>
+            <div className="flex h-[90px] w-[120px] shrink-0 items-center justify-center bg-transparent group-data-[collapsible=icon]:h-14 group-data-[collapsible=icon]:w-full">
+                <img
+                    src="/logo-zerolib.png"
+                    alt="ZeroLib"
+                    className="block h-auto max-h-full w-full object-contain group-data-[collapsible=icon]:h-10 group-data-[collapsible=icon]:w-12 group-data-[collapsible=icon]:max-h-10"
+                    loading="eager"
+                    draggable={false}
+                />
+            </div>
+            <div className="min-w-0 group-data-[collapsible=icon]:hidden">
+                <p className="m-0 font-semibold leading-[1.12] tracking-tight text-gray-950">
+                    <span className="block text-[18px]">Universitas</span>
+                    <span className="block text-[18px]">Diponegoro</span>
+                    <span className="mt-1 block text-[21px]">ZeroLib</span>
+                </p>
             </div>
         </>
     );

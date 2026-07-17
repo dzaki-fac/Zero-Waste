@@ -8,9 +8,6 @@ import {
     SidebarContent,
     SidebarFooter,
     SidebarHeader,
-    SidebarMenu,
-    SidebarMenuButton,
-    SidebarMenuItem,
 } from '@/components/ui/sidebar';
 import type { Auth, NavItem } from '@/types';
 
@@ -41,15 +38,13 @@ export function AppSidebar() {
     return (
         <Sidebar collapsible="icon">
             <SidebarHeader>
-                <SidebarMenu>
-                    <SidebarMenuItem>
-                        <SidebarMenuButton size="lg" asChild>
-                            <Link href={auth.user.role === 'petugas' ? '/form' : '/admin/dashboard'} prefetch>
-                                <AppLogo />
-                            </Link>
-                        </SidebarMenuButton>
-                    </SidebarMenuItem>
-                </SidebarMenu>
+                <Link
+                    href="/form"
+                    prefetch
+                    className="grid w-full grid-cols-[120px_minmax(0,1fr)] items-center gap-2 px-4 py-4 group-data-[collapsible=icon]:grid-cols-1 group-data-[collapsible=icon]:gap-0 group-data-[collapsible=icon]:px-2 group-data-[collapsible=icon]:py-2"
+                >
+                    <AppLogo />
+                </Link>
             </SidebarHeader>
 
             <SidebarContent>
@@ -61,4 +56,8 @@ export function AppSidebar() {
             </SidebarFooter>
         </Sidebar>
     );
+}
+
+function portalHref(path: string): string {
+    return `/${path}`;
 }

@@ -1,12 +1,21 @@
 import { Head, Link, usePage, router } from '@inertiajs/react';
-import { Leaf, LogOut, Recycle, TreePine, User } from 'lucide-react';
+import { LayoutDashboard, Leaf, LogOut, Recycle, TreePine, User } from 'lucide-react';
+
+type AuthUser = { id: number; name: string; email: string; role: 'admin' | 'petugas' };
 
 export default function Welcome() {
-    const { auth } = usePage().props as { auth: { user: { id: number; name: string; email: string } | null } };
+    const { auth } = usePage().props as { auth: { user: AuthUser | null } };
 
     const handleLogout = () => {
         router.post('/logout');
     };
+
+    const dashboardRoute =
+        auth.user?.role === 'admin'
+            ? '/admin/dashboard'
+            : auth.user?.role === 'petugas'
+              ? '/petugas/dashboard'
+              : null;
 
     return (
         <>
@@ -20,6 +29,15 @@ export default function Welcome() {
                                 <User className="h-4 w-4" />
                                 {auth.user.name}
                             </span>
+                            {dashboardRoute && (
+                                <Link
+                                    href={dashboardRoute}
+                                    className="inline-flex items-center gap-2 rounded-lg border border-green-200 bg-white px-4 py-2.5 text-sm font-medium text-green-700 shadow-sm hover:bg-green-50"
+                                >
+                                    <LayoutDashboard className="h-4 w-4" />
+                                    Dashboard
+                                </Link>
+                            )}
                             <button
                                 type="button"
                                 onClick={handleLogout}
