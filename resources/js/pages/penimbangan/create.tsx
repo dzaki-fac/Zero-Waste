@@ -13,15 +13,18 @@ import {
 import { Head, Link, useForm, usePage } from '@inertiajs/react';
 import { ArrowLeft, Save } from 'lucide-react';
 
-const subAreaMap: Record<string, string[]> = {
-    'Lantai 1': ['Area Baca', 'Kamar Kecil'],
-    'Lantai 2': ['Area Baca', 'Kamar Kecil'],
-    'Lantai 3': ['Area Baca', 'Kamar Kecil'],
-    'Lantai 4': ['Area Pertemuan', 'Area Kantor', 'Kamar Kecil'],
+type Options = {
+    area: string[];
+    sub_area: Record<string, string[]>;
+    jenis_sampah: string[];
+    tujuan_distribusi: string[];
 };
 
 export default function PenimbanganCreate() {
-    const { auth } = usePage().props as { auth: { user: { name: string } } };
+    const { auth, options } = usePage().props as unknown as {
+        auth: { user: { name: string } };
+        options: Options;
+    };
     const { data, setData, post, processing, errors } = useForm({
         nama: auth.user.name,
         tanggal: new Date(Date.now() - new Date().getTimezoneOffset() * 60000).toISOString().slice(0, 16),
@@ -30,16 +33,18 @@ export default function PenimbanganCreate() {
         sub_area: '',
     });
 
-    const subAreaOptions = subAreaMap[data.area] ?? null;
+    const subAreaOptions = data.area ? (options.sub_area[data.area] ?? null) : null;
 
     const handleAreaChange = (value: string) => {
         setData('area', value);
         setData('sub_area', '');
     };
 
+    const prefix = auth.user.role === 'admin' ? '/admin' : '/petugas';
+
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        post('/admin/penimbangan');
+        post(`${prefix}/penimbangan`);
     };
 
     return (
@@ -105,13 +110,9 @@ export default function PenimbanganCreate() {
                                     <SelectValue placeholder="Pilih area" />
                                 </SelectTrigger>
                                 <SelectContent>
-                                    <SelectItem value="Lantai 1">Lantai 1</SelectItem>
-                                    <SelectItem value="Lantai 2">Lantai 2</SelectItem>
-                                    <SelectItem value="Lantai 3">Lantai 3</SelectItem>
-                                    <SelectItem value="Lantai 4">Lantai 4</SelectItem>
-                                    <SelectItem value="Area Teras">Area Teras</SelectItem>
-                                    <SelectItem value="Area Halaman">Area Halaman</SelectItem>
-                                    <SelectItem value="Area Parkir">Area Parkir</SelectItem>
+                                    {options.area.map((opt) => (
+                                        <SelectItem key={opt} value={opt}>{opt}</SelectItem>
+                                    ))}
                                 </SelectContent>
                             </Select>
                             <InputError message={errors.area} />
@@ -149,7 +150,7 @@ export default function PenimbanganCreate() {
                                 Simpan
                             </Button>
                             <Button variant="outline" asChild className="border-green-200 text-green-700 hover:bg-green-50">
-                                <Link href="/admin/penimbangan" className="flex items-center gap-1">
+                                <Link href={`${prefix}/penimbangan`} className="flex items-center gap-1">
                                     <ArrowLeft className="h-4 w-4" />
                                     Batal
                                 </Link>

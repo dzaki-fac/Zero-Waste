@@ -1,4 +1,4 @@
-import { Head, Link, useForm } from '@inertiajs/react';
+import { Head, Link, useForm, usePage } from '@inertiajs/react';
 import { ArrowLeft, Save } from 'lucide-react';
 import Heading from '@/components/heading';
 import InputError from '@/components/input-error';
@@ -12,6 +12,7 @@ import {
     SelectTrigger,
     SelectValue,
 } from '@/components/ui/select';
+import type { Auth } from '@/types';
 
 type PilahSampah = {
     id: number;
@@ -21,11 +22,21 @@ type PilahSampah = {
     jenis_sampah: string;
 };
 
+type Options = {
+    area: string[];
+    sub_area: Record<string, string[]>;
+    jenis_sampah: string[];
+    tujuan_distribusi: string[];
+};
+
 type Props = {
     pilahSampah: PilahSampah;
 };
 
 export default function PilahSampahEdit({ pilahSampah }: Props) {
+    const { auth, options } = usePage().props as unknown as { auth: Auth; options: Options };
+    const prefix = auth.user.role === 'admin' ? '/admin' : '/petugas';
+
     const initialTanggal = (() => {
         const d = new Date(pilahSampah.tanggal);
         return new Date(d.getTime() - d.getTimezoneOffset() * 60000).toISOString().slice(0, 16);
@@ -40,7 +51,7 @@ export default function PilahSampahEdit({ pilahSampah }: Props) {
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        put(`/admin/pilah-sampah/${pilahSampah.id}`);
+        put(`${prefix}/pilah-sampah/${pilahSampah.id}`);
     };
 
     return (
@@ -106,17 +117,9 @@ export default function PilahSampahEdit({ pilahSampah }: Props) {
                                     <SelectValue placeholder="Pilih jenis sampah" />
                                 </SelectTrigger>
                                 <SelectContent>
-                                    <SelectItem value="Daun">Daun</SelectItem>
-                                    <SelectItem value="Ranting besar">Ranting besar</SelectItem>
-                                    <SelectItem value="Ranting kecil">Ranting kecil</SelectItem>
-                                    <SelectItem value="Sisa makanan">Sisa makanan</SelectItem>
-                                    <SelectItem value="Plastik berwarna">Plastik berwarna</SelectItem>
-                                    <SelectItem value="Plastik putih">Plastik putih</SelectItem>
-                                    <SelectItem value="Styrofoam">Styrofoam</SelectItem>
-                                    <SelectItem value="Botol">Botol</SelectItem>
-                                    <SelectItem value="Kardus dan Kertas">Kardus dan Kertas</SelectItem>
-                                    <SelectItem value="B3">B3</SelectItem>
-                                    <SelectItem value="Lainnya">Lainnya</SelectItem>
+                                    {options.jenis_sampah.map((opt) => (
+                                        <SelectItem key={opt} value={opt}>{opt}</SelectItem>
+                                    ))}
                                 </SelectContent>
                             </Select>
                             <InputError message={errors.jenis_sampah} />
@@ -128,7 +131,7 @@ export default function PilahSampahEdit({ pilahSampah }: Props) {
                                 Perbarui
                             </Button>
                             <Button variant="outline" asChild className="border-green-200 text-green-700 hover:bg-green-50">
-                                <Link href="/admin/pilah-sampah" className="flex items-center gap-1">
+                                <Link href={`${prefix}/pilah-sampah`} className="flex items-center gap-1">
                                     <ArrowLeft className="h-4 w-4" />
                                     Batal
                                 </Link>

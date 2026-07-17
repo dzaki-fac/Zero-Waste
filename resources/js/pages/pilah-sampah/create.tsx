@@ -13,8 +13,18 @@ import {
 import { Head, Link, useForm, usePage } from '@inertiajs/react';
 import { ArrowLeft, Save } from 'lucide-react';
 
+type Options = {
+    area: string[];
+    sub_area: Record<string, string[]>;
+    jenis_sampah: string[];
+    tujuan_distribusi: string[];
+};
+
 export default function PilahSampahCreate() {
-    const { auth } = usePage().props as { auth: { user: { name: string } } };
+    const { auth, options } = usePage().props as unknown as {
+        auth: { user: { name: string } };
+        options: Options;
+    };
     const { data, setData, post, processing, errors } = useForm({
         nama: auth.user.name,
         tanggal: new Date(Date.now() - new Date().getTimezoneOffset() * 60000).toISOString().slice(0, 16),
@@ -22,9 +32,11 @@ export default function PilahSampahCreate() {
         jenis_sampah: '',
     });
 
+    const prefix = auth.user.role === 'admin' ? '/admin' : '/petugas';
+
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        post('/admin/pilah-sampah');
+        post(`${prefix}/pilah-sampah`);
     };
 
     return (
@@ -90,17 +102,9 @@ export default function PilahSampahCreate() {
                                     <SelectValue placeholder="Pilih jenis sampah" />
                                 </SelectTrigger>
                                 <SelectContent>
-                                    <SelectItem value="Daun">Daun</SelectItem>
-                                    <SelectItem value="Ranting besar">Ranting besar</SelectItem>
-                                    <SelectItem value="Ranting kecil">Ranting kecil</SelectItem>
-                                    <SelectItem value="Sisa makanan">Sisa makanan</SelectItem>
-                                    <SelectItem value="Plastik berwarna">Plastik berwarna</SelectItem>
-                                    <SelectItem value="Plastik putih">Plastik putih</SelectItem>
-                                    <SelectItem value="Styrofoam">Styrofoam</SelectItem>
-                                    <SelectItem value="Botol">Botol</SelectItem>
-                                    <SelectItem value="Kardus dan Kertas">Kardus dan Kertas</SelectItem>
-                                    <SelectItem value="B3">B3</SelectItem>
-                                    <SelectItem value="Lainnya">Lainnya</SelectItem>
+                                    {options.jenis_sampah.map((opt) => (
+                                        <SelectItem key={opt} value={opt}>{opt}</SelectItem>
+                                    ))}
                                 </SelectContent>
                             </Select>
                             <InputError message={errors.jenis_sampah} />
@@ -112,7 +116,7 @@ export default function PilahSampahCreate() {
                                 Simpan
                             </Button>
                             <Button variant="outline" asChild className="border-green-200 text-green-700 hover:bg-green-50">
-                                <Link href="/admin/pilah-sampah" className="flex items-center gap-1">
+                                <Link href={`${prefix}/pilah-sampah`} className="flex items-center gap-1">
                                     <ArrowLeft className="h-4 w-4" />
                                     Batal
                                 </Link>
