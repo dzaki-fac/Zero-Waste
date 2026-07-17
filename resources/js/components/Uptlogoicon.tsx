@@ -5,7 +5,7 @@ export default function UptLogoIcon(props: SVGAttributes<SVGElement>) {
         <img
             src="/images/logo UPT.png"
             alt="Logo UPT Perpustakaan dan UNDIP Press"
-            className="h-30 w-30 object-contain"
+            className="h-32 w-32 object-contain"
         />
     );
 }

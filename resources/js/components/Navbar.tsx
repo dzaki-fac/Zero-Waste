@@ -34,29 +34,38 @@ export default function Navbar({ activeSection, onNavItemClick }: NavbarProps) {
           ZeroLib — yang teksnya gelap/hitam — tetap kebaca jelas. */}
       <header className="sticky top-0 z-40 border-b" style={{ backgroundColor: "#fff", borderColor: C.line }}>
         <div className="w-full pl-5 sm:pl-8 pr-5 sm:pr-8 h-16 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <UndipLogoIcon />
-            <UptLogoIcon />
-            <ZeroLibLogoIcon />
+          {/* 3 logo disamain tingginya (h-9) & di-align tengah, apa pun
+              markup internal tiap komponen logonya (img/svg) — [&>*] maksa
+              elemen di dalamnya ikut tinggi wrapper & jaga rasio aslinya. */}
+          <div className="flex items-center gap-4">
+            <div className="h-9 flex items-center [&>*]:h-full [&>*]:w-auto">
+              <UndipLogoIcon />
+            </div>
+            <div className="h-9 flex items-center [&>*]:h-full [&>*]:w-auto">
+              <UptLogoIcon />
+            </div>
+            <div className="h-9 flex items-center [&>*]:h-full [&>*]:w-auto">
+              <ZeroLibLogoIcon />
+            </div>
           </div>
 
-          <nav className="hidden md:flex items-center gap-1">
+          <nav className="hidden md:flex items-center gap-6 lg:gap-8">
             {NAV_ITEMS.map((n) => {
               const active = activeSection === n.id;
               return (
                 <button
                   key={n.id}
                   onClick={() => handleNavClick(n.id)}
-                  className="relative px-3.5 py-2 rounded-full text-sm font-medium transition-colors"
-                  style={{ color: active ? C.navy900 : C.ink500, backgroundColor: active ? C.navy050 : "transparent" }}
-                  onMouseEnter={(e) => { if (!active) e.currentTarget.style.backgroundColor = C.navy050; }}
-                  onMouseLeave={(e) => { if (!active) e.currentTarget.style.backgroundColor = "transparent"; }}
+                  className="relative py-2 text-sm font-semibold tracking-wide transition-colors"
+                  style={{ ...display, color: active ? C.leaf500 : C.ink500 }}
+                  onMouseEnter={(e) => { if (!active) e.currentTarget.style.color = C.leaf500; }}
+                  onMouseLeave={(e) => { if (!active) e.currentTarget.style.color = C.ink500; }}
                 >
                   {n.label}
                   <span
-                    className="absolute left-3.5 right-3.5 -bottom-[1px] h-[2px] rounded-full"
+                    className="absolute left-0 right-0 -bottom-[1px] h-[2px] rounded-full"
                     style={{
-                      backgroundColor: C.leaf400,
+                      backgroundColor: C.leaf500,
                       transform: active ? "scaleX(1)" : "scaleX(0)",
                       transition: "transform 220ms ease",
                     }}
@@ -68,7 +77,7 @@ export default function Navbar({ activeSection, onNavItemClick }: NavbarProps) {
 
           <button
             className="md:hidden"
-            style={{ color: C.navy900 }}
+            style={{ color: C.leaf500 }}
             onClick={() => setMobileNavOpen((v) => !v)}
             aria-label="Buka menu"
           >
@@ -84,8 +93,8 @@ export default function Navbar({ activeSection, onNavItemClick }: NavbarProps) {
                 <button
                   key={n.id}
                   onClick={() => handleNavClick(n.id)}
-                  className="text-left px-3 py-2.5 rounded-lg text-sm font-medium"
-                  style={{ color: active ? C.navy900 : C.ink500, backgroundColor: active ? C.navy050 : "transparent" }}
+                  className="text-left px-1 py-2.5 text-sm font-semibold"
+                  style={{ color: active ? C.leaf500 : C.ink500 }}
                 >
                   {n.label}
                 </button>
