@@ -13,6 +13,7 @@ class KelolaDataSeeder extends Seeder
             'area' => [
                 'Lantai 1', 'Lantai 2', 'Lantai 3', 'Lantai 4',
                 'Area Teras', 'Area Halaman', 'Area Parkir',
+                'UNDIP Press',
             ],
             'jenis_sampah' => [
                 'Daun', 'Ranting besar', 'Ranting kecil', 'Sisa makanan',

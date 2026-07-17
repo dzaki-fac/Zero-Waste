@@ -86,6 +86,13 @@ export default function Welcome() {
                             <Leaf className="h-4 w-4" />
                             Distribusi
                         </Link>
+                        <Link
+                            href="/form/pekerjaan"
+                            className="inline-flex items-center gap-2 rounded-lg bg-green-600 px-6 py-2.5 text-sm font-medium text-white shadow-sm hover:bg-green-700"
+                        >
+                            <Leaf className="h-4 w-4" />
+                            Pekerjaan
+                        </Link>
                     </div>
                 </div>
             </div>
