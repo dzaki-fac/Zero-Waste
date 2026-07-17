@@ -12,7 +12,6 @@ import { useEffect, useState } from 'react';
 
 type Options = {
     area: Array<{ value: string; label: string; icon: string }>;
-    sub_area: Record<string, string[]>;
     jenis_sampah: string[];
     tujuan_distribusi: string[];
 };

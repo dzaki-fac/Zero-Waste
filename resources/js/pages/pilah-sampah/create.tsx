@@ -15,7 +15,6 @@ import { ArrowLeft, Save } from 'lucide-react';
 
 type Options = {
     area: string[];
-    sub_area: Record<string, string[]>;
     jenis_sampah: string[];
     tujuan_distribusi: string[];
 };
