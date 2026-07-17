@@ -1,8 +1,8 @@
 <?php
 
-use App\Http\Controllers\DataDasarController;
 use App\Http\Controllers\ChecklistPekerjaanController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\DataDasarController;
 use App\Http\Controllers\DistribusiController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\KelolaDataController;
@@ -12,19 +12,29 @@ use App\Http\Controllers\PilahSampahController;
 use App\Http\Middleware\CheckRole;
 use Illuminate\Support\Facades\Route;
 
+// Public landing page (BrowserRouter-based, no auth required)
 // Public static pages (handled by BrowserRouter in React)
 Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::inertia('/sop', 'SOPPage');
 Route::inertia('/pengertian', 'pengertian');
 Route::inertia('/struktur', 'struktur');
 
-// Shared form routes (accessible by both roles)
+// Shared routes (accessible by both roles, no role check)
 Route::middleware(['auth'])->group(function () {
+    Route::inertia('/form', 'welcome')->name('form');
     Route::inertia('form/penimbangan', 'form/penimbangan')->name('form.penimbangan');
     Route::inertia('form/pilah-sampah', 'form/pilah-sampah')->name('form.pilah-sampah');
     Route::inertia('form/distribusi', 'form/distribusi')->name('form.distribusi');
+
+    Route::post('form/penimbangan', [PenimbanganController::class, 'store'])->name('form.penimbangan.store');
+    Route::post('form/pilah-sampah', [PilahSampahController::class, 'store'])->name('form.pilah-sampah.store');
+    Route::post('form/distribusi', [DistribusiController::class, 'store'])->name('form.distribusi.store');
     Route::get('form/pekerjaan', [ChecklistPekerjaanController::class, 'formPage'])->name('form.pekerjaan');
 
+    Route::middleware([CheckRole::class . ':admin'])->prefix('admin')->group(function () {
+        Route::get('kelola-data', [KelolaDataController::class, 'index'])->name('settings.index');
+        Route::post('kelola-data', [KelolaDataController::class, 'update'])->name('settings.update');
+    });
 });
 
 // Admin routes
@@ -32,12 +42,7 @@ Route::middleware(['auth', CheckRole::class . ':admin'])
     ->prefix('admin')
     ->name('admin.')
     ->group(function () {
-        Route::get('/', [DashboardController::class, 'index'])->name('dashboard')->middleware(['verified']);
-
-        Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard')->middleware(['verified']);
-
-        Route::get('kelola-data', [KelolaDataController::class, 'index'])->name('kelola-data.index');
-        Route::post('kelola-data', [KelolaDataController::class, 'update'])->name('kelola-data.update');
+        Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
         Route::get('penimbangan/export', [PenimbanganController::class, 'export'])->name('penimbangan.export');
         Route::resource('penimbangan', PenimbanganController::class)->names('penimbangan');
@@ -79,11 +84,4 @@ Route::middleware(['auth', CheckRole::class . ':petugas'])
 
         Route::get('distribusi/export', [DistribusiController::class, 'export'])->name('distribusi.export');
         Route::resource('distribusi', DistribusiController::class)->names('distribusi');
-        Route::post('checklist-pekerjaan', [ChecklistPekerjaanController::class, 'store'])->name('checklist-pekerjaan.store');
-    });
-
-// Petugas landing page (separate URL from prefix group)
-Route::middleware(['auth', CheckRole::class . ':petugas'])
-    ->group(function () {
-        Route::inertia('/form', 'welcome')->name('petugas.form');
     });

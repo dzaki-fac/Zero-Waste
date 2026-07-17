@@ -86,7 +86,7 @@ export default function FormDistribusi() {
             scrollTo('section-jenis-berat');
             return;
         }
-        router.post('/petugas/distribusi', {
+        router.post('/form/distribusi', {
             ...data,
             tujuan_distribusi: data.tujuan_distribusi === 'Tujuan lainnya' ? data.tujuan_lainnya : data.tujuan_distribusi,
         });
