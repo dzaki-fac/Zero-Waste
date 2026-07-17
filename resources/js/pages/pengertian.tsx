@@ -12,15 +12,15 @@ const PENGERTIAN_ITEMS = [
     title: "Definisi",
     shortDesc:
       "ZeroLib adalah sistem digital pengelolaan sampah UPT Perpustakaan dan UNDIP Press Universitas Diponegoro yang mengintegrasikan proses pengelolaan sampah secara terdokumentasi dan berbasis data, mulai dari identifikasi sumber, pemilahan, penimbangan, pencatatan, hingga penyaluran ke pengolahan akhir.",
-    image: "https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?auto=format&fit=crop&w=700&q=80",
+    image: "https://i.pinimg.com/736x/29/7a/3b/297a3b56abc377a1c12c9382c934ee7d.jpg",
   },
   {
     key: "prinsip",
     icon: Scale,
     title: "Prinsip",
     shortDesc:
-      "ZeroLib mendukung penerapan prinsip 5R, yaitu Reduce, Reuse, Recycle, Recover, dan Responsible Disposal, di setiap tahap pengelolaan sampah perpustakaan.",
-    image: "https://images.unsplash.com/photo-1532996122724-e3c354a0b15b?auto=format&fit=crop&w=700&q=80",
+      "ZeroLib mendukung penerapan prinsip 5R, yaitu Reduce, Reuse, Recycle, Refuse, dan ROT, di setiap tahap pengelolaan sampah perpustakaan.",
+    image: "https://i0.wp.com/www.whenateengoesgreen.com/wp-content/uploads/2019/04/5-rs-of-zero-waste-refuse-reduce-reuse-recycle-rot.png?fit=721%2C893&ssl=1",
   },
   {
     key: "manfaat",
@@ -36,7 +36,7 @@ const PENGERTIAN_ITEMS = [
     title: "Ruang Lingkup",
     shortDesc:
       "Ruang lingkup program mencakup seluruh area Perpustakaan Universitas Diponegoro, meliputi lantai satu hingga empat, area baca, ruang kantor, ruang pertemuan, toilet, teras, halaman, area parkir, dan UNDIP Press sebagai bagian dari lingkungan operasional perpustakaan.",
-    image: "https://images.unsplash.com/photo-1497366811353-6870744d04b2?auto=format&fit=crop&w=700&q=80",
+    image: "https://media.licdn.com/dms/image/v2/D5622AQFDBxnm7ErF1Q/feedshare-shrink_800/feedshare-shrink_800/0/1714140945258?e=2147483647&v=beta&t=JZo_Kp9tUI-MTiZd3Z4R_SAqrW9NBQgwgV-KYUCYlX4",
   },
 ];
 

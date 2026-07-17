@@ -16,6 +16,7 @@ Route::inertia('/', 'home')->name('home');
 Route::inertia('/sop', 'SOPPage');
 Route::inertia('/pengertian', 'pengertian');
 Route::inertia('/struktur', 'struktur');
+Route::inertia('/peraturan', 'peraturan'); 
 
 // Shared form routes (accessible by both roles)
 Route::middleware(['auth'])->group(function () {
