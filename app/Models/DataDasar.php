@@ -28,6 +28,10 @@ class DataDasar extends Model
         'baseline_sampah_periode',
         'jenis_sampah_dominan',
         'kondisi_fasilitas',
+        'sampah_residu_akhir',
+        'total_sampah_terkelola',
+        'jumlah_warga_terlibat_aktif',
+        'luas_area_zero_waste',
     ];
 
     protected function casts(): array
@@ -40,6 +44,10 @@ class DataDasar extends Model
             'jumlah_dosen' => 'integer',
             'jumlah_tendik' => 'integer',
             'jumlah_tenaga_pendukung' => 'integer',
+            'sampah_residu_akhir' => 'decimal:2',
+            'total_sampah_terkelola' => 'decimal:2',
+            'jumlah_warga_terlibat_aktif' => 'integer',
+            'luas_area_zero_waste' => 'decimal:2',
         ];
     }
 
