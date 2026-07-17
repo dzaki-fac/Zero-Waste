@@ -5,9 +5,9 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { UserInfo } from '@/components/user-info';
 import { useMobileNavigation } from '@/hooks/use-mobile-navigation';
-import { logout } from '@/routes';
+import { logout as logoutRoute } from '@/routes';
 import type { User } from '@/types';
-import { Link, router } from '@inertiajs/react';
+import { router } from '@inertiajs/react';
 import { LogOut } from 'lucide-react';
 
 type Props = {
@@ -19,7 +19,7 @@ export function UserMenuContent({ user }: Props) {
 
     const handleLogout = () => {
         cleanup();
-        router.flushAll();
+        router.post(logoutRoute().url, {}, { preserveScroll: false });
     };
 
     return (
@@ -31,16 +31,15 @@ export function UserMenuContent({ user }: Props) {
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
             <DropdownMenuItem asChild>
-                <Link
-                    className="block w-full cursor-pointer"
-                    href={logout()}
-                    as="button"
+                <button
+                    type="button"
                     onClick={handleLogout}
+                    className="flex w-full cursor-pointer items-center px-2 py-1.5 text-sm"
                     data-test="logout-button"
                 >
-                    <LogOut className="mr-2" />
+                    <LogOut className="mr-2 h-4 w-4" />
                     Log out
-                </Link>
+                </button>
             </DropdownMenuItem>
         </>
     );

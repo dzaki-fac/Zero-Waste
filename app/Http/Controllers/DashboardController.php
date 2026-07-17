@@ -19,9 +19,11 @@ class DashboardController extends Controller
         $startDate = $request->input('start_date');
         $endDate = $request->input('end_date');
 
-        $penimbanganQuery = Penimbangan::query();
-        $pilahQuery = PilahSampah::query();
-        $distribusiQuery = Distribusi::query();
+        $user = $request->user();
+
+        $penimbanganQuery = Penimbangan::visibleTo($user);
+        $pilahQuery = PilahSampah::visibleTo($user);
+        $distribusiQuery = Distribusi::visibleTo($user);
 
         if ($startDate) {
             $penimbanganQuery->where('tanggal', '>=', $startDate);
@@ -39,7 +41,7 @@ class DashboardController extends Controller
         $totalPilah = (float) $pilahQuery->sum('berat');
         $totalDistribusi = (float) $distribusiQuery->sum('berat');
 
-        $penimbanganByArea = Penimbangan::query()
+        $penimbanganByArea = Penimbangan::visibleTo($user)
             ->when($startDate, fn ($q) => $q->where('tanggal', '>=', $startDate))
             ->when($endDate, fn ($q) => $q->where('tanggal', '<=', $endDate))
             ->select('area', DB::raw('SUM(berat_sampah) as total'))
@@ -49,7 +51,7 @@ class DashboardController extends Controller
             ->values()
             ->toArray();
 
-        $pilahByJenis = PilahSampah::query()
+        $pilahByJenis = PilahSampah::visibleTo($user)
             ->when($startDate, fn ($q) => $q->where('tanggal', '>=', $startDate))
             ->when($endDate, fn ($q) => $q->where('tanggal', '<=', $endDate))
             ->select('jenis_sampah', DB::raw('SUM(berat) as total'))
@@ -59,7 +61,7 @@ class DashboardController extends Controller
             ->values()
             ->toArray();
 
-        $distribusiByTujuan = Distribusi::query()
+        $distribusiByTujuan = Distribusi::visibleTo($user)
             ->when($startDate, fn ($q) => $q->where('tanggal', '>=', $startDate))
             ->when($endDate, fn ($q) => $q->where('tanggal', '<=', $endDate))
             ->select('tujuan_distribusi', DB::raw('SUM(berat) as total'))
@@ -69,29 +71,35 @@ class DashboardController extends Controller
             ->values()
             ->toArray();
 
-        $petugasStats = User::where('role', 'petugas')
+        $petugasQuery = User::where('role', 'petugas');
+
+        if ($user->role === 'petugas') {
+            $petugasQuery->where('id', $user->id);
+        }
+
+        $petugasStats = $petugasQuery
             ->get()
-            ->map(function ($user) use ($startDate, $endDate) {
-                $penimbangan = Penimbangan::where('nama', $user->name)
+            ->map(function ($petugas) use ($startDate, $endDate) {
+                $penimbangan = Penimbangan::where('user_id', $petugas->id)
                     ->when($startDate, fn ($q) => $q->where('tanggal', '>=', $startDate))
                     ->when($endDate, fn ($q) => $q->where('tanggal', '<=', $endDate))
                     ->selectRaw('COUNT(*) as jumlah, COALESCE(SUM(berat_sampah), 0) as total_berat')
                     ->first();
 
-                $pilah = PilahSampah::where('nama', $user->name)
+                $pilah = PilahSampah::where('user_id', $petugas->id)
                     ->when($startDate, fn ($q) => $q->where('tanggal', '>=', $startDate))
                     ->when($endDate, fn ($q) => $q->where('tanggal', '<=', $endDate))
                     ->selectRaw('COUNT(*) as jumlah, COALESCE(SUM(berat), 0) as total_berat')
                     ->first();
 
-                $distribusi = Distribusi::where('nama', $user->name)
+                $distribusi = Distribusi::where('user_id', $petugas->id)
                     ->when($startDate, fn ($q) => $q->where('tanggal', '>=', $startDate))
                     ->when($endDate, fn ($q) => $q->where('tanggal', '<=', $endDate))
                     ->selectRaw('COUNT(*) as jumlah, COALESCE(SUM(berat), 0) as total_berat')
                     ->first();
 
                 return [
-                    'name' => $user->name,
+                    'name' => $petugas->name,
                     'penimbangan' => [
                         'jumlah' => (int) $penimbangan->jumlah,
                         'total_berat' => (float) $penimbangan->total_berat,

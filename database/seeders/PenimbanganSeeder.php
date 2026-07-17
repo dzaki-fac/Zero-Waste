@@ -10,7 +10,7 @@ class PenimbanganSeeder extends Seeder
 {
     public function run(): void
     {
-        $names = User::pluck('name')->toArray();
+        $petugas = User::where('role', 'petugas')->get()->keyBy('name');
         $areas = ['Lantai 1', 'Lantai 2', 'Lantai 3', 'Lantai 4', 'Area Teras', 'Area Halaman', 'Area Parkir'];
         $subAreas = ['Area Pertemuan', 'Area Kantor', 'Kamar Kecil'];
 
@@ -24,9 +24,12 @@ class PenimbanganSeeder extends Seeder
 
         for ($i = 0; $i < 20; $i++) {
             $area = fake()->randomElement($areas);
+            $petugasName = fake()->randomElement($petugas->keys()->toArray());
+            $petugasUser = $petugas[$petugasName];
 
             Penimbangan::create([
-                'nama' => fake()->randomElement($names),
+                'nama' => $petugasName,
+                'user_id' => $petugasUser->id,
                 'tanggal' => fake()->dateTimeBetween('-3 months', 'now'),
                 'berat_sampah' => $weights[$i],
                 'area' => $area,

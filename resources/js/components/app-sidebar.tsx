@@ -1,5 +1,5 @@
 import { Link, usePage } from '@inertiajs/react';
-import { Database, LayoutDashboard, Recycle, Scale, Settings, Truck, Users } from 'lucide-react';
+import { Database, LayoutDashboard, ListTodo, Recycle, Scale, Settings, Truck, Users } from 'lucide-react';
 import AppLogo from '@/components/app-logo';
 import { NavMain } from '@/components/nav-main';
 import { NavUser } from '@/components/nav-user';
@@ -14,40 +14,29 @@ import {
 } from '@/components/ui/sidebar';
 import type { Auth, NavItem } from '@/types';
 
-const mainNavItems: NavItem[] = [
-    {
-        title: 'Dashboard',
-        href: '/admin/dashboard',
-        icon: LayoutDashboard,
-    },
-    {
-        title: 'Data Dasar',
-        href: '/admin/data-dasar',
-        icon: Database,
-    },
-    {
-        title: 'Penimbangan',
-        href: '/admin/penimbangan',
-        icon: Scale,
-    },
-    {
-        title: 'Pilah Sampah',
-        href: '/admin/pilah-sampah',
-        icon: Recycle,
-    },
-    {
-        title: 'Distribusi',
-        href: '/admin/distribusi',
-        icon: Truck,
-    },
-];
-
 export function AppSidebar() {
     const { auth } = usePage().props as { auth: Auth };
 
-    const navItems: NavItem[] = auth.user?.role === 'admin'
-        ? [...mainNavItems, { title: 'Akun', href: '/admin/akun', icon: Users }, { title: 'Kelola Data', href: '/admin/kelola-data', icon: Settings }]
-        : mainNavItems;
+    const prefix = auth.user.role === 'admin' ? 'admin' : 'petugas';
+
+    const sharedNavItems: NavItem[] = [
+        { title: 'Dashboard', href: `/${prefix}/dashboard`, icon: LayoutDashboard },
+        { title: 'Penimbangan', href: `/${prefix}/penimbangan`, icon: Scale },
+        { title: 'Pilah Sampah', href: `/${prefix}/pilah-sampah`, icon: Recycle },
+        { title: 'Distribusi', href: `/${prefix}/distribusi`, icon: Truck },
+    ];
+
+    const adminNavItems: NavItem[] = [
+        { title: 'Checklist Pekerjaan', href: '/admin/checklist-pekerjaan', icon: LayoutDashboard },
+        { title: 'Data Dasar', href: '/admin/data-dasar', icon: Database },
+        { title: 'Kelola Pekerjaan', href: '/admin/kelola-pekerjaan', icon: ListTodo },
+        { title: 'Kelola Data', href: '/admin/kelola-data', icon: Settings },
+        { title: 'Akun', href: '/admin/akun', icon: Users },
+    ];
+
+    const navItems: NavItem[] = auth.user.role === 'admin'
+        ? [...sharedNavItems, ...adminNavItems]
+        : sharedNavItems;
 
     return (
         <Sidebar collapsible="icon">
@@ -55,7 +44,7 @@ export function AppSidebar() {
                 <SidebarMenu>
                     <SidebarMenuItem>
                         <SidebarMenuButton size="lg" asChild>
-                            <Link href="/" prefetch>
+                            <Link href={auth.user.role === 'petugas' ? '/form' : '/admin/dashboard'} prefetch>
                                 <AppLogo />
                             </Link>
                         </SidebarMenuButton>

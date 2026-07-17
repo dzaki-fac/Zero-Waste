@@ -19,7 +19,7 @@ test('users can authenticate using the login screen', function () {
     ]);
 
     $this->assertAuthenticated();
-    $response->assertRedirect(route('dashboard', absolute: false));
+    $response->assertRedirect(route('petugas.form', absolute: false));
 });
 
 test('users with two factor enabled are redirected to two factor challenge', function () {
@@ -58,9 +58,75 @@ test('users can logout', function () {
 
     $response = $this->actingAs($user)->post(route('logout'));
 
-    $response->assertRedirect(route('home'));
+    $response->assertRedirect('/login');
 
     $this->assertGuest();
+});
+
+test('authenticated admin can logout', function () {
+    $user = User::factory()->admin()->create();
+
+    $response = $this->actingAs($user)->post(route('logout'));
+
+    $response->assertRedirect('/login');
+    $this->assertGuest();
+});
+
+test('authenticated petugas can logout', function () {
+    $user = User::factory()->petugas()->create();
+
+    $response = $this->actingAs($user)->post(route('logout'));
+
+    $response->assertRedirect('/login');
+    $this->assertGuest();
+});
+
+test('logout invalidates session and regenerates token', function () {
+    $user = User::factory()->create();
+
+    $this->actingAs($user);
+
+    $sessionBefore = session()->getId();
+
+    $this->post(route('logout'));
+
+    $this->assertGuest();
+    $this->assertNotEquals($sessionBefore, session()->getId());
+});
+
+test('GET request to logout route is not accepted', function () {
+    $user = User::factory()->create();
+
+    $response = $this->actingAs($user)->get(route('logout'));
+
+    $response->assertStatus(405);
+});
+
+test('after logout /form redirects to login', function () {
+    $user = User::factory()->petugas()->create();
+
+    $this->actingAs($user)->post(route('logout'));
+
+    $response = $this->get(route('petugas.form'));
+    $response->assertRedirect(route('login'));
+});
+
+test('after logout /admin/dashboard redirects to login', function () {
+    $user = User::factory()->admin()->create();
+
+    $this->actingAs($user)->post(route('logout'));
+
+    $response = $this->get(route('admin.dashboard'));
+    $response->assertRedirect(route('login'));
+});
+
+test('after logout /petugas/penimbangan redirects to login', function () {
+    $user = User::factory()->petugas()->create();
+
+    $this->actingAs($user)->post(route('logout'));
+
+    $response = $this->get(route('petugas.penimbangan.index'));
+    $response->assertRedirect(route('login'));
 });
 
 test('users are rate limited', function () {

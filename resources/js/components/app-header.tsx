@@ -100,7 +100,7 @@ export function AppHeader({ breadcrumbs = [] }: Props) {
                     </div>
 
                     <Link
-                        href="/"
+                        href={auth.user?.role === 'petugas' ? '/form' : '/admin/dashboard'}
                         prefetch
                         className="flex items-center space-x-2"
                     >

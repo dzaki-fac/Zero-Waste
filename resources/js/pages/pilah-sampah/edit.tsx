@@ -12,6 +12,7 @@ import {
     SelectTrigger,
     SelectValue,
 } from '@/components/ui/select';
+import type { Auth } from '@/types';
 
 type PilahSampah = {
     id: number;
@@ -33,7 +34,9 @@ type Props = {
 };
 
 export default function PilahSampahEdit({ pilahSampah }: Props) {
-    const { options } = usePage().props as unknown as { options: Options };
+    const { auth, options } = usePage().props as unknown as { auth: Auth; options: Options };
+    const prefix = auth.user.role === 'admin' ? '/admin' : '/petugas';
+
     const initialTanggal = (() => {
         const d = new Date(pilahSampah.tanggal);
         return new Date(d.getTime() - d.getTimezoneOffset() * 60000).toISOString().slice(0, 16);
@@ -48,7 +51,7 @@ export default function PilahSampahEdit({ pilahSampah }: Props) {
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        put(`/admin/pilah-sampah/${pilahSampah.id}`);
+        put(`${prefix}/pilah-sampah/${pilahSampah.id}`);
     };
 
     return (
@@ -128,7 +131,7 @@ export default function PilahSampahEdit({ pilahSampah }: Props) {
                                 Perbarui
                             </Button>
                             <Button variant="outline" asChild className="border-green-200 text-green-700 hover:bg-green-50">
-                                <Link href="/admin/pilah-sampah" className="flex items-center gap-1">
+                                <Link href={`${prefix}/pilah-sampah`} className="flex items-center gap-1">
                                     <ArrowLeft className="h-4 w-4" />
                                     Batal
                                 </Link>

@@ -12,6 +12,7 @@ import {
     SelectTrigger,
     SelectValue,
 } from '@/components/ui/select';
+import type { Auth } from '@/types';
 
 type Penimbangan = {
     id: number;
@@ -34,7 +35,9 @@ type Props = {
 };
 
 export default function PenimbanganEdit({ penimbangan }: Props) {
-    const { options } = usePage().props as unknown as { options: Options };
+    const { auth, options } = usePage().props as unknown as { auth: Auth; options: Options };
+    const prefix = auth.user.role === 'admin' ? '/admin' : '/petugas';
+
     const initialTanggal = (() => {
         const d = new Date(penimbangan.tanggal);
         return new Date(d.getTime() - d.getTimezoneOffset() * 60000).toISOString().slice(0, 16);
@@ -62,7 +65,7 @@ export default function PenimbanganEdit({ penimbangan }: Props) {
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        put(`/admin/penimbangan/${penimbangan.id}`);
+        put(`${prefix}/penimbangan/${penimbangan.id}`);
     };
 
     return (
@@ -168,7 +171,7 @@ export default function PenimbanganEdit({ penimbangan }: Props) {
                                 Perbarui
                             </Button>
                             <Button variant="outline" asChild className="border-green-200 text-green-700 hover:bg-green-50">
-                                <Link href="/admin/penimbangan" className="flex items-center gap-1">
+                                <Link href={`${prefix}/penimbangan`} className="flex items-center gap-1">
                                     <ArrowLeft className="h-4 w-4" />
                                     Batal
                                 </Link>

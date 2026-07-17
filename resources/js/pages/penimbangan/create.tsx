@@ -40,9 +40,11 @@ export default function PenimbanganCreate() {
         setData('sub_area', '');
     };
 
+    const prefix = auth.user.role === 'admin' ? '/admin' : '/petugas';
+
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        post('/admin/penimbangan');
+        post(`${prefix}/penimbangan`);
     };
 
     return (
@@ -148,7 +150,7 @@ export default function PenimbanganCreate() {
                                 Simpan
                             </Button>
                             <Button variant="outline" asChild className="border-green-200 text-green-700 hover:bg-green-50">
-                                <Link href="/admin/penimbangan" className="flex items-center gap-1">
+                                <Link href={`${prefix}/penimbangan`} className="flex items-center gap-1">
                                     <ArrowLeft className="h-4 w-4" />
                                     Batal
                                 </Link>
