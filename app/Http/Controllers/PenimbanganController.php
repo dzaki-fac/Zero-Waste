@@ -101,7 +101,6 @@ class PenimbanganController extends Controller
                     $record->tanggal,
                     $record->berat_sampah,
                     $record->area,
-                    $record->sub_area,
                 ]);
             }
 

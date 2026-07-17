@@ -71,7 +71,6 @@ test('penimbangan form submission sets user_id', function () {
             'tanggal' => now()->format('Y-m-d H:i'),
             'berat_sampah' => '12.34',
             'area' => 'Lantai 1',
-            'sub_area' => 'Area Baca',
         ]);
 
     $response->assertRedirect('/form/penimbangan');

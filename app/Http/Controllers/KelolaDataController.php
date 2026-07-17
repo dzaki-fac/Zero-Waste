@@ -22,7 +22,6 @@ class KelolaDataController extends Controller
         $validated = $request->validate([
             'area' => ['required', 'array', 'min:1'],
             'area.*' => ['required', 'string', 'distinct'],
-            'sub_area' => ['nullable', 'array'],
             'jenis_sampah' => ['required', 'array', 'min:1'],
             'jenis_sampah.*' => ['required', 'string', 'distinct'],
             'tujuan_distribusi' => ['required', 'array', 'min:1'],

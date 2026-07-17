@@ -57,6 +57,39 @@ class ChecklistPekerjaanController extends Controller
         ]);
     }
 
+    public function formPage(Request $request): Response
+    {
+        $user = $request->user();
+
+        if ($user->role !== 'petugas') {
+            abort(403, 'Hanya petugas yang dapat mengakses halaman ini.');
+        }
+
+        $nip = $user->nip;
+        $tanggal = $request->query('tanggal', now()->toDateString());
+        $areaFilter = $request->query('area');
+
+        $masterTasks = MasterPekerjaan::active()->ordered()->get();
+
+        $checklist = $areaFilter
+            ? ChecklistPekerjaan::where('nip', $nip)
+                ->where('tanggal', $tanggal)
+                ->where('area', $areaFilter)
+                ->get()
+                ->keyBy('master_pekerjaan_id')
+            : collect();
+
+        $areas = OptionHelper::get('area');
+
+        return Inertia::render('form/pekerjaan', [
+            'tanggal' => $tanggal,
+            'masterTasks' => $masterTasks,
+            'checklist' => $checklist,
+            'areaFilter' => $areaFilter,
+            'areas' => $areas,
+        ]);
+    }
+
     public function history(string $nip, Request $request): Response
     {
         $petugas = User::where('role', 'petugas')->where('nip', $nip)->firstOrFail();
@@ -285,6 +318,20 @@ class ChecklistPekerjaanController extends Controller
 
         ChecklistPekerjaan::insert($rows);
 
-        return to_route('admin.checklist-pekerjaan.index');
+        if ($request->input('_redirect') === '/form') {
+            $total = count($rows);
+            $done = count(array_filter($rows, fn ($r) => $r['status'] === 'sudah'));
+
+            return redirect('/form/pekerjaan?' . http_build_query(['tanggal' => $validated['tanggal'], 'area' => $area]))->with('submitted', [
+                'area' => $area,
+                'tanggal' => $validated['tanggal'],
+                'total' => $total,
+                'sudah' => $done,
+                'belum' => $total - $done,
+                'nama' => $petugas->name,
+            ]);
+        }
+
+        return redirect("/admin/checklist-pekerjaan/{$petugas->nip}?" . http_build_query(['tanggal' => $validated['tanggal'], 'area' => $area]));
     }
 }

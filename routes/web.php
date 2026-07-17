@@ -22,6 +22,7 @@ Route::middleware(['auth'])->group(function () {
     Route::inertia('form/penimbangan', 'form/penimbangan')->name('form.penimbangan');
     Route::inertia('form/pilah-sampah', 'form/pilah-sampah')->name('form.pilah-sampah');
     Route::inertia('form/distribusi', 'form/distribusi')->name('form.distribusi');
+    Route::get('form/pekerjaan', [ChecklistPekerjaanController::class, 'formPage'])->name('form.pekerjaan');
 
 });
 
@@ -77,6 +78,7 @@ Route::middleware(['auth', CheckRole::class . ':petugas'])
 
         Route::get('distribusi/export', [DistribusiController::class, 'export'])->name('distribusi.export');
         Route::resource('distribusi', DistribusiController::class)->names('distribusi');
+        Route::post('checklist-pekerjaan', [ChecklistPekerjaanController::class, 'store'])->name('checklist-pekerjaan.store');
     });
 
 // Petugas landing page (separate URL from prefix group)

@@ -12,7 +12,6 @@ import { useEffect, useState } from 'react';
 
 type Options = {
     area: string[];
-    sub_area: Record<string, string[]>;
     jenis_sampah: string[];
     tujuan_distribusi: string[];
 };
@@ -25,26 +24,16 @@ export default function FormPenimbangan() {
     };
 
     const areaOptions = options.area;
-    const subAreas = options.sub_area;
     const { data, setData, post, processing, errors } = useForm({
         _redirect: '/form',
         nama: auth.user.name,
         tanggal: new Date(Date.now() - new Date().getTimezoneOffset() * 60000).toISOString().slice(0, 16),
         berat_sampah: '',
         area: '',
-        sub_area: '',
     });
-
-    const hasSubArea = data.area && (subAreas[data.area]?.length > 0);
-
-    const handleAreaChange = (value: string) => {
-        setData('area', value);
-        setData('sub_area', '');
-    };
 
     const [showSuccess, setShowSuccess] = useState(false);
     const [areaError, setAreaError] = useState('');
-    const [subAreaError, setSubAreaError] = useState('');
     const [beratError, setBeratError] = useState('');
 
     useEffect(() => {
@@ -54,10 +43,6 @@ export default function FormPenimbangan() {
     useEffect(() => {
         if (data.area) setAreaError('');
     }, [data.area]);
-
-    useEffect(() => {
-        if (data.sub_area) setSubAreaError('');
-    }, [data.sub_area]);
 
     useEffect(() => {
         if (data.berat_sampah) setBeratError('');
@@ -76,11 +61,6 @@ const handleSubmit = (e: React.FormEvent) => {
         }
         if (!data.area) {
             setAreaError('Pilih area terlebih dahulu');
-            scrollTo('section-lokasi');
-            return;
-        }
-        if (hasSubArea && !data.sub_area) {
-            setSubAreaError('Silakan pilih sub area terlebih dahulu');
             scrollTo('section-lokasi');
             return;
         }
@@ -211,7 +191,7 @@ const handleSubmit = (e: React.FormEvent) => {
                                                 <button
                                                     key={opt}
                                                     type="button"
-                                                    onClick={() => handleAreaChange(opt)}
+                                                    onClick={() => setData('area', opt)}
                                                     className={`rounded-xl border-2 px-4 py-3 text-sm font-medium transition-all active:scale-95 ${
                                                         isSelected
                                                             ? 'border-green-500 bg-green-50 text-green-700 shadow-sm'
@@ -225,32 +205,6 @@ const handleSubmit = (e: React.FormEvent) => {
                                     </div>
                                     <InputError message={errors.area || areaError} />
                                 </div>
-
-                                {hasSubArea && (
-                                    <div id="sub_area_section" className="grid gap-2">
-                                        <Label className="text-xs font-medium text-gray-600">Pilih Sub Area</Label>
-                                        <div className="grid grid-cols-2 gap-2">
-                                            {subAreas[data.area]?.map((opt) => {
-                                                const isSelected = data.sub_area === opt;
-                                                return (
-                                                    <button
-                                                        key={opt}
-                                                        type="button"
-                                                        onClick={() => setData('sub_area', opt)}
-                                                        className={`rounded-xl border-2 px-4 py-3 text-sm font-medium transition-all active:scale-95 ${
-                                                            isSelected
-                                                                ? 'border-green-500 bg-green-50 text-green-700 shadow-sm'
-                                                                : 'border-gray-100 bg-gray-50 text-gray-600 hover:border-green-200 hover:bg-green-50/50'
-                                                        }`}
-                                                    >
-                                                        {opt}
-                                                    </button>
-                                                );
-                                            })}
-                                        </div>
-                                        <InputError message={errors.sub_area || subAreaError} />
-                                    </div>
-                                )}
                             </div>
                         </div>
                     </form>
@@ -312,10 +266,6 @@ const handleSubmit = (e: React.FormEvent) => {
                         <div className="flex items-center justify-between px-4 py-2.5 text-sm">
                             <span className="text-gray-500">Area</span>
                             <span className="font-medium text-gray-800">{String(submitted?.area ?? '-')}</span>
-                        </div>
-                        <div className="flex items-center justify-between px-4 py-2.5 text-sm">
-                            <span className="text-gray-500">Sub Area</span>
-                            <span className="font-medium text-gray-800">{String(submitted?.sub_area ?? '-')}</span>
                         </div>
                     </div>
 

@@ -19,7 +19,6 @@ test('petugas can submit penimbangan form with _redirect and get success modal d
             'tanggal' => now()->format('Y-m-d H:i'),
             'berat_sampah' => $testWeight,
             'area' => 'Lantai 1',
-            'sub_area' => 'Area Baca',
         ]);
 
     $response->assertRedirect('/form/penimbangan');
@@ -28,7 +27,6 @@ test('petugas can submit penimbangan form with _redirect and get success modal d
     $submitted = session('submitted');
     expect($submitted['berat_sampah'])->toBe('12.34');
     expect($submitted['area'])->toBe('Lantai 1');
-    expect($submitted['sub_area'])->toBe('Area Baca');
     expect($submitted['nama'])->toBe($petugas->name);
 
     $this->assertDatabaseHas('penimbangan', [
@@ -55,7 +53,6 @@ test('petugas store maps user_id to authenticated user, ignoring user_id from re
             'tanggal' => now()->format('Y-m-d H:i'),
             'berat_sampah' => 5.5,
             'area' => 'Lantai 2',
-            'sub_area' => null,
             'user_id' => $otherUser->id,
         ]);
 
@@ -106,7 +103,6 @@ test('petugas sees submitted data after form submission via Inertia', function (
             'tanggal' => now()->format('Y-m-d H:i'),
             'berat_sampah' => 3.75,
             'area' => 'Lantai 3',
-            'sub_area' => 'Kamar Kecil',
         ]);
 
     $response->assertRedirect('/form/penimbangan');
@@ -119,7 +115,6 @@ test('petugas sees submitted data after form submission via Inertia', function (
         ->component('form/penimbangan')
         ->where('submitted.berat_sampah', '3.75')
         ->where('submitted.area', 'Lantai 3')
-        ->where('submitted.sub_area', 'Kamar Kecil')
         ->where('submitted.nama', $petugas->name)
     );
 });

@@ -16,6 +16,7 @@ return new class extends Migration
             $table->string('jenis_sampah');
             $table->string('tujuan_distribusi');
             $table->string('lokasi');
+            $table->foreignId('user_id')->nullable()->constrained('users')->nullOnDelete();
             $table->timestamps();
         });
     }
