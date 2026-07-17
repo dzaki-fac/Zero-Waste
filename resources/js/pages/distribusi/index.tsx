@@ -35,21 +35,11 @@ type Props = {
     distribusi: Distribusi[];
 };
 
-const jenisSampahColors: Record<string, string> = {
-    'Daun': 'bg-green-100 text-green-700',
-    'Ranting besar': 'bg-green-100 text-green-700',
-    'Ranting kecil': 'bg-green-100 text-green-700',
-    'Sisa makanan': 'bg-green-100 text-green-700',
-    'Plastik berwarna': 'bg-amber-100 text-amber-700',
-    'Plastik putih': 'bg-blue-100 text-blue-700',
-    'Styrofoam': 'bg-red-100 text-red-700',
-    'Botol': 'bg-blue-100 text-blue-700',
-    'Kardus dan Kertas': 'bg-amber-100 text-amber-700',
-    'B3': 'bg-red-100 text-red-700',
-    'Lainnya': 'bg-gray-100 text-gray-700',
-};
-
-const jenisSampahOptions = Object.keys(jenisSampahColors);
+const subjenisSampahOptions = [
+    'Daun', 'Ranting besar', 'Ranting kecil', 'Sisa makanan',
+    'Plastik berwarna', 'Plastik putih', 'Styrofoam', 'Kardus',
+    'Kertas', 'B3', 'Wadah', 'Botol', 'Tisu',
+];
 const tujuanOptions = ['TPS', 'Pupuk/kompos', 'PlasticPay', 'Tujuan lainnya'];
 
 const months = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
@@ -199,11 +189,11 @@ export default function DistribusiIndex({ distribusi }: Props) {
                             </div>
                             <Select value={filterJenis} onValueChange={setFilterJenis}>
                                 <SelectTrigger className="w-full sm:w-[200px] border-green-200 focus-visible:border-green-500 focus-visible:ring-green-500/20">
-                                    <SelectValue placeholder="Semua Jenis" />
+                                    <SelectValue placeholder="Semua Subjenis" />
                                 </SelectTrigger>
                                 <SelectContent>
-                                    <SelectItem value="all">Semua Jenis Sampah</SelectItem>
-                                    {jenisSampahOptions.map((j) => (
+                                    <SelectItem value="all">Semua Subjenis</SelectItem>
+                                    {subjenisSampahOptions.map((j) => (
                                         <SelectItem key={j} value={j}>{j}</SelectItem>
                                     ))}
                                 </SelectContent>
@@ -336,7 +326,7 @@ export default function DistribusiIndex({ distribusi }: Props) {
                                         <TableHead className="text-green-700">Nama</TableHead>
                                         <TableHead className="text-green-700">Tanggal</TableHead>
                                         <TableHead className="text-green-700">Berat (kg)</TableHead>
-                                        <TableHead className="text-green-700">Jenis Sampah</TableHead>
+                                        <TableHead className="text-green-700">Subjenis</TableHead>
                                         <TableHead className="text-green-700">Tujuan</TableHead>
                                         <TableHead className="text-green-700">Lokasi</TableHead>
                                         <TableHead className="text-right text-green-700">Aksi</TableHead>
@@ -359,7 +349,7 @@ export default function DistribusiIndex({ distribusi }: Props) {
                                                     {Number(item.berat).toLocaleString('id-ID', { minimumFractionDigits: 2 })} kg
                                                 </TableCell>
                                                 <TableCell>
-                                                    <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${jenisSampahColors[item.jenis_sampah] ?? 'bg-gray-100 text-gray-700'}`}>
+                                                    <span className="inline-flex items-center rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-medium text-green-700">
                                                         {item.jenis_sampah}
                                                     </span>
                                                 </TableCell>

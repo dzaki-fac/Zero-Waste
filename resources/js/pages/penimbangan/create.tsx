@@ -28,6 +28,7 @@ export default function PenimbanganCreate() {
         nama: auth.user.name,
         tanggal: new Date(Date.now() - new Date().getTimezoneOffset() * 60000).toISOString().slice(0, 16),
         berat_sampah: '',
+        jenis_sampah: '',
         area: '',
     });
 
@@ -92,6 +93,21 @@ export default function PenimbanganCreate() {
                                 className="border-green-200 focus-visible:border-green-500 focus-visible:ring-green-500/20"
                             />
                             <InputError message={errors.berat_sampah} />
+                        </div>
+
+                        <div className="grid gap-2">
+                            <Label className="text-green-700">Jenis Sampah</Label>
+                            <Select value={data.jenis_sampah} onValueChange={(v) => setData('jenis_sampah', v)}>
+                                <SelectTrigger className="w-full border-green-200 focus-visible:border-green-500 focus-visible:ring-green-500/20">
+                                    <SelectValue placeholder="Pilih jenis" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    {options.jenis_sampah.map((opt) => (
+                                        <SelectItem key={opt} value={opt}>{opt}</SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
+                            <InputError message={errors.jenis_sampah} />
                         </div>
 
                         <div className="grid gap-2">

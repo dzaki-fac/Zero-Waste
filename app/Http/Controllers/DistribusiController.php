@@ -52,7 +52,7 @@ class DistribusiController extends Controller
                 $distribusi = Distribusi::create([
                     'nama' => $nama,
                     'tanggal' => $request->input('tanggal'),
-                    'jenis_sampah' => $item['jenis_sampah'],
+                    'jenis_sampah' => $item['subjenis_sampah'],
                     'berat' => $berat,
                     'tujuan_distribusi' => $request->input('tujuan_distribusi'),
                     'lokasi' => $request->input('lokasi'),
@@ -120,7 +120,7 @@ class DistribusiController extends Controller
 
         $filename = 'distribusi_' . now()->toDateString() . '.csv';
 
-        $headers = ['No', 'Nama', 'Tanggal', 'Berat (kg)', 'Jenis Sampah', 'Tujuan', 'Lokasi'];
+        $headers = ['No', 'Nama', 'Tanggal', 'Berat (kg)', 'Subjenis', 'Tujuan', 'Lokasi'];
 
         $callback = function () use ($records, $headers) {
             $file = fopen('php://output', 'w');

@@ -37,15 +37,46 @@ class PenimbanganController extends Controller
 
     public function store(PenimbanganRequest $request): RedirectResponse
     {
-        $penimbangan = Penimbangan::create([
-            ...$request->validated(),
-            'nama' => $request->user()->name,
-            'user_id' => auth()->id(),
-        ]);
+        $nama = $request->user()->name;
 
         if ($request->input('_redirect') === '/form') {
-            return redirect('/form/penimbangan')->with('submitted', $penimbangan->toArray());
+            $items = $request->input('items', []);
+            $created = [];
+
+            foreach ($items as $item) {
+                $berat = $item['berat'] ?? null;
+                if ($berat === null || $berat === '' || (float) $berat <= 0) {
+                    continue;
+                }
+
+                $penimbangan = Penimbangan::create([
+                    'nama' => $nama,
+                    'tanggal' => $request->input('tanggal'),
+                    'area' => $request->input('area'),
+                    'jenis_sampah' => $item['jenis_sampah'],
+                    'berat_sampah' => $berat,
+                    'user_id' => auth()->id(),
+                ]);
+                $created[] = $penimbangan->toArray();
+            }
+
+            if (empty($created)) {
+                return back()->withErrors(['items' => 'Minimal isi berat pada 1 subjenis sampah']);
+            }
+
+            return redirect('/form/penimbangan')->with('submitted', [
+                'nama' => $nama,
+                'tanggal' => $request->input('tanggal'),
+                'items' => $created,
+                'total_berat' => array_sum(array_column($created, 'berat_sampah')),
+            ]);
         }
+
+        $penimbangan = Penimbangan::create([
+            ...$request->validated(),
+            'nama' => $nama,
+            'user_id' => auth()->id(),
+        ]);
 
         return to_route($this->routePrefix() . '.penimbangan.index');
     }
@@ -86,7 +117,7 @@ class PenimbanganController extends Controller
 
         $filename = 'penimbangan_' . now()->toDateString() . '.csv';
 
-        $headers = ['No', 'Nama', 'Tanggal', 'Berat (kg)', 'Area', 'Sub Area'];
+        $headers = ['No', 'Nama', 'Tanggal', 'Berat (kg)', 'Jenis', 'Subjenis', 'Area'];
 
         $callback = function () use ($records, $headers) {
             $file = fopen('php://output', 'w');
@@ -100,7 +131,9 @@ class PenimbanganController extends Controller
                     $record->nama,
                     $record->tanggal,
                     $record->berat_sampah,
-                    $record->area,
+                    $record->jenis_sampah ?? '-',
+                    $record->subjenis_sampah ?? '-',
+                    $record->area ?? '-',
                 ]);
             }
 

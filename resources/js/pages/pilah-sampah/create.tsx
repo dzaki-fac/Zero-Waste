@@ -15,7 +15,7 @@ import { ArrowLeft, Save } from 'lucide-react';
 
 type Options = {
     area: string[];
-    jenis_sampah: string[];
+    subjenis_sampah: string[];
     tujuan_distribusi: string[];
 };
 
@@ -28,7 +28,7 @@ export default function PilahSampahCreate() {
         nama: auth.user.name,
         tanggal: new Date(Date.now() - new Date().getTimezoneOffset() * 60000).toISOString().slice(0, 16),
         berat: '',
-        jenis_sampah: '',
+        subjenis_sampah: '',
     });
 
     const prefix = auth.user.role === 'admin' ? '/admin' : '/petugas';
@@ -95,18 +95,18 @@ export default function PilahSampahCreate() {
                         </div>
 
                         <div className="grid gap-2">
-                            <Label htmlFor="jenis_sampah" className="text-green-700">Jenis Sampah</Label>
-                            <Select name="jenis_sampah" value={data.jenis_sampah} onValueChange={(v) => setData('jenis_sampah', v)}>
+                            <Label htmlFor="subjenis_sampah" className="text-green-700">Subjenis Sampah</Label>
+                            <Select name="subjenis_sampah" value={data.subjenis_sampah} onValueChange={(v) => setData('subjenis_sampah', v)}>
                                 <SelectTrigger className="w-full border-green-200 focus-visible:border-green-500 focus-visible:ring-green-500/20">
-                                    <SelectValue placeholder="Pilih jenis sampah" />
+                                    <SelectValue placeholder="Pilih subjenis" />
                                 </SelectTrigger>
                                 <SelectContent>
-                                    {options.jenis_sampah.map((opt) => (
+                                    {options.subjenis_sampah.map((opt) => (
                                         <SelectItem key={opt} value={opt}>{opt}</SelectItem>
                                     ))}
                                 </SelectContent>
                             </Select>
-                            <InputError message={errors.jenis_sampah} />
+                            <InputError message={errors.subjenis_sampah} />
                         </div>
 
                         <div className="flex items-center gap-3 pt-2">

@@ -26,28 +26,19 @@ type PilahSampah = {
     nama: string;
     tanggal: string;
     berat: string;
-    jenis_sampah: string;
+    jenis_sampah: string | null;
+    subjenis_sampah: string | null;
 };
 
 type Props = {
     pilahSampah: PilahSampah[];
 };
 
-const jenisSampahColors: Record<string, string> = {
-    'Daun': 'bg-green-100 text-green-700',
-    'Ranting besar': 'bg-green-100 text-green-700',
-    'Ranting kecil': 'bg-green-100 text-green-700',
-    'Sisa makanan': 'bg-green-100 text-green-700',
-    'Plastik berwarna': 'bg-amber-100 text-amber-700',
-    'Plastik putih': 'bg-blue-100 text-blue-700',
-    'Styrofoam': 'bg-red-100 text-red-700',
-    'Botol': 'bg-blue-100 text-blue-700',
-    'Kardus dan Kertas': 'bg-amber-100 text-amber-700',
-    'B3': 'bg-red-100 text-red-700',
-    'Lainnya': 'bg-gray-100 text-gray-700',
-};
-
-const jenisSampahOptions = Object.keys(jenisSampahColors);
+const subjenisSampahOptions = [
+    'Daun', 'Ranting besar', 'Ranting kecil', 'Sisa makanan',
+    'Plastik berwarna', 'Plastik putih', 'Styrofoam', 'Kardus',
+    'Kertas', 'B3', 'Wadah', 'Botol', 'Tisu',
+];
 
 const months = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
 const currentYear = new Date().getFullYear();
@@ -111,8 +102,9 @@ export default function PilahSampahIndex({ pilahSampah }: Props) {
     };
 
     const filtered = pilahSampah.filter((item) => {
+        const type = item.subjenis_sampah ?? item.jenis_sampah ?? '';
         const matchSearch = item.nama.toLowerCase().includes(search.toLowerCase());
-        const matchJenis = filterJenis === 'all' || item.jenis_sampah === filterJenis;
+        const matchJenis = filterJenis === 'all' || type === filterJenis;
         const matchDate = matchesDate(item.tanggal);
         return matchSearch && matchJenis && matchDate;
     });
@@ -194,11 +186,11 @@ export default function PilahSampahIndex({ pilahSampah }: Props) {
                             </div>
                             <Select value={filterJenis} onValueChange={setFilterJenis}>
                                 <SelectTrigger className="w-full sm:w-[200px] border-green-200 focus-visible:border-green-500 focus-visible:ring-green-500/20">
-                                    <SelectValue placeholder="Semua Jenis" />
+                                    <SelectValue placeholder="Semua Subjenis" />
                                 </SelectTrigger>
                                 <SelectContent>
-                                    <SelectItem value="all">Semua Jenis Sampah</SelectItem>
-                                    {jenisSampahOptions.map((j) => (
+                                    <SelectItem value="all">Semua Subjenis</SelectItem>
+                                    {subjenisSampahOptions.map((j) => (
                                         <SelectItem key={j} value={j}>{j}</SelectItem>
                                     ))}
                                 </SelectContent>
@@ -320,7 +312,7 @@ export default function PilahSampahIndex({ pilahSampah }: Props) {
                                         <TableHead className="text-green-700">Nama</TableHead>
                                         <TableHead className="text-green-700">Tanggal</TableHead>
                                         <TableHead className="text-green-700">Berat (kg)</TableHead>
-                                        <TableHead className="text-green-700">Jenis Sampah</TableHead>
+                                        <TableHead className="text-green-700">Subjenis</TableHead>
                                         <TableHead className="text-right text-green-700">Aksi</TableHead>
                                     </TableRow>
                                 </TableHeader>
@@ -332,40 +324,43 @@ export default function PilahSampahIndex({ pilahSampah }: Props) {
                                             </TableCell>
                                         </TableRow>
                                     ) : (
-                                        filtered.map((item, index) => (
-                                            <TableRow key={item.id} className="border-green-100">
-                                                <TableCell>{index + 1}</TableCell>
-                                                <TableCell className="font-medium">{item.nama}</TableCell>
-                                                <TableCell>{new Date(item.tanggal).toLocaleString('id-ID', { day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' })}</TableCell>
-                                                <TableCell className="font-medium">
-                                                    {Number(item.berat).toLocaleString('id-ID', { minimumFractionDigits: 2 })} kg
-                                                </TableCell>
-                                                <TableCell>
-                                                    <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${jenisSampahColors[item.jenis_sampah] ?? 'bg-gray-100 text-gray-700'}`}>
-                                                        {item.jenis_sampah}
-                                                    </span>
-                                                </TableCell>
-                                                <TableCell className="text-right">
-                                                    <div className="flex justify-end gap-2">
-                                                        <Button variant="outline" size="sm" asChild className="border-green-200 text-green-700 hover:bg-green-50 hover:text-green-800">
-                                                            <Link href={`${prefix}/pilah-sampah/${item.id}/edit`} className="flex items-center gap-1">
-                                                                <Pencil className="h-3.5 w-3.5" />
-                                                                Edit
-                                                            </Link>
-                                                        </Button>
-                                                        <Button
-                                                            variant="destructive"
-                                                            size="sm"
-                                                            onClick={() => handleDelete(item.id)}
-                                                            className="flex items-center gap-1"
-                                                        >
-                                                            <Trash2 className="h-3.5 w-3.5" />
-                                                            Hapus
-                                                        </Button>
-                                                    </div>
-                                                </TableCell>
-                                            </TableRow>
-                                        ))
+                                        filtered.map((item, index) => {
+                                            const type = item.subjenis_sampah ?? item.jenis_sampah ?? '-';
+                                            return (
+                                                <TableRow key={item.id} className="border-green-100">
+                                                    <TableCell>{index + 1}</TableCell>
+                                                    <TableCell className="font-medium">{item.nama}</TableCell>
+                                                    <TableCell>{new Date(item.tanggal).toLocaleString('id-ID', { day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' })}</TableCell>
+                                                    <TableCell className="font-medium">
+                                                        {Number(item.berat).toLocaleString('id-ID', { minimumFractionDigits: 2 })} kg
+                                                    </TableCell>
+                                                    <TableCell>
+                                                        <span className="inline-flex items-center rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-medium text-green-700">
+                                                            {type}
+                                                        </span>
+                                                    </TableCell>
+                                                    <TableCell className="text-right">
+                                                        <div className="flex justify-end gap-2">
+                                                            <Button variant="outline" size="sm" asChild className="border-green-200 text-green-700 hover:bg-green-50 hover:text-green-800">
+                                                                <Link href={`${prefix}/pilah-sampah/${item.id}/edit`} className="flex items-center gap-1">
+                                                                    <Pencil className="h-3.5 w-3.5" />
+                                                                    Edit
+                                                                </Link>
+                                                            </Button>
+                                                            <Button
+                                                                variant="destructive"
+                                                                size="sm"
+                                                                onClick={() => handleDelete(item.id)}
+                                                                className="flex items-center gap-1"
+                                                            >
+                                                                <Trash2 className="h-3.5 w-3.5" />
+                                                                Hapus
+                                                            </Button>
+                                                        </div>
+                                                    </TableCell>
+                                                </TableRow>
+                                            );
+                                        })
                                     )}
                                 </TableBody>
                             </Table>

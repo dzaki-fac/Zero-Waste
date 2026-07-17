@@ -16,9 +16,13 @@ class KelolaDataSeeder extends Seeder
                 'UNDIP Press',
             ],
             'jenis_sampah' => [
+                'Plastik Kresek & Bungkus', 'Sampah Tisu', 'Kaleng & Botol Kaca',
+                'Sisa Makanan', 'Plastik Botol & Wadah', 'Styrofoam', 'Daun', 'Ranting',
+            ],
+            'subjenis_sampah' => [
                 'Daun', 'Ranting besar', 'Ranting kecil', 'Sisa makanan',
-                'Plastik berwarna', 'Plastik putih', 'Styrofoam', 'Botol',
-                'Kardus dan Kertas', 'B3', 'Lainnya',
+                'Plastik berwarna', 'Plastik putih', 'Styrofoam', 'Kardus',
+                'Kertas', 'B3', 'Wadah', 'Botol', 'Tisu',
             ],
             'tujuan_distribusi' => [
                 'TPS', 'Pupuk/kompos', 'PlasticPay', 'Tujuan lainnya',

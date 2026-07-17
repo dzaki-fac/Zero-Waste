@@ -11,12 +11,23 @@ class PenimbanganRequest extends FormRequest
     public function rules(): array
     {
         $areaValues = OptionHelper::get('area');
+        $subjenis = OptionHelper::get('subjenis_sampah');
 
-        return [
+        $rules = [
             'nama' => ['required', 'string', 'max:255'],
             'tanggal' => ['required', 'date'],
-            'berat_sampah' => ['required', 'numeric', 'min:0'],
-            'area' => ['required', Rule::in($areaValues)],
         ];
+
+        if ($this->input('_redirect') === '/form') {
+            $rules['items'] = ['required', 'array', 'min:1'];
+            $rules['items.*.jenis_sampah'] = ['required', Rule::in($subjenis)];
+            $rules['items.*.berat'] = ['nullable', 'numeric', 'min:0'];
+        } else {
+            $rules['berat_sampah'] = ['required', 'numeric', 'min:0'];
+            $rules['area'] = ['required', Rule::in($areaValues)];
+            $rules['jenis_sampah'] = ['nullable', Rule::in($subjenis)];
+        }
+
+        return $rules;
     }
 }

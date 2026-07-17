@@ -52,7 +52,7 @@ class PilahSampahController extends Controller
                 $pilahSampah = PilahSampah::create([
                     'nama' => $nama,
                     'tanggal' => $request->input('tanggal'),
-                    'jenis_sampah' => $item['jenis_sampah'],
+                    'subjenis_sampah' => $item['subjenis_sampah'],
                     'berat' => $berat,
                     'user_id' => auth()->id(),
                 ]);
@@ -116,7 +116,7 @@ class PilahSampahController extends Controller
 
         $filename = 'pilah_sampah_' . now()->toDateString() . '.csv';
 
-        $headers = ['No', 'Nama', 'Tanggal', 'Berat (kg)', 'Jenis Sampah'];
+        $headers = ['No', 'Nama', 'Tanggal', 'Berat (kg)', 'Subjenis'];
 
         $callback = function () use ($records, $headers) {
             $file = fopen('php://output', 'w');
@@ -130,7 +130,7 @@ class PilahSampahController extends Controller
                     $record->nama,
                     $record->tanggal,
                     $record->berat,
-                    $record->jenis_sampah,
+                    $record->subjenis_sampah ?? '-',
                 ]);
             }
 
