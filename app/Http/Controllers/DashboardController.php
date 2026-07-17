@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\DataDasar;
 use App\Models\Distribusi;
 use App\Models\Penimbangan;
 use App\Models\PilahSampah;
@@ -138,7 +139,10 @@ class DashboardController extends Controller
             ->values()
             ->toArray();
 
+        $dataDasar = DataDasar::where('user_id', auth()->id())->first();
+
         return Inertia::render('dashboard', [
+            'dataDasar' => $dataDasar,
             'penimbanganByArea' => $penimbanganByArea,
             'pilahByJenis' => $pilahByJenis,
             'distribusiByTujuan' => $distribusiByTujuan,

@@ -3,7 +3,7 @@ import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from 'recharts';
 import type { PieLabelRenderProps } from 'recharts';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Scale, Recycle, Truck, Users, CalendarIcon, Clock, Package, CheckCircle, ChevronLeft, ChevronRight, Send } from 'lucide-react';
+import { Scale, Recycle, Truck, Users, CalendarIcon, Clock, Package, CheckCircle, ChevronLeft, ChevronRight, Send, Leaf } from 'lucide-react';
 import { useState, useRef, useEffect } from 'react';
 import type { Auth } from '@/types';
 
@@ -24,7 +24,35 @@ type PetugasStat = {
     distribusi: ActivityStat;
 };
 
+type JenisSampahItem = {
+    kategori: string;
+    berat: number | string;
+    periode: 'hari' | 'minggu';
+};
+
+type DataDasarType = {
+    id: number | null;
+    nama_tim: string;
+    fakultas: string;
+    alamat: string | null;
+    penanggung_jawab: string;
+    nomor_hp_email: string;
+    tanggal_pengisian: string;
+    jumlah_mahasiswa: number;
+    jumlah_dosen: number;
+    jumlah_tendik: number;
+    jumlah_tenaga_pendukung: number;
+    total_warga: number;
+    luas_area_fakultas: number;
+    luas_area_objek_lomba: number;
+    baseline_sampah: number;
+    baseline_sampah_periode: 'hari' | 'minggu';
+    jenis_sampah_dominan: JenisSampahItem[];
+    kondisi_fasilitas: string | null;
+};
+
 type PageProps = {
+    dataDasar: DataDasarType | null;
     penimbanganByArea: ChartData;
     pilahByJenis: ChartData;
     distribusiByTujuan: ChartData;
@@ -65,21 +93,6 @@ function getCategoryColor(name: string): string {
     return color;
 }
 
-const AMBER_PALETTE = [
-    '#f59e0b', '#fbbf24', '#f97316', '#fcd34d', '#fb923c',
-    '#fde68a', '#d97706', '#facc15', '#ea580c', '#fef3c7',
-];
-
-const siapColorMap = new Map<string, string>();
-function getSiapColor(name: string): string {
-    let color = siapColorMap.get(name);
-    if (!color) {
-        color = AMBER_PALETTE[siapColorMap.size % AMBER_PALETTE.length];
-        siapColorMap.set(name, color);
-    }
-    return color;
-}
-
 function CustomTooltip({ active, payload }: { active?: boolean; payload?: Array<{ name: string; value: number; payload: { percent?: number } }> }) {
     if (active && payload && payload.length) {
         const data = payload[0];
@@ -111,8 +124,9 @@ function renderCustomLabel(props: PieLabelRenderProps) {
     );
 }
 
-function PieChartCard({ title, icon: Icon, data, totalLabel }: {
+function PieChartCard({ title, icon: Icon, data, totalLabel, legendPosition = 'bottom' }: {
     title: string; icon: React.ComponentType<{ className?: string }>; data: ChartData; totalLabel: string;
+    legendPosition?: 'bottom' | 'right';
 }) {
     const total = data.reduce((sum, d) => sum + d.value, 0);
     const sortedData = data.slice().sort((a, b) => b.value - a.value);
@@ -130,63 +144,120 @@ function PieChartCard({ title, icon: Icon, data, totalLabel }: {
             </CardHeader>
             <CardContent>
                 {data.length > 0 ? (
-                    <div className="h-75">
-                        <ResponsiveContainer width="100%" height="100%">
-                            <PieChart>
-                                <defs>
-                                    <filter id="pieLabelShadow" x="-50%" y="-50%" width="200%" height="200%">
-                                        <feDropShadow dx="0" dy="1" stdDeviation="1.2" floodColor="#000000" floodOpacity="0.65" />
-                                    </filter>
-                                </defs>
-                                <Pie
-                                    data={sortedData}
-                                    cx="50%"
-                                    cy="50%"
-                                    labelLine={false}
-                                    label={renderCustomLabel}
-                                    outerRadius={110}
-                                    dataKey="value"
-                                    stroke="none"
-                                >
-                                    {sortedData.map((entry) => (
-                                        <Cell key={`cell-${entry.name}`} fill={getCategoryColor(entry.name)} />
-                                    ))}
-                                </Pie>
-                                <Tooltip content={<CustomTooltip />} />
-                            </PieChart>
-                        </ResponsiveContainer>
-                    </div>
+                    legendPosition === 'right' ? (
+                        <div className="flex flex-col gap-4 lg:flex-row lg:items-center">
+                            <div className="h-[240px] shrink-0 lg:w-1/2">
+                                <ResponsiveContainer width="100%" height="100%">
+                                    <PieChart>
+                                        <defs>
+                                            <filter id="pieLabelShadow" x="-50%" y="-50%" width="200%" height="200%">
+                                                <feDropShadow dx="0" dy="1" stdDeviation="1.2" floodColor="#000000" floodOpacity="0.65" />
+                                            </filter>
+                                        </defs>
+                                        <Pie
+                                            data={sortedData}
+                                            cx="50%"
+                                            cy="50%"
+                                            labelLine={false}
+                                            label={renderCustomLabel}
+                                            outerRadius={110}
+                                            dataKey="value"
+                                            stroke="none"
+                                        >
+                                            {sortedData.map((entry) => (
+                                                <Cell key={`cell-${entry.name}`} fill={getCategoryColor(entry.name)} />
+                                            ))}
+                                        </Pie>
+                                        <Tooltip content={<CustomTooltip />} />
+                                    </PieChart>
+                                </ResponsiveContainer>
+                            </div>
+                            <div className="w-full space-y-1.5 lg:pl-4">
+                                {data
+                                    .slice()
+                                    .sort((a, b) => b.value - a.value)
+                                    .map((item) => {
+                                        const percent = total > 0 ? (item.value / total) * 100 : 0;
+                                        return (
+                                            <div key={item.name} className="flex items-center gap-2">
+                                                <span
+                                                    className="size-2.5 shrink-0 rounded-full"
+                                                    style={{ backgroundColor: getCategoryColor(item.name) }}
+                                                />
+                                                <span className="min-w-0 flex-1 truncate text-xs text-gray-700">
+                                                    {item.name}
+                                                </span>
+                                                <span className="shrink-0 text-xs font-medium tabular-nums text-gray-900">
+                                                    {item.value.toLocaleString('id-ID', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} kg
+                                                </span>
+                                                <span className="shrink-0 text-xs tabular-nums text-gray-500">
+                                                    ({percent.toFixed(1)}%)
+                                                </span>
+                                            </div>
+                                        );
+                                    })}
+                            </div>
+                        </div>
+                    ) : (
+                        <>
+                            <div className="h-75">
+                                <ResponsiveContainer width="100%" height="100%">
+                                    <PieChart>
+                                        <defs>
+                                            <filter id="pieLabelShadow" x="-50%" y="-50%" width="200%" height="200%">
+                                                <feDropShadow dx="0" dy="1" stdDeviation="1.2" floodColor="#000000" floodOpacity="0.65" />
+                                            </filter>
+                                        </defs>
+                                        <Pie
+                                            data={sortedData}
+                                            cx="50%"
+                                            cy="50%"
+                                            labelLine={false}
+                                            label={renderCustomLabel}
+                                            outerRadius={110}
+                                            dataKey="value"
+                                            stroke="none"
+                                        >
+                                            {sortedData.map((entry) => (
+                                                <Cell key={`cell-${entry.name}`} fill={getCategoryColor(entry.name)} />
+                                            ))}
+                                        </Pie>
+                                        <Tooltip content={<CustomTooltip />} />
+                                    </PieChart>
+                                </ResponsiveContainer>
+                            </div>
+                            {data.length > 0 && (
+                                <div className="mt-2 space-y-1.5">
+                                    {data
+                                        .slice()
+                                        .sort((a, b) => b.value - a.value)
+                                        .map((item) => {
+                                            const percent = total > 0 ? (item.value / total) * 100 : 0;
+                                            return (
+                                                <div key={item.name} className="flex items-center gap-2">
+                                                    <span
+                                                        className="size-2.5 shrink-0 rounded-full"
+                                                        style={{ backgroundColor: getCategoryColor(item.name) }}
+                                                    />
+                                                    <span className="min-w-0 flex-1 truncate text-xs text-gray-700">
+                                                        {item.name}
+                                                    </span>
+                                                    <span className="shrink-0 text-xs font-medium tabular-nums text-gray-900">
+                                                        {item.value.toLocaleString('id-ID', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} kg
+                                                    </span>
+                                                    <span className="shrink-0 text-xs tabular-nums text-gray-500">
+                                                        ({percent.toFixed(1)}%)
+                                                    </span>
+                                                </div>
+                                            );
+                                        })}
+                                </div>
+                            )}
+                        </>
+                    )
                 ) : (
                     <div className="flex h-75 items-center justify-center text-sm text-gray-400">
                         Belum ada data
-                    </div>
-                )}
-
-                {data.length > 0 && (
-                    <div className="mt-2 space-y-1.5">
-                        {data
-                            .slice()
-                            .sort((a, b) => b.value - a.value)
-                            .map((item) => {
-                                const percent = total > 0 ? (item.value / total) * 100 : 0;
-                                return (
-                                    <div key={item.name} className="flex items-center gap-2">
-                                        <span
-                                            className="size-2.5 shrink-0 rounded-full"
-                                            style={{ backgroundColor: getCategoryColor(item.name) }}
-                                        />
-                                        <span className="min-w-0 flex-1 truncate text-xs text-gray-700">
-                                            {item.name}
-                                        </span>
-                                        <span className="shrink-0 text-xs font-medium tabular-nums text-gray-900">
-                                            {item.value.toLocaleString('id-ID', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} kg
-                                        </span>
-                                        <span className="shrink-0 text-xs tabular-nums text-gray-500">
-                                            ({percent.toFixed(1)}%)
-                                        </span>
-                                    </div>
-                                );
-                            })}
                     </div>
                 )}
             </CardContent>
@@ -389,10 +460,171 @@ function SimpleDatePicker({ value, onChange, placeholder }: { value: string; onC
     );
 }
 
+function ReadField({ label, value }: { label: string; value: React.ReactNode }) {
+    return (
+        <div className="grid gap-0.5">
+            <span className="text-xs font-medium text-green-700">{label}</span>
+            <span className="text-sm text-green-900">
+                {value || <span className="text-slate-400 italic">Belum diisi</span>}
+            </span>
+        </div>
+    );
+}
+
+function DataDasarSummary({ dataDasar }: { dataDasar: DataDasarType | null }) {
+    if (!dataDasar) {
+        return (
+            <Card className="border-green-200">
+                <CardContent className="py-8 text-center text-sm text-gray-400">
+                    Data dasar belum diisi.
+                </CardContent>
+            </Card>
+        );
+    }
+
+    const formattedTanggal = dataDasar.tanggal_pengisian
+        ? new Date(dataDasar.tanggal_pengisian + 'T00:00:00').toLocaleDateString('id-ID', {
+              day: 'numeric',
+              month: 'long',
+              year: 'numeric',
+          })
+        : '';
+
+    return (
+        <Card className="border-green-200">
+            <CardHeader className="pb-2">
+                <CardTitle className="flex items-center gap-2 text-base text-green-900">
+                    <Leaf className="size-5 text-green-600" />
+                    Data Dasar
+                </CardTitle>
+                <p className="text-xs text-green-700">
+                    Informasi dasar unit/fakultas sebagai baseline program Zero Waste
+                </p>
+            </CardHeader>
+            <CardContent className="space-y-5">
+                {/* Identitas: 2 kolom x 3 baris */}
+                <div className="grid grid-cols-1 gap-4 rounded-lg border border-green-100 bg-green-50/30 p-4 sm:grid-cols-3 sm:grid-rows-2">
+                    <ReadField label="Nama Tim / Unit" value={dataDasar.nama_tim} />
+                    <ReadField label="Fakultas / Unit" value={dataDasar.fakultas} />
+                    <ReadField label="Alamat / Lokasi Program" value={dataDasar.alamat} />
+                    <ReadField label="Penanggung Jawab" value={dataDasar.penanggung_jawab} />
+                    <ReadField label="Nomor HP / Email" value={dataDasar.nomor_hp_email} />
+                    <ReadField label="Tanggal Pengisian" value={formattedTanggal} />
+                </div>
+
+                <div className="grid gap-4 lg:grid-cols-2">
+                    {/* Tabel 1: Data Warga, 5 baris x 3 kolom */}
+                    <div className="overflow-hidden rounded-lg border border-green-100">
+                        <table className="w-full text-sm">
+                            <thead>
+                                <tr className="bg-green-50/60">
+                                    <th className="px-3 py-2 text-left text-xs font-semibold tracking-wide text-green-700 uppercase">Data</th>
+                                    <th className="px-3 py-2 text-left text-xs font-semibold tracking-wide text-green-700 uppercase">Keterangan</th>
+                                    <th className="px-3 py-2 text-right text-xs font-semibold tracking-wide text-green-700 uppercase">Nilai</th>
+                                </tr>
+                            </thead>
+                            <tbody className="divide-y divide-green-100">
+                                <tr>
+                                    <td className="px-3 py-2 text-green-800">Jumlah Mahasiswa</td>
+                                    <td className="px-3 py-2 text-xs text-gray-500">Mahasiswa aktif</td>
+                                    <td className="px-3 py-2 text-right tabular-nums text-green-900">
+                                        {dataDasar.jumlah_mahasiswa.toLocaleString('id-ID')} orang
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td className="px-3 py-2 text-green-800">Jumlah Dosen</td>
+                                    <td className="px-3 py-2 text-xs text-gray-500">Dosen aktif</td>
+                                    <td className="px-3 py-2 text-right tabular-nums text-green-900">
+                                        {dataDasar.jumlah_dosen.toLocaleString('id-ID')} orang
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td className="px-3 py-2 text-green-800">Jumlah Tenaga Kependidikan</td>
+                                    <td className="px-3 py-2 text-xs text-gray-500">Tendik aktif</td>
+                                    <td className="px-3 py-2 text-right tabular-nums text-green-900">
+                                        {dataDasar.jumlah_tendik.toLocaleString('id-ID')} orang
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td className="px-3 py-2 text-green-800">Jumlah Tenaga Pendukung</td>
+                                    <td className="px-3 py-2 text-xs text-gray-500">Cleaning service, satpam, dsb.</td>
+                                    <td className="px-3 py-2 text-right tabular-nums text-green-900">
+                                        {dataDasar.jumlah_tenaga_pendukung.toLocaleString('id-ID')} orang
+                                    </td>
+                                </tr>
+                                <tr className="bg-green-50/40">
+                                    <td className="px-3 py-2 font-semibold text-green-900">Total Warga</td>
+                                    <td className="px-3 py-2 text-xs text-gray-500">Jumlah keseluruhan</td>
+                                    <td className="px-3 py-2 text-right font-semibold tabular-nums text-green-900">
+                                        {dataDasar.total_warga.toLocaleString('id-ID')} orang
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td className="px-3 py-2 text-green-800">Luas Area Fakultas</td>
+                                    <td className="px-3 py-2 text-xs text-gray-500">Total luas area</td>
+                                    <td className="px-3 py-2 text-right tabular-nums text-green-900">
+                                        {dataDasar.luas_area_fakultas.toLocaleString('id-ID')} m&sup2;
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td className="px-3 py-2 text-green-800">Luas Area Objek Lomba</td>
+                                    <td className="px-3 py-2 text-xs text-gray-500">Cakupan program</td>
+                                    <td className="px-3 py-2 text-right tabular-nums text-green-900">
+                                        {dataDasar.luas_area_objek_lomba.toLocaleString('id-ID')} m&sup2;
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    {/* Tabel 2: Sampah, 3 baris x 3 kolom */}
+                    <div className="overflow-hidden rounded-lg border border-green-100">
+                        <table className="w-full text-sm">
+                            <thead>
+                                <tr className="bg-green-50/60">
+                                    <th className="px-3 py-2 text-left text-xs font-semibold tracking-wide text-green-700 uppercase">Data</th>
+                                    <th className="px-3 py-2 text-left text-xs font-semibold tracking-wide text-green-700 uppercase">Keterangan</th>
+                                    <th className="px-3 py-2 text-right text-xs font-semibold tracking-wide text-green-700 uppercase">Nilai</th>
+                                </tr>
+                            </thead>
+                            <tbody className="divide-y divide-green-100">
+                                <tr>
+                                    <td className="px-3 py-2 text-green-800">Baseline Sampah Awal</td>
+                                    <td className="px-3 py-2 text-xs text-gray-500">Sebelum program berjalan</td>
+                                    <td className="px-3 py-2 text-right tabular-nums text-green-900">
+                                        {dataDasar.baseline_sampah.toLocaleString('id-ID')} kg/{dataDasar.baseline_sampah_periode}
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td className="px-3 py-2 align-top text-green-800">Jenis Sampah Dominan</td>
+                                    <td className="px-3 py-2 align-top text-xs text-gray-500">Timbulan tiap jenis</td>
+                                    <td className="px-3 py-2 text-right text-xs text-green-900">
+                                        <div className="space-y-0.5">
+                                            {dataDasar.jenis_sampah_dominan?.map((item) => (
+                                                <div key={item.kategori}>
+                                                    {item.kategori}: {Number(item.berat || 0).toLocaleString('id-ID')} kg/{item.periode}
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td className="px-3 py-2 align-top text-green-800">Kondisi Fasilitas</td>
+                                    <td className="px-3 py-2 align-top text-xs text-gray-500" colSpan={2}>
+                                        {dataDasar.kondisi_fasilitas || <span className="text-slate-400 italic">Belum diisi</span>}
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </CardContent>
+        </Card>
+    );
+}
+
 export default function Dashboard() {
-    const { penimbanganByArea, pilahByJenis, distribusiByTujuan, petugasStats, statusBerat, siapDidistribusikanByJenis, filters } = usePage<PageProps>().props;
-    const { auth } = usePage().props as { auth: Auth };
-    const prefix = auth.user.role === 'admin' ? '/admin' : '/petugas';
+    const { dataDasar, penimbanganByArea, pilahByJenis, distribusiByTujuan, petugasStats, statusBerat, siapDidistribusikanByJenis, filters } = usePage<PageProps>().props;
 
     const siapSortedData = siapDidistribusikanByJenis.slice().sort((a, b) => b.value - a.value);
     const siapTotal = siapDidistribusikanByJenis.reduce((s, d) => s + d.value, 0);
@@ -407,7 +639,7 @@ export default function Dashboard() {
         const query: Record<string, string> = {};
         if (params.start_date) query.start_date = params.start_date;
         if (params.end_date) query.end_date = params.end_date;
-        router.get(`${prefix}/dashboard`, query, { preserveState: true, replace: true });
+        router.get('/admin/dashboard', query, { preserveState: true, preserveScroll: true, replace: true });
     }
 
     function handlePreset(preset: typeof PRESETS[number]) {
@@ -443,6 +675,8 @@ export default function Dashboard() {
             <Head title="Dashboard" />
 
             <div className="flex h-full flex-1 flex-col gap-4 overflow-x-auto rounded-xl p-4">
+                <DataDasarSummary dataDasar={dataDasar} />
+
                 <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                     <div>
                         <h2 className="text-xl font-semibold tracking-tight">
@@ -508,7 +742,7 @@ export default function Dashboard() {
                                 const total = chartData.reduce((s, d) => s + d.value, 0);
 
                                 return (
-                                    <div className="flex flex-col items-center gap-6 lg:flex-row lg:items-start">
+                                    <div className="flex flex-col items-center gap-6 lg:flex-row lg:items-center">
                                         <div className="relative h-[240px] w-[240px] shrink-0">
                                             <ResponsiveContainer width="100%" height="100%">
                                                 <PieChart>
@@ -571,20 +805,42 @@ export default function Dashboard() {
                         </CardContent>
                     </Card>
 
-                    <Card className="border-amber-200 bg-amber-50/40">
+                    <PieChartCard
+                        title="Penimbangan per Area"
+                        icon={Scale}
+                        data={penimbanganByArea}
+                        totalLabel="Total berat ditimbang"
+                        legendPosition="right"
+                    />
+                </div>
+
+                <div className="grid gap-4 lg:grid-cols-3">
+                    <PieChartCard
+                        title="Distribusi per Tujuan"
+                        icon={Truck}
+                        data={distribusiByTujuan}
+                        totalLabel="Total berat didistribusikan"
+                    />
+                    <PieChartCard
+                        title="Pilah Sampah per Jenis"
+                        icon={Recycle}
+                        data={pilahByJenis}
+                        totalLabel="Total berat dipilah"
+                    />
+                    <Card className="border-green-200">
                         <CardHeader className="pb-2">
-                            <CardTitle className="flex items-center gap-2 text-base text-amber-900">
-                                <Send className="size-5 text-amber-600" />
-                                Siap Didistribusikan
+                            <CardTitle className="flex items-center gap-2 text-base text-green-900">
+                                <Send className="size-5 text-green-600" />
+                                Sisa dan Siap Didistribusikan
                             </CardTitle>
-                            <p className="text-xs text-amber-700/80">
-                                Berat terpilah belum didistribusikan per jenis
+                            <p className="text-xs text-green-700">
+                                Total sampah sisa dan siap didistribusikan : {siapTotal.toLocaleString('id-ID', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} kg
                             </p>
                         </CardHeader>
                         <CardContent>
                             {siapDidistribusikanByJenis.length > 0 ? (
-                                <div className="flex flex-col items-center gap-6 lg:flex-row lg:items-start">
-                                    <div className="relative h-[220px] w-[220px] shrink-0">
+                                <>
+                                    <div className="h-75">
                                         <ResponsiveContainer width="100%" height="100%">
                                             <PieChart>
                                                 <defs>
@@ -598,19 +854,19 @@ export default function Dashboard() {
                                                     cy="50%"
                                                     labelLine={false}
                                                     label={renderCustomLabel}
-                                                    outerRadius={95}
+                                                    outerRadius={110}
                                                     dataKey="value"
                                                     stroke="none"
                                                 >
                                                     {siapSortedData.map((entry) => (
-                                                        <Cell key={`cell-${entry.name}`} fill={getSiapColor(entry.name)} />
+                                                        <Cell key={`cell-${entry.name}`} fill={getCategoryColor(entry.name)} />
                                                     ))}
                                                 </Pie>
                                                 <Tooltip content={<CustomTooltip />} />
                                             </PieChart>
                                         </ResponsiveContainer>
                                     </div>
-                                    <div className="flex w-full flex-col gap-2">
+                                    <div className="mt-2 space-y-1.5">
                                             {siapSortedData
                                             .map((item) => {
                                                 const percent = siapTotal > 0 ? (item.value / siapTotal) * 100 : 0;
@@ -618,7 +874,7 @@ export default function Dashboard() {
                                                     <div key={item.name} className="flex items-center gap-2">
                                                         <span
                                                             className="size-2.5 shrink-0 rounded-full"
-                                                            style={{ backgroundColor: getSiapColor(item.name) }}
+                                                            style={{ backgroundColor: getCategoryColor(item.name) }}
                                                         />
                                                         <span className="min-w-0 flex-1 truncate text-xs text-gray-700">
                                                             {item.name}
@@ -633,7 +889,7 @@ export default function Dashboard() {
                                                 );
                                             })}
                                     </div>
-                                </div>
+                                </>
                             ) : (
                                 <div className="flex h-[220px] items-center justify-center text-sm text-gray-400">
                                     Semua sudah terdistribusi
@@ -641,27 +897,6 @@ export default function Dashboard() {
                             )}
                         </CardContent>
                     </Card>
-                </div>
-
-                <div className="grid gap-4 lg:grid-cols-3">
-                    <PieChartCard
-                        title="Penimbangan per Area"
-                        icon={Scale}
-                        data={penimbanganByArea}
-                        totalLabel="Total berat ditimbang"
-                    />
-                    <PieChartCard
-                        title="Pilah Sampah per Jenis"
-                        icon={Recycle}
-                        data={pilahByJenis}
-                        totalLabel="Total berat dipilah"
-                    />
-                    <PieChartCard
-                        title="Distribusi per Tujuan"
-                        icon={Truck}
-                        data={distribusiByTujuan}
-                        totalLabel="Total berat didistribusikan"
-                    />
                 </div>
 
                 <Card className="border-green-200">

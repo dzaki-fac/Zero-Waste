@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\DataDasarController;
 use App\Http\Controllers\ChecklistPekerjaanController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DistribusiController;
@@ -21,6 +22,11 @@ Route::middleware(['auth'])->group(function () {
     Route::middleware([CheckRole::class . ':admin'])->prefix('admin')->group(function () {
         Route::get('kelola-data', [KelolaDataController::class, 'index'])->name('settings.index');
         Route::post('kelola-data', [KelolaDataController::class, 'update'])->name('settings.update');
+    });
+
+    Route::prefix('admin')->group(function () {
+        Route::get('data-dasar', [DataDasarController::class, 'index'])->name('data-dasar.index');
+        Route::post('data-dasar', [DataDasarController::class, 'update'])->name('data-dasar.update');
     });
 });
 
