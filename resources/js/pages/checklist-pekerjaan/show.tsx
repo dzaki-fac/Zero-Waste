@@ -402,7 +402,6 @@ export default function ChecklistPekerjaanShow({ petugas, tanggal, masterTasks, 
                                                         <input
                                                             type="checkbox"
                                                             checked={item.status === 'sudah'}
-                                                            disabled={!areaSelected}
                                                             onChange={() => toggleStatus(item.master_pekerjaan_id)}
                                                             className="sr-only"
                                                         />
