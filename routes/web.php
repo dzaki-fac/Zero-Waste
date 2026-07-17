@@ -12,10 +12,11 @@ use App\Http\Middleware\CheckRole;
 use Illuminate\Support\Facades\Route;
 
 // Public landing page (BrowserRouter-based, no auth required)
-Route::view('/', 'home')->name('home');
-Route::view('/pengertian', 'home');
-Route::view('/struktur', 'home');
-Route::view('/sop', 'home');
+// Public static pages (handled by BrowserRouter in React)
+Route::inertia('/', 'home')->name('home');
+Route::inertia('/sop', 'SOPPage');
+Route::inertia('/pengertian', 'pengertian');
+Route::inertia('/struktur', 'struktur');
 
 // Shared routes (accessible by both roles, no role check)
 Route::middleware(['auth'])->group(function () {
