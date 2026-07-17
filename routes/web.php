@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\DataDasarController;
 use App\Http\Controllers\ChecklistPekerjaanController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DistribusiController;
@@ -21,6 +22,7 @@ Route::middleware(['auth'])->group(function () {
     Route::inertia('form/penimbangan', 'form/penimbangan')->name('form.penimbangan');
     Route::inertia('form/pilah-sampah', 'form/pilah-sampah')->name('form.pilah-sampah');
     Route::inertia('form/distribusi', 'form/distribusi')->name('form.distribusi');
+
 });
 
 // Admin routes
@@ -55,6 +57,9 @@ Route::middleware(['auth', CheckRole::class . ':admin'])
             ->only(['index', 'store', 'update', 'destroy'])
             ->parameters(['kelola-pekerjaan' => 'masterPekerjaan'])
             ->names('kelola-pekerjaan');
+
+        Route::get('data-dasar', [DataDasarController::class, 'index'])->name('data-dasar.index');
+        Route::post('data-dasar', [DataDasarController::class, 'update'])->name('data-dasar.update');
     });
 
 // Petugas routes
