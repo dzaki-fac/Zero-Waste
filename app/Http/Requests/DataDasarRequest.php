@@ -28,6 +28,10 @@ class DataDasarRequest extends FormRequest
             'jenis_sampah_dominan.*.berat' => ['required', 'numeric', 'min:0'],
             'jenis_sampah_dominan.*.periode' => ['required', 'in:hari,minggu'],
             'kondisi_fasilitas' => ['nullable', 'string'],
+            'sampah_residu_akhir' => ['nullable', 'numeric', 'min:0'],
+            'total_sampah_terkelola' => ['nullable', 'numeric', 'min:0'],
+            'jumlah_warga_terlibat_aktif' => ['nullable', 'integer', 'min:0'],
+            'luas_area_zero_waste' => ['nullable', 'numeric', 'min:0'],
         ];
     }
 }
