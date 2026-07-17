@@ -31,6 +31,7 @@ Route::middleware(['auth'])->group(function () {
     Route::post('form/pilah-sampah', [PilahSampahController::class, 'store'])->name('form.pilah-sampah.store');
     Route::post('form/distribusi', [DistribusiController::class, 'store'])->name('form.distribusi.store');
     Route::get('form/pekerjaan', [ChecklistPekerjaanController::class, 'formPage'])->name('form.pekerjaan');
+    Route::post('form/checklist-pekerjaan', [ChecklistPekerjaanController::class, 'store'])->name('form.checklist-pekerjaan.store');
 
     Route::middleware([CheckRole::class . ':admin'])->prefix('admin')->group(function () {
         Route::get('kelola-data', [KelolaDataController::class, 'index'])->name('settings.index');
