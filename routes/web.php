@@ -4,6 +4,7 @@ use App\Http\Controllers\DataDasarController;
 use App\Http\Controllers\ChecklistPekerjaanController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DistribusiController;
+use App\Http\Controllers\HomeController;
 use App\Http\Controllers\KelolaDataController;
 use App\Http\Controllers\MasterPekerjaanController;
 use App\Http\Controllers\PenimbanganController;
@@ -12,7 +13,7 @@ use App\Http\Middleware\CheckRole;
 use Illuminate\Support\Facades\Route;
 
 // Public static pages (handled by BrowserRouter in React)
-Route::inertia('/', 'home')->name('home');
+Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::inertia('/sop', 'SOPPage');
 Route::inertia('/pengertian', 'pengertian');
 Route::inertia('/struktur', 'struktur');

@@ -20,9 +20,20 @@ import {
   Globe,
   Phone,
   Mail,
+  Scale,
+  Truck,
+  Package,
+  Clock,
+  CheckCircle,
+  Send,
+  CalendarIcon,
 } from "lucide-react";
+import { usePage, router } from '@inertiajs/react';
+import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from 'recharts';
 import { C, display, body } from "../theme";
 import Navbar from "../components/Navbar";
+import { ChartTooltip, ChartLabel, getCategoryColor, PieLegend } from "../components/charts";
+import type { ChartData } from "../components/charts";
 
 // ---- Tiktok Icon --------------------------------------------------------
 function TiktokIcon({ size = 16, color = "currentColor" }: { size?: number; color?: string }) {
@@ -358,26 +369,246 @@ function SafeImage({ src, alt, icon: Icon, gradient, className, style }: { src: 
   );
 }
 
-function PlaceholderPanel({ item }: { item: (typeof MENU_DECK)[number] }) {
-  const Icon = item.icon;
-  return (
-    <div className="mt-4 rounded-2xl border border-dashed p-6 sm:p-8" style={{ borderColor: "#B9C0D6", backgroundColor: C.navy050 }}>
-      <div className="flex items-center gap-2 mb-2">
-        <Icon size={16} color={C.navy700} />
-        <span className="text-xs font-semibold uppercase tracking-wider" style={{ ...body, color: C.navy700 }}>
-          Ruang konten — {item.title}
-        </span>
-      </div>
-      <p className="text-sm leading-relaxed" style={{ ...body, color: C.ink500 }}>
-        {item.placeholder}
-      </p>
-    </div>
-  );
+// ---- Page props -------------------------------------------------------
+
+type PresetKey = 'all' | 'today' | '7d' | '30d' | '3m';
+
+const PRESETS: { key: PresetKey; label: string; days: number | null }[] = [
+    { key: 'all', label: 'Semua', days: null },
+    { key: 'today', label: 'Hari Ini', days: 0 },
+    { key: '7d', label: '7 Hari', days: 7 },
+    { key: '30d', label: '30 Hari', days: 30 },
+    { key: '3m', label: '3 Bulan', days: 90 },
+];
+
+function daysAgo(n: number): string {
+    const d = new Date();
+    d.setDate(d.getDate() - n);
+    return d.toISOString().split('T')[0];
 }
+
+function formatDateInput(d: Date): string {
+    return d.toISOString().split('T')[0];
+}
+
+type PageProps = {
+    penimbanganByArea: ChartData;
+    pilahByJenis: ChartData;
+    distribusiByTujuan: ChartData;
+    statusBerat: {
+        menunggu_pemilahan: number;
+        siap_didistribusikan: number;
+        sudah_didistribusikan: number;
+    };
+    siapDidistribusikanByJenis: ChartData;
+    filters?: {
+        start_date: string | null;
+        end_date: string | null;
+    };
+};
 
 // ---- Main component ---------------------------------------------------
 
+function LaporanCharts({ data }: { data: PageProps }) {
+    const { penimbanganByArea, pilahByJenis, distribusiByTujuan, statusBerat, siapDidistribusikanByJenis } = data;
+
+    const siapSorted = siapDidistribusikanByJenis.slice().sort((a, b) => b.value - a.value);
+    const siapTotal = siapDidistribusikanByJenis.reduce((s, d) => s + d.value, 0);
+
+    const STATUS_DATA = [
+        { key: 'menunggu_pemilahan', name: 'Menunggu Pemilahan', value: statusBerat.menunggu_pemilahan, color: '#ef4444', icon: Clock },
+        { key: 'siap_didistribusikan', name: 'Siap Didistribusikan', value: statusBerat.siap_didistribusikan, color: '#f59e0b', icon: Package },
+        { key: 'sudah_didistribusikan', name: 'Sudah Didistribusikan', value: statusBerat.sudah_didistribusikan, color: '#22c55e', icon: CheckCircle },
+    ];
+    const statusTotal = STATUS_DATA.reduce((s, d) => s + d.value, 0);
+
+    return (
+        <div className="flex flex-col gap-6">
+            <div className="grid gap-6 lg:grid-cols-2">
+                {/* Status Berat Sampah - Donut */}
+                <div className="rounded-2xl border bg-white p-5" style={{ borderColor: C.line }}>
+                    <div className="mb-1 flex items-center gap-2">
+                        <Package className="size-5" style={{ color: C.leaf500 }} />
+                        <h3 className="text-sm font-semibold" style={{ color: C.navy900 }}>Status Berat Sampah</h3>
+                    </div>
+                    <p className="mb-4 text-xs" style={{ color: C.ink500 }}>Alur berat sampah dari penimbangan hingga distribusi</p>
+                    <div className="flex flex-col items-center gap-6 lg:flex-row lg:items-center">
+                        <div className="relative h-[220px] w-[220px] shrink-0">
+                            <ResponsiveContainer width="100%" height="100%">
+                                <PieChart>
+                                    <Pie data={STATUS_DATA} cx="50%" cy="50%" innerRadius={58} outerRadius={95} paddingAngle={3} dataKey="value" stroke="none">
+                                        {STATUS_DATA.map((_, i) => <Cell key={i} fill={STATUS_DATA[i].color} />)}
+                                    </Pie>
+                                    <Tooltip content={<ChartTooltip />} />
+                                    <text x="50%" y="46%" textAnchor="middle" dominantBaseline="middle" className="fill-gray-900 text-xl font-bold tabular-nums">
+                                        {statusTotal.toLocaleString('id-ID', { minimumFractionDigits: 1, maximumFractionDigits: 1 })}
+                                    </text>
+                                    <text x="50%" y="58%" textAnchor="middle" dominantBaseline="middle" className="fill-gray-500 text-[10px]">
+                                        kg total
+                                    </text>
+                                </PieChart>
+                            </ResponsiveContainer>
+                        </div>
+                        <div className="flex w-full flex-col gap-2.5">
+                            {STATUS_DATA.map((item) => {
+                                const pct = statusTotal > 0 ? (item.value / statusTotal) * 100 : 0;
+                                const Icon = item.icon;
+                                return (
+                                    <div key={item.key} className="flex items-center gap-3 rounded-lg p-3" style={{ backgroundColor: `${item.color}0d` }}>
+                                        <div className="flex size-8 shrink-0 items-center justify-center rounded-lg" style={{ backgroundColor: `${item.color}1a` }}>
+                                            <Icon className="size-4" style={{ color: item.color }} />
+                                        </div>
+                                        <div className="min-w-0 flex-1">
+                                            <p className="text-xs font-medium" style={{ color: C.ink900 }}>{item.name}</p>
+                                            <div className="mt-1 h-1.5 w-full overflow-hidden rounded-full" style={{ backgroundColor: `${item.color}20` }}>
+                                                <div className="h-full rounded-full transition-all" style={{ width: `${pct}%`, backgroundColor: item.color }} />
+                                            </div>
+                                        </div>
+                                        <div className="shrink-0 text-right">
+                                            <p className="text-sm font-bold tabular-nums" style={{ color: C.ink900 }}>
+                                                {item.value.toLocaleString('id-ID', { minimumFractionDigits: 1, maximumFractionDigits: 1 })}
+                                            </p>
+                                            <p className="text-[10px]" style={{ color: C.ink500 }}>kg &middot; {pct.toFixed(1)}%</p>
+                                        </div>
+                                    </div>
+                                );
+                            })}
+                        </div>
+                    </div>
+                </div>
+
+                {/* Penimbangan per Area */}
+                {(() => {
+                    const data = penimbanganByArea;
+                    const total = data.reduce((s, d) => s + d.value, 0);
+                    const sorted = data.slice().sort((a, b) => b.value - a.value);
+                    return (
+                        <div className="rounded-2xl border bg-white p-5" style={{ borderColor: C.line }}>
+                            <div className="mb-1 flex items-center gap-2">
+                                <Scale className="size-5" style={{ color: C.leaf500 }} />
+                                <h3 className="text-sm font-semibold" style={{ color: C.navy900 }}>Penimbangan per Area</h3>
+                            </div>
+                            <p className="mb-4 text-xs" style={{ color: C.ink500 }}>
+                                Total berat ditimbang: {total.toLocaleString('id-ID', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} kg
+                            </p>
+                            {data.length > 0 ? (
+                                <div className="flex flex-col gap-4 lg:flex-row lg:items-center">
+                                    <div className="h-[240px] shrink-0 lg:w-1/2">
+                                        <ResponsiveContainer width="100%" height="100%">
+                                            <PieChart>
+                                                <defs>
+                                                    <filter id="homePieShadow1" x="-50%" y="-50%" width="200%" height="200%">
+                                                        <feDropShadow dx="0" dy="1" stdDeviation="1.2" floodColor="#000000" floodOpacity="0.65" />
+                                                    </filter>
+                                                </defs>
+                                                <Pie data={sorted} cx="50%" cy="50%" labelLine={false} label={ChartLabel} outerRadius={100} dataKey="value" stroke="none">
+                                                    {sorted.map((entry) => <Cell key={entry.name} fill={getCategoryColor(entry.name)} />)}
+                                                </Pie>
+                                                <Tooltip content={<ChartTooltip />} />
+                                            </PieChart>
+                                        </ResponsiveContainer>
+                                    </div>
+                                    <div className="w-full space-y-1.5 lg:pl-4">
+                                        <PieLegend data={sorted} total={total} />
+                                    </div>
+                                </div>
+                            ) : (
+                                <div className="flex h-48 items-center justify-center text-sm" style={{ color: C.ink500 }}>
+                                    Belum ada data
+                                </div>
+                            )}
+                        </div>
+                    );
+                })()}
+            </div>
+
+            {/* Tiga Pie Chart: Penimbangan, Pilah, Distribusi */}
+            <div className="grid gap-6 md:grid-cols-3">
+                {([
+                    { title: 'Distribusi per Tujuan', icon: Truck, data: distribusiByTujuan, totalLabel: 'Total berat didistribusikan' },
+                    { title: 'Pilah Sampah per Jenis', icon: Recycle, data: pilahByJenis, totalLabel: 'Total berat dipilah' },
+                    { title: 'Sisa & Siap Didistribusikan', icon: Send, data: siapDidistribusikanByJenis, totalLabel: 'Total sisa dan siap didistribusikan' },
+                ] as const).map((card) => {
+                    const total = card.data.reduce((s, d) => s + d.value, 0);
+                    const sorted = card.data.slice().sort((a, b) => b.value - a.value);
+                    return (
+                        <div key={card.title} className="rounded-2xl border bg-white p-5" style={{ borderColor: C.line }}>
+                            <div className="mb-1 flex items-center gap-2">
+                                <card.icon className="size-5" style={{ color: C.leaf500 }} />
+                                <h3 className="text-sm font-semibold" style={{ color: C.navy900 }}>{card.title}</h3>
+                            </div>
+                            <p className="mb-4 text-xs" style={{ color: C.ink500 }}>
+                                {card.totalLabel}: {total.toLocaleString('id-ID', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} kg
+                            </p>
+                            {card.data.length > 0 ? (
+                                <>
+                                    <div className="h-64">
+                                        <ResponsiveContainer width="100%" height="100%">
+                                            <PieChart>
+                                                <defs>
+                                                    <filter id="homePieShadowSm" x="-50%" y="-50%" width="200%" height="200%">
+                                                        <feDropShadow dx="0" dy="1" stdDeviation="1.2" floodColor="#000000" floodOpacity="0.65" />
+                                                    </filter>
+                                                </defs>
+                                                <Pie data={sorted} cx="50%" cy="50%" labelLine={false} label={ChartLabel} outerRadius={100} dataKey="value" stroke="none">
+                                                    {sorted.map((entry) => <Cell key={entry.name} fill={getCategoryColor(entry.name)} />)}
+                                                </Pie>
+                                                <Tooltip content={<ChartTooltip />} />
+                                            </PieChart>
+                                        </ResponsiveContainer>
+                                    </div>
+                                    <PieLegend data={sorted} total={total} />
+                                </>
+                            ) : (
+                                <div className="flex h-48 items-center justify-center text-sm" style={{ color: C.ink500 }}>
+                                    Belum ada data
+                                </div>
+                            )}
+                        </div>
+                    );
+                })}
+            </div>
+        </div>
+    );
+}
+
 export default function Dashboard() {
+    const pageProps = usePage().props as unknown as PageProps;
+    const [activePreset, setActivePreset] = useState<PresetKey>('all');
+    const [startDate, setStartDate] = useState(pageProps.filters?.start_date ?? '');
+    const [endDate, setEndDate] = useState(pageProps.filters?.end_date ?? '');
+
+    function applyFilter(params: { start_date?: string | null; end_date?: string | null }) {
+        const query: Record<string, string> = {};
+        if (params.start_date) query.start_date = params.start_date;
+        if (params.end_date) query.end_date = params.end_date;
+        router.get('/', query, { preserveState: true, preserveScroll: true, replace: true });
+    }
+
+    function handlePreset(preset: typeof PRESETS[number]) {
+        setActivePreset(preset.key);
+        if (preset.days === null) {
+            setStartDate('');
+            setEndDate('');
+            applyFilter({});
+        } else if (preset.days === 0) {
+            const today = formatDateInput(new Date());
+            setStartDate(today);
+            setEndDate(today);
+            applyFilter({ start_date: today, end_date: today });
+        } else {
+            const s = daysAgo(preset.days);
+            const e = formatDateInput(new Date());
+            setStartDate(s);
+            setEndDate(e);
+            applyFilter({ start_date: s, end_date: e });
+        }
+    }
+
+    function handleCustomDate() {
+        setActivePreset('all');
+        applyFilter({ start_date: startDate || null, end_date: endDate || null });
+    }
   const [heroIndex, setHeroIndex] = useState(0);
   const [posterIndex, setPosterIndex] = useState(0);
   const [posterPaused, setPosterPaused] = useState(false);
@@ -698,12 +929,56 @@ export default function Dashboard() {
       {/* ---- Laporan ---- */}
       <section id="laporan" ref={setSectionRef("laporan")} className="max-w-6xl mx-auto px-5 sm:px-8 pt-6 sm:pt-8 pb-8 sm:pb-10" style={{ scrollMarginTop: 72 }}>
         <Reveal>
-          <h2 className="text-2xl sm:text-3xl font-semibold mb-2" style={{ ...display, color: C.navy900 }}>
-            Laporan
-          </h2>
+          <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+            <div>
+              <h2 className="text-2xl sm:text-3xl font-semibold mb-1" style={{ ...display, color: C.navy900 }}>
+                Laporan
+              </h2>
+              <p className="text-sm" style={{ color: C.ink500 }}>Rekap data pengelolaan sampah</p>
+            </div>
+            <div className="flex flex-wrap items-center gap-2 shrink-0">
+              <div className="flex items-center rounded-lg border bg-white p-0.5" style={{ borderColor: C.line }}>
+                {PRESETS.map((preset) => (
+                  <button
+                    key={preset.key}
+                    onClick={() => handlePreset(preset)}
+                    className={`rounded-md px-3 py-1.5 text-xs font-medium transition-colors ${
+                      activePreset === preset.key
+                        ? 'bg-green-600 text-white shadow-sm'
+                        : 'text-gray-600 hover:text-gray-900'
+                    }`}
+                  >
+                    {preset.label}
+                  </button>
+                ))}
+              </div>
+              <div className="flex items-center gap-1.5 rounded-lg border bg-white px-2 py-1" style={{ borderColor: C.line }}>
+                <CalendarIcon className="size-3.5 text-gray-400" />
+                <input
+                  type="date"
+                  value={startDate}
+                  onChange={(e) => setStartDate(e.target.value)}
+                  className="w-28 border-0 bg-transparent text-xs text-gray-700 outline-none hover:text-gray-900 [color-scheme:light]"
+                />
+                <span className="text-xs text-gray-400">&ndash;</span>
+                <input
+                  type="date"
+                  value={endDate}
+                  onChange={(e) => setEndDate(e.target.value)}
+                  className="w-28 border-0 bg-transparent text-xs text-gray-700 outline-none hover:text-gray-900 [color-scheme:light]"
+                />
+                <button
+                  onClick={handleCustomDate}
+                  className="h-6 rounded-md px-2 text-xs font-medium text-green-700 hover:bg-green-50 hover:text-green-800 transition-colors"
+                >
+                  Terapkan
+                </button>
+              </div>
+            </div>
+          </div>
         </Reveal>
         <Reveal delay={80}>
-          <PlaceholderPanel item={MENU_DECK.find((item) => item.id === "laporan")!} />
+          <LaporanCharts data={pageProps} />
         </Reveal>
       </section>
 
