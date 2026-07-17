@@ -12,9 +12,14 @@ use Illuminate\Support\Facades\Route;
 
 // Shared routes (accessible by both roles, no role check)
 Route::middleware(['auth'])->group(function () {
+    Route::inertia('/form', 'welcome')->name('form');
     Route::inertia('form/penimbangan', 'form/penimbangan')->name('form.penimbangan');
     Route::inertia('form/pilah-sampah', 'form/pilah-sampah')->name('form.pilah-sampah');
     Route::inertia('form/distribusi', 'form/distribusi')->name('form.distribusi');
+
+    Route::post('form/penimbangan', [PenimbanganController::class, 'store'])->name('form.penimbangan.store');
+    Route::post('form/pilah-sampah', [PilahSampahController::class, 'store'])->name('form.pilah-sampah.store');
+    Route::post('form/distribusi', [DistribusiController::class, 'store'])->name('form.distribusi.store');
 
     Route::get('admin/dashboard', [DashboardController::class, 'index'])->name('dashboard')->middleware(['verified', CheckRole::class . ':admin']);
 
@@ -70,8 +75,3 @@ Route::middleware(['auth', CheckRole::class . ':petugas'])
         Route::resource('distribusi', DistribusiController::class)->names('distribusi');
     });
 
-// Petugas landing page (separate URL from prefix group)
-Route::middleware(['auth', CheckRole::class . ':petugas'])
-    ->group(function () {
-        Route::inertia('/form', 'welcome')->name('petugas.form');
-    });

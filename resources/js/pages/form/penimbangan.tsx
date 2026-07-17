@@ -84,7 +84,7 @@ const handleSubmit = (e: React.FormEvent) => {
             scrollTo('section-lokasi');
             return;
         }
-        post('/petugas/penimbangan');
+        post('/form/penimbangan');
     };
 
     const now = new Date(Date.now() - new Date().getTimezoneOffset() * 60000).toISOString().slice(0, 16);

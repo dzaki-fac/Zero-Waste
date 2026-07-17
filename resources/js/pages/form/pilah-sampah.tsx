@@ -55,7 +55,7 @@ const handleSubmit = (e: React.FormEvent) => {
             return;
         }
         setSubmitError('');
-        post('/petugas/pilah-sampah');
+        post('/form/pilah-sampah');
     };
 
     const now = new Date(Date.now() - new Date().getTimezoneOffset() * 60000).toISOString().slice(0, 16);
