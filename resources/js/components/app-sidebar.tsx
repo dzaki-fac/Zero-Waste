@@ -1,5 +1,5 @@
 import { Link, usePage } from '@inertiajs/react';
-import { LayoutDashboard, Recycle, Scale, Settings, Truck, Users } from 'lucide-react';
+import { Database, LayoutDashboard, Recycle, Scale, Settings, Truck, Users } from 'lucide-react';
 import AppLogo from '@/components/app-logo';
 import { NavMain } from '@/components/nav-main';
 import { NavUser } from '@/components/nav-user';
@@ -19,6 +19,11 @@ const mainNavItems: NavItem[] = [
         title: 'Dashboard',
         href: '/admin/dashboard',
         icon: LayoutDashboard,
+    },
+    {
+        title: 'Data Dasar',
+        href: '/admin/data-dasar',
+        icon: Database,
     },
     {
         title: 'Penimbangan',
