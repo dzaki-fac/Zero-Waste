@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\ChecklistPekerjaanController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\DataDasarController;
 use App\Http\Controllers\DistribusiController;
 use App\Http\Controllers\KelolaDataController;
 use App\Http\Controllers\MasterPekerjaanController;
@@ -26,6 +27,7 @@ Route::middleware(['auth'])->group(function () {
     Route::post('form/penimbangan', [PenimbanganController::class, 'store'])->name('form.penimbangan.store');
     Route::post('form/pilah-sampah', [PilahSampahController::class, 'store'])->name('form.pilah-sampah.store');
     Route::post('form/distribusi', [DistribusiController::class, 'store'])->name('form.distribusi.store');
+    Route::get('form/pekerjaan', [ChecklistPekerjaanController::class, 'formPage'])->name('form.pekerjaan');
 
     Route::middleware([CheckRole::class . ':admin'])->prefix('admin')->group(function () {
         Route::get('kelola-data', [KelolaDataController::class, 'index'])->name('settings.index');
@@ -60,6 +62,9 @@ Route::middleware(['auth', CheckRole::class . ':admin'])
             ->only(['index', 'store', 'update', 'destroy'])
             ->parameters(['kelola-pekerjaan' => 'masterPekerjaan'])
             ->names('kelola-pekerjaan');
+
+        Route::get('data-dasar', [DataDasarController::class, 'index'])->name('data-dasar.index');
+        Route::post('data-dasar', [DataDasarController::class, 'update'])->name('data-dasar.update');
     });
 
 // Petugas routes

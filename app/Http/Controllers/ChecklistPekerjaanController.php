@@ -61,10 +61,6 @@ class ChecklistPekerjaanController extends Controller
     {
         $user = $request->user();
 
-        if ($user->role !== 'petugas') {
-            abort(403, 'Hanya petugas yang dapat mengakses halaman ini.');
-        }
-
         $nip = $user->nip;
         $tanggal = $request->query('tanggal', now()->toDateString());
         $areaFilter = $request->query('area');
