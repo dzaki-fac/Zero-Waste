@@ -4,16 +4,18 @@ export default function AppLogo() {
             <img
                 src="/images/undip-logo.png"
                 alt="Logo Universitas Diponegoro"
-                className="size-8 shrink-0 object-contain"
+                className="h-12 w-12 shrink-0 object-contain"
             />
-            <div className="ml-1 grid flex-1 text-left text-sm">
-                <span className="truncate leading-tight font-semibold">
-                    Universitas Diponegoro
-                </span>
-                <span className="truncate leading-tight text-xs text-muted-foreground">
-                    UPT Perpustakaan dan Undip Press
-                </span>
-            </div>
+            <img
+                src="/images/logo UPT.png"
+                alt="Logo UPT Perpustakaan dan UNDIP Press"
+                className="h-20 w-20 shrink-0 object-contain ml-2"
+            />
+            <img
+                src="/images/LOGO ZeroLib.png"
+                alt="ZeroLib — UPT Perpustakaan dan UNDIP Press"
+                className="h-20 w-20 shrink-0 object-contain ml-2"
+            />
         </>
     );
 }
