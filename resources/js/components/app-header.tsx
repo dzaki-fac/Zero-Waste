@@ -1,5 +1,5 @@
 import AppLogo from '@/components/app-logo';
-import AppLogoIcon from '@/components/app-logo-icon';
+import AppLogoIcon from '@/components/Undiplogoicon';
 import { Breadcrumbs } from '@/components/breadcrumbs';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
@@ -22,14 +22,23 @@ import {
 } from '@/components/ui/tooltip';
 import { UserMenuContent } from '@/components/user-menu-content';
 import { useInitials } from '@/hooks/use-initials';
-import { toUrl } from '@/lib/utils';
+import { cn, toUrl } from '@/lib/utils';
+import { home } from '@/routes';
 import type { BreadcrumbItem, NavItem } from '@/types';
 import { Link, usePage } from '@inertiajs/react';
-import { BookOpen, Folder, Menu } from 'lucide-react';
+import { BookOpen, Folder, LayoutGrid, Menu } from 'lucide-react';
 
 type Props = {
     breadcrumbs?: BreadcrumbItem[];
 };
+
+const mainNavItems: NavItem[] = [
+    {
+        title: 'Dashboard',
+        href: home(),
+        icon: LayoutGrid,
+    },
+];
 
 const rightNavItems: NavItem[] = [
     {
@@ -100,7 +109,7 @@ export function AppHeader({ breadcrumbs = [] }: Props) {
                     </div>
 
                     <Link
-                        href={auth.user?.role === 'petugas' ? '/form' : '/admin/dashboard'}
+                        href={auth.user ? (auth.user.role === 'petugas' ? '/form' : '/admin/dashboard') : home()}
                         prefetch
                         className="flex items-center space-x-2"
                     >

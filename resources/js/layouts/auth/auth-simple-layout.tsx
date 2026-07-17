@@ -1,5 +1,5 @@
 import { Link } from '@inertiajs/react';
-import AppLogoIcon from '@/components/app-logo-icon';
+import AppLogoIcon from '@/components/Undiplogoicon';
 import { login } from '@/routes';
 import type { AuthLayoutProps } from '@/types';
 
