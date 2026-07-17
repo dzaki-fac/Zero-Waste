@@ -64,16 +64,12 @@ const handleSubmit = (e: React.FormEvent) => {
             scrollTo('section-lokasi');
             return;
         }
-<<<<<<< HEAD
-        post('/petugas/penimbangan');
-=======
         if (hasSubArea && !data.sub_area) {
             setSubAreaError('Silakan pilih sub area terlebih dahulu');
             scrollTo('section-lokasi');
             return;
         }
         post('/form/penimbangan');
->>>>>>> temp-branch
     };
 
     const now = new Date(Date.now() - new Date().getTimezoneOffset() * 60000).toISOString().slice(0, 16);
