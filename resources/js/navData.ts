@@ -1,6 +1,6 @@
 export const NAV_ITEMS = [
   { id: "beranda", label: "Beranda" },
-  { id: "pengertian", label: "Pengertian" },
+  { id: "pengertian", label: "Tentang" },
   { id: "struktur", label: "Struktur" },
   { id: "sop", label: "SOP" },
   { id: "laporan", label: "Laporan" },

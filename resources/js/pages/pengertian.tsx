@@ -11,7 +11,7 @@ const PENGERTIAN_ITEMS = [
     icon: Info,
     title: "Definisi",
     shortDesc:
-      "Zero Waste merupakan pendekatan pengelolaan sumber daya yang berupaya mencegah timbulnya sampah melalui pengurangan, penggunaan kembali, perbaikan, dan daur ulang material. Pendekatan ini menempatkan konservasi sumber daya sebagai prioritas utama demi keberlanjutan lingkungan dan masyarakat.",
+      "ZeroLib adalah sistem digital pengelolaan sampah UPT Perpustakaan dan UNDIP Press Universitas Diponegoro yang mengintegrasikan proses pengelolaan sampah secara terdokumentasi dan berbasis data, mulai dari identifikasi sumber, pemilahan, penimbangan, pencatatan, hingga penyaluran ke pengolahan akhir.",
     image: "https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?auto=format&fit=crop&w=700&q=80",
   },
   {
@@ -19,7 +19,7 @@ const PENGERTIAN_ITEMS = [
     icon: Scale,
     title: "Prinsip",
     shortDesc:
-      "Penerapan Zero Waste didasarkan pada prinsip Refuse, Reduce, Reuse, Repair, Recycle, dan Recovery. Hierarki ini menempatkan pencegahan sampah sebagai prioritas utama sebelum pengolahan atau pembuangan akhir, sehingga penggunaan sumber daya dapat menjadi lebih efisien dan berkelanjutan.",
+      "ZeroLib mendukung penerapan prinsip 5R, yaitu Reduce, Reuse, Recycle, Recover, dan Responsible Disposal, di setiap tahap pengelolaan sampah perpustakaan.",
     image: "https://images.unsplash.com/photo-1532996122724-e3c354a0b15b?auto=format&fit=crop&w=700&q=80",
   },
   {
@@ -27,7 +27,7 @@ const PENGERTIAN_ITEMS = [
     icon: Info,
     title: "Manfaat",
     shortDesc:
-      "Penerapan Zero Waste membantu mengurangi volume sampah yang berakhir di tempat pemrosesan akhir, meningkatkan efisiensi pemanfaatan sumber daya, menekan pencemaran lingkungan, serta membangun budaya konsumsi dan pengelolaan sampah yang lebih bertanggung jawab di lingkungan institusi.",
+      "Melalui ZeroLib, setiap sampah tidak lagi dipandang sebagai limbah semata, melainkan sebagai data yang dapat diukur, dipantau, dan dianalisis secara berkala untuk mendukung proses pengelolaan yang transparan, akuntabel, serta perpustakaan yang lebih hijau dan berkelanjutan.",
     image: "https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?auto=format&fit=crop&w=700&q=80",
   },
   {
@@ -98,7 +98,7 @@ export default function PengertianPage() {
       <Navbar activeSection="pengertian" />
       <section className="max-w-6xl mx-auto px-5 sm:px-8 pt-8 sm:pt-10 pb-24">
         <Reveal>
-          <h2 className="text-2xl sm:text-3xl font-semibold mb-6" style={{ ...display, color: C.navy900 }}>Pengertian</h2>
+          <h2 className="text-2xl sm:text-3xl font-semibold mb-6" style={{ ...display, color: C.navy900 }}>Tentang ZeroLib</h2>
         </Reveal>
         <Reveal delay={80}>
           <PengertianContent />

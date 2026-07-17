@@ -34,7 +34,7 @@ type NavItem =
 
 export const NAV_ITEMS: NavItem[] = [
   { id: "beranda", label: "Beranda", type: "anchor" },
-  { id: "pengertian", label: "Pengertian", type: "page", href: "/pengertian" },
+  { id: "pengertian", label: "Tentang ZeroLib", type: "page", href: "/pengertian" },
   { id: "struktur", label: "Struktur", type: "page", href: "/struktur" },
   { id: "sop", label: "SOP", type: "anchor" },
   { id: "laporan", label: "Laporan", type: "anchor" },
