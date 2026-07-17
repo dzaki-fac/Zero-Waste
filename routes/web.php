@@ -18,6 +18,7 @@ Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::inertia('/sop', 'SOPPage');
 Route::inertia('/pengertian', 'pengertian');
 Route::inertia('/struktur', 'struktur');
+Route::inertia('/peraturan', 'peraturan'); 
 
 // Shared routes (accessible by both roles, no role check)
 Route::middleware(['auth'])->group(function () {
