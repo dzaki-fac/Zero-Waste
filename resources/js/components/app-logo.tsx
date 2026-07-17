@@ -1,3 +1,5 @@
+const appName = import.meta.env.VITE_APP_NAME || 'Universitas Diponegoro ZeroLib';
+
 export default function AppLogo() {
     return (
         <>
@@ -16,6 +18,11 @@ export default function AppLogo() {
                 alt="ZeroLib — UPT Perpustakaan dan UNDIP Press"
                 className="h-20 w-20 shrink-0 object-contain ml-2"
             />
+            <div className="ml-2 grid flex-1 text-left text-sm">
+                <span className="whitespace-normal break-words leading-tight font-semibold tracking-tight">
+                    {appName}
+                </span>
+            </div>
         </>
     );
 }

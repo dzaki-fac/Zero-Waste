@@ -1,7 +1,6 @@
-import { Link } from '@inertiajs/react';
-import { BookOpen, FolderGit2, LayoutGrid } from 'lucide-react';
+import { Link, usePage } from '@inertiajs/react';
+import { LayoutDashboard, ListTodo, Recycle, Scale, Settings, Truck, Users } from 'lucide-react';
 import AppLogo from '@/components/app-logo';
-import { NavFooter } from '@/components/nav-footer';
 import { NavMain } from '@/components/nav-main';
 import { NavUser } from '@/components/nav-user';
 import {
@@ -13,38 +12,42 @@ import {
     SidebarMenuButton,
     SidebarMenuItem,
 } from '@/components/ui/sidebar';
-import { home } from '@/routes';
-import type { NavItem } from '@/types';
+import type { Auth, NavItem } from '@/types';
 
-const mainNavItems: NavItem[] = [
-    {
-        title: 'Dashboard',
-        href: home(),
-        icon: LayoutGrid,
-    },
-];
-
-const footerNavItems: NavItem[] = [
-    {
-        title: 'Repository',
-        href: 'https://github.com/laravel/react-starter-kit',
-        icon: FolderGit2,
-    },
-    {
-        title: 'Documentation',
-        href: 'https://laravel.com/docs/starter-kits#react',
-        icon: BookOpen,
-    },
-];
+function portalHref(path: string): string {
+    return `/${path}`;
+}
 
 export function AppSidebar() {
+    const { auth } = usePage().props as { auth: Auth };
+
+    const prefix = auth.user.role === 'admin' ? 'admin' : 'petugas';
+
+    const sharedNavItems: NavItem[] = [
+        { title: 'Dashboard', href: `/${prefix}/dashboard`, icon: LayoutDashboard },
+        { title: 'Penimbangan', href: `/${prefix}/penimbangan`, icon: Scale },
+        { title: 'Pilah Sampah', href: `/${prefix}/pilah-sampah`, icon: Recycle },
+        { title: 'Distribusi', href: `/${prefix}/distribusi`, icon: Truck },
+    ];
+
+    const adminNavItems: NavItem[] = [
+        { title: 'Checklist Pekerjaan', href: '/admin/checklist-pekerjaan', icon: LayoutDashboard },
+        { title: 'Kelola Pekerjaan', href: '/admin/kelola-pekerjaan', icon: ListTodo },
+        { title: 'Kelola Data', href: '/admin/kelola-data', icon: Settings },
+        { title: 'Akun', href: '/admin/akun', icon: Users },
+    ];
+
+    const navItems: NavItem[] = auth.user.role === 'admin'
+        ? [...sharedNavItems, ...adminNavItems]
+        : sharedNavItems;
+
     return (
-        <Sidebar collapsible="icon" variant="inset">
+        <Sidebar collapsible="icon">
             <SidebarHeader>
                 <SidebarMenu>
                     <SidebarMenuItem>
                         <SidebarMenuButton size="lg" asChild>
-                            <Link href={home()} prefetch>
+                            <Link href={auth.user.role === 'petugas' ? '/form' : '/admin/dashboard'} prefetch>
                                 <AppLogo />
                             </Link>
                         </SidebarMenuButton>
@@ -53,11 +56,10 @@ export function AppSidebar() {
             </SidebarHeader>
 
             <SidebarContent>
-                <NavMain items={mainNavItems} />
+                <NavMain items={navItems} />
             </SidebarContent>
 
             <SidebarFooter>
-                <NavFooter items={footerNavItems} className="mt-auto" />
                 <NavUser />
             </SidebarFooter>
         </Sidebar>

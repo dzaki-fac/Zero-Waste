@@ -45,6 +45,6 @@
         <title>{{ config('app.name', 'Laravel') }}</title>
     </head>
     <body class="font-sans antialiased">
-        <div id="app"></div>
+        @inertia
     </body>
 </html>
