@@ -20,12 +20,10 @@ type Penimbangan = {
     tanggal: string;
     berat_sampah: string;
     area: string;
-    sub_area: string;
 };
 
 type Options = {
     area: string[];
-    sub_area: Record<string, string[]>;
     jenis_sampah: string[];
     tujuan_distribusi: string[];
 };
@@ -43,25 +41,12 @@ export default function PenimbanganEdit({ penimbangan }: Props) {
         return new Date(d.getTime() - d.getTimezoneOffset() * 60000).toISOString().slice(0, 16);
     })();
 
-    const subAreaMap = options.sub_area;
-    const initialSubArea = subAreaMap[penimbangan.area]?.includes(penimbangan.sub_area)
-        ? penimbangan.sub_area
-        : '';
-
     const { data, setData, put, processing, errors } = useForm({
         nama: penimbangan.nama,
         tanggal: initialTanggal,
         berat_sampah: penimbangan.berat_sampah,
         area: penimbangan.area,
-        sub_area: initialSubArea,
     });
-
-    const subAreaOptions = data.area ? (subAreaMap[data.area] ?? null) : null;
-
-    const handleAreaChange = (value: string) => {
-        setData('area', value);
-        setData('sub_area', '');
-    };
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
@@ -126,7 +111,7 @@ export default function PenimbanganEdit({ penimbangan }: Props) {
 
                         <div className="grid gap-2">
                             <Label htmlFor="area" className="text-green-700">Area</Label>
-                            <Select name="area" value={data.area} onValueChange={handleAreaChange}>
+                            <Select name="area" value={data.area} onValueChange={(v) => setData('area', v)}>
                                 <SelectTrigger className="w-full border-green-200 focus-visible:border-green-500 focus-visible:ring-green-500/20">
                                     <SelectValue placeholder="Pilih area" />
                                 </SelectTrigger>
@@ -137,32 +122,6 @@ export default function PenimbanganEdit({ penimbangan }: Props) {
                                 </SelectContent>
                             </Select>
                             <InputError message={errors.area} />
-                        </div>
-
-                        <div className="grid gap-2">
-                            <Label htmlFor="sub_area" className="text-green-700">Sub Area</Label>
-                            {subAreaOptions ? (
-                                <Select name="sub_area" value={data.sub_area} onValueChange={(v) => setData('sub_area', v)}>
-                                    <SelectTrigger className="w-full border-green-200 focus-visible:border-green-500 focus-visible:ring-green-500/20">
-                                        <SelectValue placeholder="Pilih sub area" />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        {subAreaOptions.map((option) => (
-                                            <SelectItem key={option} value={option}>{option}</SelectItem>
-                                        ))}
-                                    </SelectContent>
-                                </Select>
-                            ) : (
-                                <Input
-                                    id="sub_area"
-                                    name="sub_area"
-                                    value=""
-                                    disabled
-                                    placeholder="Sub area tidak tersedia"
-                                    className="border-green-200 bg-green-50 text-green-500 placeholder:text-green-500"
-                                />
-                            )}
-                            <InputError message={errors.sub_area} />
                         </div>
 
                         <div className="flex items-center gap-3 pt-2">

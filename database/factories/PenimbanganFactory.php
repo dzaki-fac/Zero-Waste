@@ -29,9 +29,6 @@ class PenimbanganFactory extends Factory
             'tanggal' => fake()->dateTimeBetween('-6 months', 'now'),
             'berat_sampah' => fake()->randomFloat(2, 1, 100),
             'area' => $area,
-            'sub_area' => str_starts_with($area, 'Lantai')
-                ? fake()->randomElement(['Area Baca', 'Area Kantor', 'Area Pertemuan', 'Kamar Kecil'])
-                : '-',
         ];
     }
 }

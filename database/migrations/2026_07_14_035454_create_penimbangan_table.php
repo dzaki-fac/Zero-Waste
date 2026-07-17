@@ -14,7 +14,7 @@ return new class extends Migration
             $table->dateTime('tanggal');
             $table->decimal('berat_sampah', 10, 2);
             $table->string('area');
-            $table->string('sub_area')->nullable();
+            $table->foreignId('user_id')->nullable()->constrained('users')->nullOnDelete();
             $table->timestamps();
         });
     }

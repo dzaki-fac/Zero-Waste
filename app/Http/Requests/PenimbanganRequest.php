@@ -17,7 +17,6 @@ class PenimbanganRequest extends FormRequest
             'tanggal' => ['required', 'date'],
             'berat_sampah' => ['required', 'numeric', 'min:0'],
             'area' => ['required', Rule::in($areaValues)],
-            'sub_area' => ['nullable', 'string', 'max:255'],
         ];
     }
 }

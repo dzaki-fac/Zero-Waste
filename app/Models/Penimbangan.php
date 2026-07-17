@@ -20,7 +20,6 @@ class Penimbangan extends Model
         'tanggal',
         'berat_sampah',
         'area',
-        'sub_area',
         'user_id',
     ];
 

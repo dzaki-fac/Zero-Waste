@@ -60,7 +60,6 @@ test('petugas A cannot update petugas B record', function () {
         'tanggal' => now()->format('Y-m-d H:i'),
         'berat_sampah' => 50,
         'area' => 'Lantai 1',
-        'sub_area' => 'Area Baca',
     ]);
 
     $response->assertForbidden();
@@ -125,7 +124,6 @@ test('admin can update records created by any petugas', function () {
         'tanggal' => now()->format('Y-m-d H:i'),
         'berat_sampah' => 100,
         'area' => 'Lantai 1',
-        'sub_area' => 'Area Baca',
     ]);
 
     $response->assertRedirect();
@@ -149,7 +147,6 @@ test('newly created record is assigned to the authenticated user', function () {
         'tanggal' => now()->format('Y-m-d H:i'),
         'berat_sampah' => 10,
         'area' => 'Lantai 1',
-        'sub_area' => 'Area Baca',
     ]);
 
     $record = Penimbangan::where('nama', $this->petugasA->name)->latest()->first();
@@ -164,7 +161,6 @@ test('submitted fake user_id is ignored by the server', function () {
         'tanggal' => now()->format('Y-m-d H:i'),
         'berat_sampah' => 10,
         'area' => 'Lantai 1',
-        'sub_area' => 'Area Baca',
         'user_id' => $this->petugasB->id,
     ]);
 

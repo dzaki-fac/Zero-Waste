@@ -1,11 +1,11 @@
 <?php
 
-use Illuminate\Database\Migrations\Migration;
-use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Schema;
+namespace Database\Seeders;
 
-return new class extends Migration
+use App\Models\MasterPekerjaan;
+use Illuminate\Database\Seeder;
+
+class MasterPekerjaanSeeder extends Seeder
 {
     private array $tugasList = [
         'Membersihkan furniture, meja, kursi, laci, lemari dari debu yang menempel',
@@ -30,33 +30,19 @@ return new class extends Migration
         'Mengganti pengharum kamar mandi dan ruangan',
     ];
 
-    public function up(): void
+    public function run(): void
     {
-        Schema::table('checklist_pekerjaan', function (Blueprint $table) {
-            $table->string('jenis_pekerjaan', 20)->after('nip');
-        });
+        foreach ($this->tugasList as $i => $tugas) {
+            $jenis = $i < 7 ? 'harian' : ($i < 12 ? 'mingguan' : 'bulanan');
 
-        $harian = array_slice($this->tugasList, 0, 7);
-        $mingguan = array_slice($this->tugasList, 7, 5);
-        $bulanan = array_slice($this->tugasList, 12, 8);
-
-        DB::table('checklist_pekerjaan')
-            ->whereIn('tugas', $harian)
-            ->update(['jenis_pekerjaan' => 'harian']);
-
-        DB::table('checklist_pekerjaan')
-            ->whereIn('tugas', $mingguan)
-            ->update(['jenis_pekerjaan' => 'mingguan']);
-
-        DB::table('checklist_pekerjaan')
-            ->whereIn('tugas', $bulanan)
-            ->update(['jenis_pekerjaan' => 'bulanan']);
+            MasterPekerjaan::firstOrCreate(
+                ['nama_pekerjaan' => $tugas],
+                [
+                    'jenis_pekerjaan' => $jenis,
+                    'urutan' => $i + 1,
+                    'is_active' => true,
+                ]
+            );
+        }
     }
-
-    public function down(): void
-    {
-        Schema::table('checklist_pekerjaan', function (Blueprint $table) {
-            $table->dropColumn('jenis_pekerjaan');
-        });
-    }
-};
+}

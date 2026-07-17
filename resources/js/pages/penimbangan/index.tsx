@@ -27,7 +27,6 @@ type Penimbangan = {
     tanggal: string;
     berat_sampah: string;
     area: string;
-    sub_area: string;
 };
 
 type Props = {
@@ -309,14 +308,13 @@ export default function PenimbanganIndex({ penimbangan }: Props) {
                                         <TableHead className="text-green-700">Tanggal</TableHead>
                                         <TableHead className="text-green-700">Berat (kg)</TableHead>
                                         <TableHead className="text-green-700">Area</TableHead>
-                                        <TableHead className="text-green-700">Sub Area</TableHead>
                                         <TableHead className="text-right text-green-700">Aksi</TableHead>
                                     </TableRow>
                                 </TableHeader>
                                 <TableBody>
                                     {filtered.length === 0 ? (
                                         <TableRow>
-                                            <TableCell colSpan={7} className="text-center text-green-600/70">
+                                                <TableCell colSpan={6} className="text-center text-green-600/70">
                                                 Tidak ada data yang cocok.
                                             </TableCell>
                                         </TableRow>
@@ -334,7 +332,6 @@ export default function PenimbanganIndex({ penimbangan }: Props) {
                                                         {item.area}
                                                     </span>
                                                 </TableCell>
-                                                <TableCell>{item.sub_area}</TableCell>
                                                 <TableCell className="text-right">
                                                     <div className="flex justify-end gap-2">
                                                         <Button variant="outline" size="sm" asChild className="border-green-200 text-green-700 hover:bg-green-50 hover:text-green-800">
