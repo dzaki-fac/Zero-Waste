@@ -1,5 +1,5 @@
 import { Link, usePage } from '@inertiajs/react';
-import { Database, LayoutDashboard, ListTodo, Recycle, Scale, Settings, Truck, Users } from 'lucide-react';
+import { ClipboardCheck, Database, LayoutDashboard, ListTodo, Recycle, Scale, Settings, Truck, Users } from 'lucide-react';
 import AppLogo from '@/components/app-logo';
 import { NavMain } from '@/components/nav-main';
 import { NavUser } from '@/components/nav-user';
@@ -31,9 +31,13 @@ export function AppSidebar() {
         { title: 'Akun', href: '/admin/akun', icon: Users },
     ];
 
+    const petugasNavItems: NavItem[] = [
+        { title: 'Checklist Pekerjaan', href: '/petugas/checklist-pekerjaan', icon: ClipboardCheck },
+    ];
+
     const navItems: NavItem[] = auth.user.role === 'admin'
         ? [...sharedNavItems, ...adminNavItems]
-        : sharedNavItems;
+        : [...sharedNavItems, ...petugasNavItems];
 
     return (
         <Sidebar collapsible="icon">

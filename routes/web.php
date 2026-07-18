@@ -53,6 +53,7 @@ Route::middleware(['auth', CheckRole::class . ':admin'])
         Route::resource('pilah-sampah', PilahSampahController::class)->names('pilah-sampah');
 
         Route::get('distribusi/export', [DistribusiController::class, 'export'])->name('distribusi.export');
+        Route::patch('distribusi/{distribusi}/review', [DistribusiController::class, 'review'])->name('distribusi.review');
         Route::resource('distribusi', DistribusiController::class)->names('distribusi');
 
         Route::get('checklist-pekerjaan/export', [ChecklistPekerjaanController::class, 'export'])->name('checklist-pekerjaan.export');
@@ -77,6 +78,8 @@ Route::middleware(['auth', CheckRole::class . ':petugas'])
     ->name('petugas.')
     ->group(function () {
         Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard');
+
+        Route::get('checklist-pekerjaan', [ChecklistPekerjaanController::class, 'showForAuthPetugas'])->name('checklist-pekerjaan.index');
 
         Route::get('penimbangan/export', [PenimbanganController::class, 'export'])->name('penimbangan.export');
         Route::resource('penimbangan', PenimbanganController::class)->names('penimbangan');

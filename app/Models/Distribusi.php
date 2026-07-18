@@ -28,11 +28,18 @@ class Distribusi extends Model
     protected $casts = [
         'tanggal' => 'datetime',
         'berat' => 'decimal:2',
+        'reviewed_at' => 'datetime',
+        'revision_submitted_at' => 'datetime',
     ];
 
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function reviewedBy(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'reviewed_by');
     }
 
     public function scopeVisibleTo($query, User $user)
