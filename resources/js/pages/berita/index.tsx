@@ -48,11 +48,13 @@ export default function KelolaBerita({ news }: Props) {
     const [deleteError, setDeleteError] = useState<string | null>(null);
     const [editKey, setEditKey] = useState(0);
 
+    const [imagePreview, setImagePreview] = useState<string | null>(null);
+
     const addForm = useForm({
         tag: '',
         title: '',
         date: '',
-        image_url: '',
+        image: null as File | null,
         href: '',
         is_published: true,
         order: 0,
@@ -74,6 +76,8 @@ export default function KelolaBerita({ news }: Props) {
             preserveScroll: true,
             onSuccess: () => {
                 setAddOpen(false);
+                if (imagePreview) URL.revokeObjectURL(imagePreview);
+                setImagePreview(null);
                 addForm.reset();
             },
         });
@@ -140,6 +144,8 @@ export default function KelolaBerita({ news }: Props) {
                         onClick={() => {
                             addForm.reset();
                             addForm.clearErrors();
+                            if (imagePreview) URL.revokeObjectURL(imagePreview);
+                            setImagePreview(null);
                             setAddOpen(true);
                         }}
                         className="bg-green-600 text-white hover:bg-green-700"
@@ -304,25 +310,33 @@ export default function KelolaBerita({ news }: Props) {
                             )}
                         </div>
                         <div className="grid gap-2">
-                            <Label htmlFor="add-image_url">URL Gambar</Label>
+                            <Label htmlFor="add-image">Gambar</Label>
                             <Input
-                                id="add-image_url"
-                                type="url"
-                                value={addForm.data.image_url}
-                                onChange={(e) => addForm.setData('image_url', e.target.value)}
-                                placeholder="https://..."
+                                id="add-image"
+                                type="file"
+                                accept="image/jpeg,image/png,image/jpg,image/webp"
+                                onChange={(e) => {
+                                    const file = e.target.files?.[0] ?? null;
+                                    if (file && file.size > 2 * 1024 * 1024) {
+                                        alert('Ukuran gambar terlalu besar. Maksimal 2 MB.');
+                                        e.target.value = '';
+                                        return;
+                                    }
+                                    addForm.setData('image', file);
+                                    if (imagePreview) URL.revokeObjectURL(imagePreview);
+                                    setImagePreview(file ? URL.createObjectURL(file) : null);
+                                }}
                                 required
-                                className="border-green-200 focus-visible:border-green-500 focus-visible:ring-green-500/20"
+                                className="border-green-200 focus-visible:border-green-500 focus-visible:ring-green-500/20 file:mr-3 file:rounded-md file:border-0 file:bg-green-600 file:px-3 file:py-1 file:text-white file:hover:bg-green-700"
                             />
-                            {addForm.errors.image_url && (
-                                <p className="text-sm text-red-500">{addForm.errors.image_url}</p>
+                            {addForm.errors.image && (
+                                <p className="text-sm text-red-500">{addForm.errors.image}</p>
                             )}
-                            {addForm.data.image_url && (
+                            {imagePreview && (
                                 <img
-                                    src={addForm.data.image_url}
+                                    src={imagePreview}
                                     alt="preview"
                                     className="mt-1 h-20 rounded-md object-cover border border-green-100"
-                                    onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = 'none'; }}
                                 />
                             )}
                         </div>

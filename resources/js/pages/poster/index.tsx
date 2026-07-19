@@ -46,10 +46,13 @@ export default function KelolaPoster({ posters }: Props) {
     const [deleteError, setDeleteError] = useState<string | null>(null);
     const [editKey, setEditKey] = useState(0);
 
+    const [imagePreview, setImagePreview] = useState<string | null>(null);
+    const [editPreview, setEditPreview] = useState<string | null>(null);
+
     const addForm = useForm({
         title: '',
         tag: '',
-        image_url: '',
+        image: null as File | null,
         order: 0,
         is_published: true,
     });
@@ -58,6 +61,7 @@ export default function KelolaPoster({ posters }: Props) {
         title: '',
         tag: '',
         image_url: '',
+        image: null as File | null,
         order: 0,
         is_published: true,
     });
@@ -68,6 +72,8 @@ export default function KelolaPoster({ posters }: Props) {
             preserveScroll: true,
             onSuccess: () => {
                 setAddOpen(false);
+                if (imagePreview) URL.revokeObjectURL(imagePreview);
+                setImagePreview(null);
                 addForm.reset();
             },
         });
@@ -79,10 +85,13 @@ export default function KelolaPoster({ posters }: Props) {
             title: item.title,
             tag: item.tag || item.title,
             image_url: item.image_url,
+            image: null,
             order: item.order,
             is_published: item.is_published,
         });
         editForm.clearErrors();
+        if (editPreview) URL.revokeObjectURL(editPreview);
+        setEditPreview(null);
         setEditKey((k) => k + 1);
         setEditOpen(true);
     }
@@ -95,6 +104,8 @@ export default function KelolaPoster({ posters }: Props) {
             onSuccess: () => {
                 setEditOpen(false);
                 setEditingItem(null);
+                if (editPreview) URL.revokeObjectURL(editPreview);
+                setEditPreview(null);
             },
         });
     }
@@ -132,6 +143,8 @@ export default function KelolaPoster({ posters }: Props) {
                         onClick={() => {
                             addForm.reset();
                             addForm.clearErrors();
+                            if (imagePreview) URL.revokeObjectURL(imagePreview);
+                            setImagePreview(null);
                             setAddOpen(true);
                         }}
                         className="bg-green-600 text-white hover:bg-green-700"
@@ -253,25 +266,33 @@ export default function KelolaPoster({ posters }: Props) {
                             )}
                         </div>
                         <div className="grid gap-2">
-                            <Label htmlFor="add-image_url">URL Gambar</Label>
+                            <Label htmlFor="add-image">Gambar</Label>
                             <Input
-                                id="add-image_url"
-                                type="url"
-                                value={addForm.data.image_url}
-                                onChange={(e) => addForm.setData('image_url', e.target.value)}
-                                placeholder="https://..."
+                                id="add-image"
+                                type="file"
+                                accept="image/jpeg,image/png,image/jpg,image/webp"
+                                onChange={(e) => {
+                                    const file = e.target.files?.[0] ?? null;
+                                    if (file && file.size > 2 * 1024 * 1024) {
+                                        alert('Ukuran gambar terlalu besar. Maksimal 2 MB.');
+                                        e.target.value = '';
+                                        return;
+                                    }
+                                    addForm.setData('image', file);
+                                    if (imagePreview) URL.revokeObjectURL(imagePreview);
+                                    setImagePreview(file ? URL.createObjectURL(file) : null);
+                                }}
                                 required
-                                className="border-green-200 focus-visible:border-green-500 focus-visible:ring-green-500/20"
+                                className="border-green-200 focus-visible:border-green-500 focus-visible:ring-green-500/20 file:mr-3 file:rounded-md file:border-0 file:bg-green-600 file:px-3 file:py-1 file:text-white file:hover:bg-green-700"
                             />
-                            {addForm.errors.image_url && (
-                                <p className="text-sm text-red-500">{addForm.errors.image_url}</p>
+                            {addForm.errors.image && (
+                                <p className="text-sm text-red-500">{addForm.errors.image}</p>
                             )}
-                            {addForm.data.image_url && (
+                            {imagePreview && (
                                 <img
-                                    src={addForm.data.image_url}
+                                    src={imagePreview}
                                     alt="preview"
                                     className="mt-1 h-20 rounded-md object-cover border border-green-100"
-                                    onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = 'none'; }}
                                 />
                             )}
                         </div>
@@ -317,7 +338,13 @@ export default function KelolaPoster({ posters }: Props) {
                 </DialogContent>
             </Dialog>
 
-            <Dialog key={editKey} open={editOpen} onOpenChange={setEditOpen}>
+            <Dialog key={editKey} open={editOpen} onOpenChange={(open) => {
+                if (!open) {
+                    if (editPreview) URL.revokeObjectURL(editPreview);
+                    setEditPreview(null);
+                }
+                setEditOpen(open);
+            }}>
                 <DialogContent className="sm:max-w-lg">
                     <DialogHeader>
                         <DialogTitle>Edit Poster</DialogTitle>
@@ -344,24 +371,42 @@ export default function KelolaPoster({ posters }: Props) {
                             )}
                         </div>
                         <div className="grid gap-2">
-                            <Label htmlFor="edit-image_url">URL Gambar</Label>
-                            <Input
-                                id="edit-image_url"
-                                type="url"
-                                value={editForm.data.image_url}
-                                onChange={(e) => editForm.setData('image_url', e.target.value)}
-                                required
-                                className="border-green-200 focus-visible:border-green-500 focus-visible:ring-green-500/20"
-                            />
-                            {editForm.errors.image_url && (
-                                <p className="text-sm text-red-500">{editForm.errors.image_url}</p>
+                            {editingItem?.image_url && !editPreview && (
+                                <div>
+                                    <p className="mb-2 text-sm text-green-700">Gambar saat ini</p>
+                                    <img
+                                        src={editingItem.image_url}
+                                        alt="Current poster"
+                                        className="h-32 w-auto rounded-lg border border-green-100 object-contain"
+                                    />
+                                </div>
                             )}
-                            {editForm.data.image_url && (
+                            <Label htmlFor="edit-image">Ganti Gambar</Label>
+                            <Input
+                                id="edit-image"
+                                type="file"
+                                accept="image/jpeg,image/png,image/jpg,image/webp"
+                                onChange={(e) => {
+                                    const file = e.target.files?.[0] ?? null;
+                                    if (file && file.size > 2 * 1024 * 1024) {
+                                        alert('Ukuran gambar terlalu besar. Maksimal 2 MB.');
+                                        e.target.value = '';
+                                        return;
+                                    }
+                                    editForm.setData('image', file);
+                                    if (editPreview) URL.revokeObjectURL(editPreview);
+                                    setEditPreview(file ? URL.createObjectURL(file) : null);
+                                }}
+                                className="border-green-200 focus-visible:border-green-500 focus-visible:ring-green-500/20 file:mr-3 file:rounded-md file:border-0 file:bg-green-600 file:px-3 file:py-1 file:text-white file:hover:bg-green-700"
+                            />
+                            {editForm.errors.image && (
+                                <p className="text-sm text-red-500">{editForm.errors.image}</p>
+                            )}
+                            {editPreview && (
                                 <img
-                                    src={editForm.data.image_url}
+                                    src={editPreview}
                                     alt="preview"
                                     className="mt-1 h-20 rounded-md object-cover border border-green-100"
-                                    onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = 'none'; }}
                                 />
                             )}
                         </div>

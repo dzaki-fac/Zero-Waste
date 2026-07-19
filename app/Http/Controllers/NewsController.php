@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\News;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -23,11 +24,13 @@ class NewsController extends Controller
             'tag' => ['required', 'string', 'max:255'],
             'title' => ['required', 'string', 'max:255'],
             'date' => ['required', 'string', 'max:255'],
-            'image_url' => ['required', 'url', 'max:2048'],
+            'image' => ['required', 'image', 'mimes:jpeg,png,jpg,webp', 'max:2048'],
             'href' => ['required', 'url', 'max:2048'],
             'is_published' => ['boolean'],
             'order' => ['integer', 'min:0'],
         ]);
+
+        $validated['image_url'] = Storage::url($request->file('image')->store('images', 'public'));
 
         News::create($validated);
 
