@@ -13,24 +13,24 @@ pdfjs.GlobalWorkerOptions.workerSrc = new URL(
   import.meta.url
 ).toString();
 
-const SOP_FILE = "/documents/sop.pdf";
+const PERATURAN_FILE = "/documents/peraturan.pdf";
 
-export default function SOPPage() {
+export default function PeraturanPage() {
   const [numPages, setNumPages] = useState<number>(0);
   const [pageNumber, setPageNumber] = useState(1);
   const [scale, setScale] = useState(1.1);
 
   return (
     <div style={{ ...body, backgroundColor: C.paper50, color: C.ink900 }} className="min-h-screen flex flex-col">
-      <Navbar activeSection="sop" />
+      <Navbar activeSection="peraturan" />
       <section className="flex-1 max-w-6xl mx-auto px-5 sm:px-8 pt-8 sm:pt-10 pb-24 w-full">
         <Reveal>
           <div className="flex items-end justify-between mb-6 gap-4 flex-wrap">
             <h2 className="text-2xl sm:text-3xl font-semibold" style={{ ...display, color: C.navy900 }}>
-              SOP
+              Peraturan
             </h2>
             <a
-              href={SOP_FILE}
+              href={PERATURAN_FILE}
               download
               className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-wider px-4 py-2.5 rounded-md border transition-colors"
               style={{ ...body, color: C.navy900, borderColor: C.navy900 }}
@@ -44,7 +44,7 @@ export default function SOPPage() {
               }}
             >
               <Download size={14} />
-              Unduh SOP
+              Unduh Peraturan
             </a>
           </div>
         </Reveal>
@@ -106,7 +106,7 @@ export default function SOPPage() {
             {/* Halaman PDF */}
             <div className="flex justify-center py-10 overflow-x-auto" style={{ backgroundColor: "#E3E6EE" }}>
               <Document
-                file={SOP_FILE}
+                file={PERATURAN_FILE}
                 onLoadSuccess={({ numPages }) => setNumPages(numPages)}
                 loading={
                   <p className="text-sm py-20" style={{ ...body, color: C.ink500 }}>
@@ -115,7 +115,7 @@ export default function SOPPage() {
                 }
                 error={
                   <p className="text-sm py-20" style={{ ...body, color: C.ink500 }}>
-                    Gagal memuat dokumen SOP.
+                    Gagal memuat dokumen Peraturan.
                   </p>
                 }
               >
