@@ -41,7 +41,9 @@ class DistribusiController extends Controller
     {
         $nama = $request->user()->name;
 
-        if ($request->input('_redirect') === '/form') {
+        $redirect = $request->input('_redirect');
+
+        if (in_array($redirect, ['/form', '/admin'])) {
             $items = $request->input('items', []);
             $created = [];
 
@@ -67,14 +69,18 @@ class DistribusiController extends Controller
                 return back()->withErrors(['items' => 'Minimal isi berat pada 1 jenis sampah']);
             }
 
-            return redirect('/form/distribusi')->with('submitted', [
-                'nama' => $nama,
-                'tanggal' => $request->input('tanggal'),
-                'items' => $created,
-                'total_berat' => array_sum(array_column($created, 'berat')),
-                'tujuan_distribusi' => $request->input('tujuan_distribusi'),
-                'lokasi' => $request->input('lokasi'),
-            ]);
+            if ($redirect === '/form') {
+                return redirect('/form/distribusi')->with('submitted', [
+                    'nama' => $nama,
+                    'tanggal' => $request->input('tanggal'),
+                    'items' => $created,
+                    'total_berat' => array_sum(array_column($created, 'berat')),
+                    'tujuan_distribusi' => $request->input('tujuan_distribusi'),
+                    'lokasi' => $request->input('lokasi'),
+                ]);
+            }
+
+            return redirect()->route($this->routePrefix() . '.distribusi.index')->with('success', 'Data distribusi berhasil disimpan.');
         }
 
         $distribusi = Distribusi::create([

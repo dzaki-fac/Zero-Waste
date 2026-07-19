@@ -55,10 +55,10 @@ class DashboardController extends Controller
         $pilahByJenis = PilahSampah::visibleTo($user)
             ->when($startDate, fn ($q) => $q->where('tanggal', '>=', $startDate))
             ->when($endDate, fn ($q) => $q->where('tanggal', '<=', $endDate))
-            ->select('jenis_sampah', DB::raw('SUM(berat) as total'))
-            ->groupBy('jenis_sampah')
-            ->pluck('total', 'jenis_sampah')
-            ->map(fn ($total, $jenis) => ['name' => $jenis, 'value' => (float) $total])
+            ->select('subjenis_sampah', DB::raw('SUM(berat) as total'))
+            ->groupBy('subjenis_sampah')
+            ->pluck('total', 'subjenis_sampah')
+            ->map(fn ($total, $sub) => ['name' => $sub, 'value' => (float) $total])
             ->values()
             ->toArray();
 

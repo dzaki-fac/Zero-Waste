@@ -32,6 +32,6 @@ class KelolaDataController extends Controller
 
         OptionHelper::save($validated);
 
-        return redirect()->route('admin.kelola-data.index');
+        return redirect()->route('settings.index');
     }
 }

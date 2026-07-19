@@ -19,7 +19,7 @@ class PilahSampahRequest extends FormRequest
             'area' => ['nullable', Rule::in($area)],
         ];
 
-        if ($this->input('_redirect') === '/form') {
+        if (in_array($this->input('_redirect'), ['/form', '/admin'])) {
             $rules['items'] = ['required', 'array', 'min:1'];
             $rules['items.*.subjenis_sampah'] = ['required', Rule::in($subjenis)];
             $rules['items.*.berat'] = ['nullable', 'numeric', 'min:0'];

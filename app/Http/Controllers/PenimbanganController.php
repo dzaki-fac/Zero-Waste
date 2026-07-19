@@ -39,7 +39,9 @@ class PenimbanganController extends Controller
     {
         $nama = $request->user()->name;
 
-        if ($request->input('_redirect') === '/form') {
+        $redirect = $request->input('_redirect');
+
+        if (in_array($redirect, ['/form', '/admin'])) {
             $items = $request->input('items', []);
             $created = [];
 
@@ -61,16 +63,20 @@ class PenimbanganController extends Controller
             }
 
             if (empty($created)) {
-                return back()->withErrors(['items' => 'Minimal isi berat pada 1 subjenis sampah']);
+                return back()->withErrors(['items' => 'Minimal isi berat pada 1 jenis sampah']);
             }
 
-            return redirect('/form/penimbangan')->with('submitted', [
-                'nama' => $nama,
-                'tanggal' => $request->input('tanggal'),
-                'area' => $request->input('area'),
-                'items' => $created,
-                'total_berat' => array_sum(array_column($created, 'berat_sampah')),
-            ]);
+            if ($redirect === '/form') {
+                return redirect('/form/penimbangan')->with('submitted', [
+                    'nama' => $nama,
+                    'tanggal' => $request->input('tanggal'),
+                    'area' => $request->input('area'),
+                    'items' => $created,
+                    'total_berat' => array_sum(array_column($created, 'berat_sampah')),
+                ]);
+            }
+
+            return redirect()->route($this->routePrefix() . '.penimbangan.index')->with('success', 'Data penimbangan berhasil disimpan.');
         }
 
         $penimbangan = Penimbangan::create([

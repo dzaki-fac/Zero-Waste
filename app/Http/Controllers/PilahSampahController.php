@@ -39,7 +39,9 @@ class PilahSampahController extends Controller
     {
         $nama = $request->user()->name;
 
-        if ($request->input('_redirect') === '/form') {
+        $redirect = $request->input('_redirect');
+
+        if (in_array($redirect, ['/form', '/admin'])) {
             $items = $request->input('items', []);
             $created = [];
 
@@ -63,12 +65,16 @@ class PilahSampahController extends Controller
                 return back()->withErrors(['items' => 'Minimal isi berat pada 1 jenis sampah']);
             }
 
-            return redirect('/form/pilah-sampah')->with('submitted', [
-                'nama' => $nama,
-                'tanggal' => $request->input('tanggal'),
-                'items' => $created,
-                'total_berat' => array_sum(array_column($created, 'berat')),
-            ]);
+            if ($redirect === '/form') {
+                return redirect('/form/pilah-sampah')->with('submitted', [
+                    'nama' => $nama,
+                    'tanggal' => $request->input('tanggal'),
+                    'items' => $created,
+                    'total_berat' => array_sum(array_column($created, 'berat')),
+                ]);
+            }
+
+            return redirect()->route($this->routePrefix() . '.pilah-sampah.index')->with('success', 'Data pilah sampah berhasil disimpan.');
         }
 
         $pilahSampah = PilahSampah::create([

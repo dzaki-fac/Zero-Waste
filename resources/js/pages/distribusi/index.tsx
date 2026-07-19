@@ -448,7 +448,7 @@ export default function DistribusiIndex({ distribusi }: Props) {
                                                 <TableRow key={item.id} className="border-green-100">
                                                     <TableCell>{index + 1}</TableCell>
                                                     <TableCell className="font-medium">{item.nama}</TableCell>
-                                                    <TableCell>{new Date(item.tanggal).toLocaleString('id-ID', { day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' })}</TableCell>
+                                                    <TableCell>{new Date(item.tanggal).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })} {new Date(item.tanggal).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })}</TableCell>
                                                     <TableCell className="font-medium">
                                                         {Number(item.berat).toLocaleString('id-ID', { minimumFractionDigits: 2 })} kg
                                                     </TableCell>
