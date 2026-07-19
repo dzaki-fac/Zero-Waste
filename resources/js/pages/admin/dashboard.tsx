@@ -1,9 +1,9 @@
-import { Head, router, usePage } from '@inertiajs/react';
+import { Head, Link, router, usePage } from '@inertiajs/react';
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from 'recharts';
 import type { PieLabelRenderProps } from 'recharts';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Scale, Recycle, Truck, Users, CalendarIcon, Clock, Package, CheckCircle, ChevronLeft, ChevronRight, Send, Leaf } from 'lucide-react';
+import { Scale, Recycle, Truck, Users, CalendarIcon, Clock, Package, CheckCircle, ChevronLeft, ChevronRight, Send, Leaf, ClipboardCheck } from 'lucide-react';
 import { useState, useRef, useEffect } from 'react';
 import type { Auth } from '@/types';
 
@@ -74,6 +74,18 @@ type PageProps = {
         sudah_didistribusikan: number;
     };
     siapDidistribusikanByJenis: ChartData;
+    checklistStats: {
+        total: number;
+        selesai: number;
+        belum: number;
+        petugas: {
+            name: string;
+            nip: string;
+            total: number;
+            selesai: number;
+            belum: number;
+        }[];
+    } | null;
     filters: {
         start_date: string | null;
         end_date: string | null;
@@ -705,7 +717,7 @@ function DataDasarSummary({ dataDasar, rincianArea }: { dataDasar: DataDasarType
 }
 
 export default function Dashboard() {
-    const { dataDasar, rincianArea, penimbanganByArea, pilahByJenis, distribusiByTujuan, petugasStats, statusBerat, siapDidistribusikanByJenis, filters } = usePage<PageProps>().props;
+    const { dataDasar, rincianArea, penimbanganByArea, pilahByJenis, distribusiByTujuan, petugasStats, statusBerat, siapDidistribusikanByJenis, checklistStats, filters } = usePage<PageProps>().props;
 
     const siapSortedData = siapDidistribusikanByJenis.slice().sort((a, b) => b.value - a.value);
     const siapTotal = siapDidistribusikanByJenis.reduce((s, d) => s + d.value, 0);
@@ -1080,6 +1092,94 @@ export default function Dashboard() {
                         )}
                     </CardContent>
                 </Card>
+
+                {checklistStats && checklistStats.total > 0 && (
+                    <Card className="border-green-200">
+                        <CardHeader className="pb-2">
+                            <CardTitle className="flex items-center gap-2 text-base text-green-900">
+                                <ClipboardCheck className="size-5 text-green-600" />
+                                Checklist Pekerjaan
+                            </CardTitle>
+                            <p className="text-xs text-green-700">
+                                Rekap progres checklist pekerjaan petugas
+                            </p>
+                        </CardHeader>
+                        <CardContent>
+                            <div className="mb-4 flex items-center gap-6 rounded-lg border border-green-100 bg-green-50/40 p-4">
+                                <div className="text-center">
+                                    <p className="text-2xl font-bold text-green-900">{checklistStats.total}</p>
+                                    <p className="text-xs text-green-700">Total Tugas</p>
+                                </div>
+                                <div className="text-center">
+                                    <p className="text-2xl font-bold text-green-600">{checklistStats.selesai}</p>
+                                    <p className="text-xs text-green-700">Selesai</p>
+                                </div>
+                                <div className="text-center">
+                                    <p className="text-2xl font-bold text-red-500">{checklistStats.belum}</p>
+                                    <p className="text-xs text-green-700">Belum</p>
+                                </div>
+                                <div className="flex-1">
+                                    <div className="h-3 w-full overflow-hidden rounded-full bg-red-100">
+                                        {checklistStats.total > 0 && (
+                                            <div
+                                                className="h-full rounded-full bg-green-500 transition-all"
+                                                style={{ width: `${(checklistStats.selesai / checklistStats.total) * 100}%` }}
+                                            />
+                                        )}
+                                    </div>
+                                    <p className="mt-1 text-xs text-green-700">
+                                        {checklistStats.total > 0
+                                            ? `${((checklistStats.selesai / checklistStats.total) * 100).toFixed(1)}% selesai`
+                                            : 'Belum ada data'}
+                                    </p>
+                                </div>
+                            </div>
+
+                            {checklistStats.petugas.length > 0 && (
+                                <div className="overflow-x-auto">
+                                    <table className="w-full text-sm">
+                                        <thead>
+                                            <tr className="border-b border-green-100">
+                                                <th className="px-3 py-2 text-left text-xs font-semibold text-green-700">Petugas</th>
+                                                <th className="px-3 py-2 text-right text-xs font-semibold text-green-700">Total</th>
+                                                <th className="px-3 py-2 text-right text-xs font-semibold text-green-700">Selesai</th>
+                                                <th className="px-3 py-2 text-right text-xs font-semibold text-green-700">Belum</th>
+                                                <th className="px-3 py-2 text-right text-xs font-semibold text-green-700">Progres</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody className="divide-y divide-green-50">
+                                            {checklistStats.petugas
+                                                .slice()
+                                                .sort((a, b) => b.total - a.total)
+                                                .map((p) => {
+                                                    const pct = p.total > 0 ? (p.selesai / p.total) * 100 : 0;
+                                                    return (
+                                                        <tr key={p.nip} className="hover:bg-green-50/30">
+                                                            <td className="px-3 py-2 font-medium text-green-900">{p.name}</td>
+                                                            <td className="px-3 py-2 text-right tabular-nums text-green-800">{p.total}</td>
+                                                            <td className="px-3 py-2 text-right tabular-nums text-green-600">{p.selesai}</td>
+                                                            <td className="px-3 py-2 text-right tabular-nums text-red-500">{p.belum}</td>
+                                                            <td className="px-3 py-2 text-right">
+                                                                <div className="flex items-center justify-end gap-2">
+                                                                    <div className="h-2 w-24 overflow-hidden rounded-full bg-red-100">
+                                                                        <div
+                                                                            className="h-full rounded-full bg-green-500 transition-all"
+                                                                            style={{ width: `${pct}%` }}
+                                                                        />
+                                                                    </div>
+                                                                    <span className="text-xs tabular-nums text-green-700 w-10">{pct.toFixed(0)}%</span>
+                                                                </div>
+                                                            </td>
+                                                        </tr>
+                                                    );
+                                                })}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            )}
+                        </CardContent>
+                    </Card>
+                )}
             </div>
         </>
     );

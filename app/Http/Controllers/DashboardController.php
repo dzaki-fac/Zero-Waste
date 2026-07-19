@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Helpers\OptionHelper;
+use App\Models\ChecklistPekerjaan;
 use App\Models\DataDasar;
 use App\Models\Distribusi;
 use App\Models\Penimbangan;
@@ -142,6 +143,50 @@ class DashboardController extends Controller
 
         $dataDasar = DataDasar::where('user_id', auth()->id())->first();
 
+        $checklistStats = null;
+
+        if ($user->role === 'admin') {
+            $checklistBase = ChecklistPekerjaan::query();
+            if ($startDate) {
+                $checklistBase->where('tanggal', '>=', $startDate);
+            }
+            if ($endDate) {
+                $checklistBase->where('tanggal', '<=', $endDate);
+            }
+
+            $totalTugas = $checklistBase->clone()->count();
+            $totalSelesai = $checklistBase->clone()->where('status', 'sudah')->count();
+            $totalBelum = $totalTugas - $totalSelesai;
+
+            $petugasChecklist = User::where('role', 'petugas')
+                ->whereNotNull('nip')
+                ->where('nip', '!=', '')
+                ->get()
+                ->map(function ($petugas) use ($checklistBase) {
+                    $stats = $checklistBase->clone()
+                        ->where('nip', $petugas->nip)
+                        ->selectRaw('COUNT(*) as total, SUM(CASE WHEN status = ? THEN 1 ELSE 0 END) as selesai', ['sudah'])
+                        ->first();
+
+                    return [
+                        'name' => $petugas->name,
+                        'nip' => $petugas->nip,
+                        'total' => (int) ($stats->total ?? 0),
+                        'selesai' => (int) ($stats->selesai ?? 0),
+                        'belum' => (int) (($stats->total ?? 0) - ($stats->selesai ?? 0)),
+                    ];
+                })
+                ->filter(fn ($p) => $p['total'] > 0)
+                ->values();
+
+            $checklistStats = [
+                'total' => $totalTugas,
+                'selesai' => $totalSelesai,
+                'belum' => $totalBelum,
+                'petugas' => $petugasChecklist,
+            ];
+        }
+
         return Inertia::render('admin/dashboard', [
             'dataDasar' => $dataDasar,
             'rincianArea' => OptionHelper::get('rincian_area', []),
@@ -151,6 +196,7 @@ class DashboardController extends Controller
             'petugasStats' => $petugasStats,
             'statusBerat' => $statusBerat,
             'siapDidistribusikanByJenis' => $siapDidistribusikanByJenis,
+            'checklistStats' => $checklistStats,
             'filters' => [
                 'start_date' => $startDate,
                 'end_date' => $endDate,
