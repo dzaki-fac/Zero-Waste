@@ -24,6 +24,8 @@ class KelolaDataController extends Controller
             'area.*' => ['required', 'string', 'distinct'],
             'jenis_sampah' => ['required', 'array', 'min:1'],
             'jenis_sampah.*' => ['required', 'string', 'distinct'],
+            'subjenis_sampah' => ['required', 'array', 'min:1'],
+            'subjenis_sampah.*' => ['required', 'string', 'distinct'],
             'tujuan_distribusi' => ['required', 'array', 'min:1'],
             'tujuan_distribusi.*' => ['required', 'string', 'distinct'],
             'rincian_area' => ['required', 'array', 'min:1'],

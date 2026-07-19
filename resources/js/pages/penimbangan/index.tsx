@@ -26,6 +26,8 @@ type Penimbangan = {
     nama: string;
     tanggal: string;
     berat_sampah: string;
+    jenis_sampah: string | null;
+    subjenis_sampah: string | null;
     area: string;
 };
 
@@ -307,6 +309,7 @@ export default function PenimbanganIndex({ penimbangan }: Props) {
                                         <TableHead className="text-green-700">Nama</TableHead>
                                         <TableHead className="text-green-700">Tanggal</TableHead>
                                         <TableHead className="text-green-700">Berat (kg)</TableHead>
+                                        <TableHead className="text-green-700">Jenis</TableHead>
                                         <TableHead className="text-green-700">Area</TableHead>
                                         <TableHead className="text-right text-green-700">Aksi</TableHead>
                                     </TableRow>
@@ -314,7 +317,7 @@ export default function PenimbanganIndex({ penimbangan }: Props) {
                                 <TableBody>
                                     {filtered.length === 0 ? (
                                         <TableRow>
-                                                <TableCell colSpan={6} className="text-center text-green-600/70">
+                                                <TableCell colSpan={7} className="text-center text-green-600/70">
                                                 Tidak ada data yang cocok.
                                             </TableCell>
                                         </TableRow>
@@ -323,9 +326,14 @@ export default function PenimbanganIndex({ penimbangan }: Props) {
                                             <TableRow key={item.id} className="border-green-100">
                                                 <TableCell>{index + 1}</TableCell>
                                                 <TableCell className="font-medium">{item.nama}</TableCell>
-                                                <TableCell>{new Date(item.tanggal).toLocaleString('id-ID', { day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' })}</TableCell>
+                                                <TableCell>{new Date(item.tanggal).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })} {new Date(item.tanggal).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })}</TableCell>
                                                 <TableCell className="font-medium">
                                                     {Number(item.berat_sampah).toLocaleString('id-ID', { minimumFractionDigits: 2 })} kg
+                                                </TableCell>
+                                                <TableCell>
+                                                    <span className="inline-flex items-center rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-medium text-green-700">
+                                                        {item.jenis_sampah ?? item.subjenis_sampah ?? '-'}
+                                                    </span>
                                                 </TableCell>
                                                 <TableCell>
                                                     <span className="inline-flex items-center rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-medium text-green-700">

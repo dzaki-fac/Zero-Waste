@@ -18,13 +18,15 @@ type PilahSampah = {
     id: number;
     nama: string;
     tanggal: string;
+    area: string | null;
     berat: string;
-    jenis_sampah: string;
+    jenis_sampah: string | null;
+    subjenis_sampah: string | null;
 };
 
 type Options = {
     area: string[];
-    jenis_sampah: string[];
+    subjenis_sampah: string[];
     tujuan_distribusi: string[];
 };
 
@@ -45,7 +47,7 @@ export default function PilahSampahEdit({ pilahSampah }: Props) {
         nama: pilahSampah.nama,
         tanggal: initialTanggal,
         berat: pilahSampah.berat,
-        jenis_sampah: pilahSampah.jenis_sampah,
+        subjenis_sampah: pilahSampah.subjenis_sampah ?? pilahSampah.jenis_sampah ?? '',
     });
 
     const handleSubmit = (e: React.FormEvent) => {
@@ -110,18 +112,18 @@ export default function PilahSampahEdit({ pilahSampah }: Props) {
                         </div>
 
                         <div className="grid gap-2">
-                            <Label htmlFor="jenis_sampah" className="text-green-700">Jenis Sampah</Label>
-                            <Select name="jenis_sampah" value={data.jenis_sampah} onValueChange={(v) => setData('jenis_sampah', v)}>
+                            <Label htmlFor="subjenis_sampah" className="text-green-700">Subjenis Sampah</Label>
+                            <Select name="subjenis_sampah" value={data.subjenis_sampah} onValueChange={(v) => setData('subjenis_sampah', v)}>
                                 <SelectTrigger className="w-full border-green-200 focus-visible:border-green-500 focus-visible:ring-green-500/20">
-                                    <SelectValue placeholder="Pilih jenis sampah" />
+                                    <SelectValue placeholder="Pilih subjenis" />
                                 </SelectTrigger>
                                 <SelectContent>
-                                    {options.jenis_sampah.map((opt) => (
+                                    {options.subjenis_sampah.map((opt) => (
                                         <SelectItem key={opt} value={opt}>{opt}</SelectItem>
                                     ))}
                                 </SelectContent>
                             </Select>
-                            <InputError message={errors.jenis_sampah} />
+                            <InputError message={errors.subjenis_sampah} />
                         </div>
 
                         <div className="flex items-center gap-3 pt-2">

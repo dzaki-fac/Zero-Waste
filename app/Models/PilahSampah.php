@@ -18,8 +18,10 @@ class PilahSampah extends Model
     protected $fillable = [
         'nama',
         'tanggal',
+        'area',
         'berat',
         'jenis_sampah',
+        'subjenis_sampah',
         'user_id',
     ];
 

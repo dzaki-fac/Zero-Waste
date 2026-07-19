@@ -39,7 +39,9 @@ class PilahSampahController extends Controller
     {
         $nama = $request->user()->name;
 
-        if ($request->input('_redirect') === '/form') {
+        $redirect = $request->input('_redirect');
+
+        if (in_array($redirect, ['/form', '/admin'])) {
             $items = $request->input('items', []);
             $created = [];
 
@@ -52,7 +54,7 @@ class PilahSampahController extends Controller
                 $pilahSampah = PilahSampah::create([
                     'nama' => $nama,
                     'tanggal' => $request->input('tanggal'),
-                    'jenis_sampah' => $item['jenis_sampah'],
+                    'subjenis_sampah' => $item['subjenis_sampah'],
                     'berat' => $berat,
                     'user_id' => auth()->id(),
                 ]);
@@ -63,12 +65,16 @@ class PilahSampahController extends Controller
                 return back()->withErrors(['items' => 'Minimal isi berat pada 1 jenis sampah']);
             }
 
-            return redirect('/form/pilah-sampah')->with('submitted', [
-                'nama' => $nama,
-                'tanggal' => $request->input('tanggal'),
-                'items' => $created,
-                'total_berat' => array_sum(array_column($created, 'berat')),
-            ]);
+            if ($redirect === '/form') {
+                return redirect('/form/pilah-sampah')->with('submitted', [
+                    'nama' => $nama,
+                    'tanggal' => $request->input('tanggal'),
+                    'items' => $created,
+                    'total_berat' => array_sum(array_column($created, 'berat')),
+                ]);
+            }
+
+            return redirect()->route($this->routePrefix() . '.pilah-sampah.index')->with('success', 'Data pilah sampah berhasil disimpan.');
         }
 
         $pilahSampah = PilahSampah::create([
@@ -116,7 +122,7 @@ class PilahSampahController extends Controller
 
         $filename = 'pilah_sampah_' . now()->toDateString() . '.csv';
 
-        $headers = ['No', 'Nama', 'Tanggal', 'Berat (kg)', 'Jenis Sampah'];
+        $headers = ['No', 'Nama', 'Tanggal', 'Berat (kg)', 'Subjenis'];
 
         $callback = function () use ($records, $headers) {
             $file = fopen('php://output', 'w');
@@ -130,7 +136,7 @@ class PilahSampahController extends Controller
                     $record->nama,
                     $record->tanggal,
                     $record->berat,
-                    $record->jenis_sampah,
+                    $record->subjenis_sampah ?? '-',
                 ]);
             }
 

@@ -10,7 +10,7 @@ class DistribusiRequest extends FormRequest
 {
     public function rules(): array
     {
-        $jenisSampah = OptionHelper::get('jenis_sampah');
+        $subjenis = OptionHelper::get('subjenis_sampah');
         $tujuanDistribusi = OptionHelper::get('tujuan_distribusi');
 
         $rules = [
@@ -20,13 +20,13 @@ class DistribusiRequest extends FormRequest
             'lokasi' => ['required', 'string', 'max:255'],
         ];
 
-        if ($this->input('_redirect') === '/form') {
+        if (in_array($this->input('_redirect'), ['/form', '/admin'])) {
             $rules['items'] = ['required', 'array', 'min:1'];
-            $rules['items.*.jenis_sampah'] = ['required', Rule::in($jenisSampah)];
+            $rules['items.*.subjenis_sampah'] = ['required', Rule::in($subjenis)];
             $rules['items.*.berat'] = ['nullable', 'numeric', 'min:0'];
         } else {
             $rules['berat'] = ['required', 'numeric', 'min:0'];
-            $rules['jenis_sampah'] = ['required', Rule::in($jenisSampah)];
+            $rules['jenis_sampah'] = ['required', Rule::in($subjenis)];
             $rules['tujuan_distribusi'][] = Rule::in($tujuanDistribusi);
         }
 

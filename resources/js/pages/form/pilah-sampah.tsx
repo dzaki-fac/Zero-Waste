@@ -4,15 +4,15 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Head, Link, router, useForm, usePage } from '@inertiajs/react';
-import { ArrowLeft, Send, Calendar, Weight, User, Trash2, CheckCircle2 } from 'lucide-react';
+import { ArrowLeft, Send, Calendar, User, Trash2, CheckCircle2 } from 'lucide-react';
 import {
     Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle,
 } from '@/components/ui/dialog';
 import { useEffect, useState } from 'react';
 
 type Options = {
-    area: Array<{ value: string; label: string; icon: string }>;
-    jenis_sampah: string[];
+    area: string[];
+    subjenis_sampah: string[];
     tujuan_distribusi: string[];
 };
 
@@ -23,12 +23,12 @@ export default function FormPilahSampah() {
         options: Options;
     };
 
-    const jenisSampahOptions = options.jenis_sampah;
+    const subjenisOptions = options.subjenis_sampah;
     const { data, setData, post, processing, errors } = useForm({
         _redirect: '/form',
         nama: auth.user.name,
         tanggal: new Date(Date.now() - new Date().getTimezoneOffset() * 60000).toISOString().slice(0, 16),
-        items: jenisSampahOptions.map((jenis) => ({ jenis_sampah: jenis, berat: '' })),
+        items: subjenisOptions.map((sub) => ({ subjenis_sampah: sub, berat: '' })),
     });
 
     const [showSuccess, setShowSuccess] = useState(false);
@@ -41,16 +41,11 @@ export default function FormPilahSampah() {
     const totalBerat = data.items.reduce((sum, item) => sum + (parseFloat(item.berat) || 0), 0);
     const filledCount = data.items.filter((item) => parseFloat(item.berat) > 0).length;
 
-    const scrollTo = (id: string) => {
-        document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    };
-
-const handleSubmit = (e: React.FormEvent) => {
+    const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
         const filledCount = data.items.filter((item) => parseFloat(item.berat) > 0).length;
         if (!filledCount) {
-            setSubmitError('Minimal isi berat pada 1 jenis sampah');
-            scrollTo('section-jenis-berat');
+            setSubmitError('Minimal isi berat pada 1 subjenis sampah');
             return;
         }
         setSubmitError('');
@@ -65,13 +60,13 @@ const handleSubmit = (e: React.FormEvent) => {
 
     return (
         <>
-            <Head title="Tambah Pilah Sampah" />
+            <Head title="Pencatatan Pilah Sampah" />
 
             <div className="mx-auto flex min-h-dvh w-full max-w-lg flex-col bg-linear-to-b from-green-50/50 to-white">
                 <div className="flex-1 px-4 pb-36 pt-6">
                     <Heading
-                        title="Tambah Pilah Sampah"
-                        description="Isi berat pada jenis sampah yang akan dicatat"
+                        title="Pencatatan Pilah Sampah"
+                        description="Isi berat pada subjenis sampah yang dipilah"
                     />
 
                     <form onSubmit={handleSubmit} className="mt-6 space-y-6" noValidate>
@@ -103,7 +98,7 @@ const handleSubmit = (e: React.FormEvent) => {
 
                             <div className="grid gap-2">
                                 <Label htmlFor="tanggal" className="text-xs font-medium text-gray-600">Tanggal & Waktu</Label>
-                                <div className="grid grid-cols-2 gap-3">
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                                     <div>
                                         <Input
                                             id="tanggal_date"
@@ -138,14 +133,14 @@ const handleSubmit = (e: React.FormEvent) => {
                         <div id="section-jenis-berat" className="rounded-2xl border border-green-100 bg-white p-5 shadow-sm">
                             <div className="mb-4 flex items-center gap-2 text-sm font-medium text-green-700">
                                 <Trash2 className="h-4 w-4" />
-                                Jenis & Berat Sampah
+                                Subjenis & Berat Sampah
                             </div>
-                            <p className="-mt-2 mb-3 text-xs text-gray-500">Isi berat pada minimal 1 jenis sampah (boleh lebih dari satu)</p>
+                            <p className="-mt-2 mb-3 text-xs text-gray-500">Isi berat pada minimal 1 subjenis sampah (boleh lebih dari satu)</p>
 
                             <div className="divide-y divide-green-100 rounded-xl border border-green-100 overflow-hidden">
                                 {data.items.map((item, i) => (
-                                    <div key={item.jenis_sampah} className="flex items-center gap-3 px-4 py-2.5 bg-white even:bg-green-50/30">
-                                        <span className="min-w-0 flex-1 text-sm font-medium text-gray-700">{item.jenis_sampah}</span>
+                                    <div key={item.subjenis_sampah} className="flex items-center gap-3 px-4 py-2.5 bg-white even:bg-green-50/30">
+                                        <span className="min-w-0 flex-1 text-sm font-medium text-gray-700">{item.subjenis_sampah}</span>
                                         <div className="relative w-32 shrink-0">
                                             <Input
                                                 type="number"
@@ -236,7 +231,7 @@ const handleSubmit = (e: React.FormEvent) => {
 
                         {submittedItems?.map((item, i) => (
                             <div key={i} className="flex items-center justify-between px-4 py-2 text-sm">
-                                <span className="text-gray-500">{item.jenis_sampah as string}</span>
+                                <span className="text-gray-500">{item.subjenis_sampah as string}</span>
                                 <span className="font-medium text-gray-800">{Number(item.berat).toFixed(2)} kg</span>
                             </div>
                         ))}
