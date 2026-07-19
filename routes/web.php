@@ -7,8 +7,10 @@ use App\Http\Controllers\DistribusiController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\KelolaDataController;
 use App\Http\Controllers\MasterPekerjaanController;
+use App\Http\Controllers\NewsController;
 use App\Http\Controllers\PenimbanganController;
 use App\Http\Controllers\PilahSampahController;
+use App\Http\Controllers\PosterController;
 use App\Http\Middleware\CheckRole;
 use Illuminate\Support\Facades\Route;
 
@@ -65,6 +67,16 @@ Route::middleware(['auth', CheckRole::class . ':admin'])
             ->only(['index', 'store', 'update', 'destroy'])
             ->parameters(['kelola-pekerjaan' => 'masterPekerjaan'])
             ->names('kelola-pekerjaan');
+
+        Route::resource('berita', NewsController::class)
+            ->only(['index', 'store', 'update', 'destroy'])
+            ->parameters(['berita' => 'news'])
+            ->names('berita');
+
+        Route::resource('poster', PosterController::class)
+            ->only(['index', 'store', 'update', 'destroy'])
+            ->parameters(['poster' => 'poster'])
+            ->names('poster');
 
         Route::get('data-dasar', [DataDasarController::class, 'index'])->name('data-dasar.index');
         Route::post('data-dasar', [DataDasarController::class, 'update'])->name('data-dasar.update');

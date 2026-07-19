@@ -127,98 +127,12 @@ const MENU_DECK = [
   },
 ];
 
-const NEWS = [
-  {
-    tag: "UNDIP",
-    date: "04 Apr 2026",
-    title: "K3L Sosialisasikan Pemilahan Sampah Residu di TPST Kampus UNDIP",
-    image:
-      "https://i.ytimg.com/vi/ne1zRy1AOOM/hq720.jpg?sqp=-oaymwEhCK4FEIIDSFryq4qpAxMIARUAAAAAGAElAADIQj0AgKJD&rs=AOn4CLDjk6kykjZwKXx6RaQdlDsDhyqU6g",
-    href: "https://kemdiktisaintek.go.id/news/article/implementasi-undip-zero-waste-k3l-sosialisasikan-pemilahan-sampah-residu",
-  },
-  {
-    tag: "UNDIP",
-    date: "Jun 2026",
-    title: "SV Zero Discharge: Langkah Strategis Sekolah Vokasi UNDIP",
-    image:
-      "https://undip.ac.id/wp-content/uploads/2026/06/1-ezgif.com-jpg-to-webp-converter-5.webp",
-    href: "https://undip.ac.id/post/57036/sv-zero-discharge-langkah-strategis-sekolah-vokasi-undip-menuju-kampus-berkelanjutan-berkelas-dunia.html",
-  },
-  {
-    tag: "Nasional",
-    date: "15 Jul 2026",
-    title: "UI Gandeng BRIN dan Industri Kembangkan Model Zero Waste",
-    image:
-      "https://apakabar.co.id/uploads/2026/07/post_6a50fe5d0bca19.37943188.jpg",
-    href: "https://www.kompas.com/edu/read/2026/07/15/101720771/gaet-brin-dan-industri-ui-kembangkan-pengolahan-sampah-model-zero-waste",
-  },
-  {
-    tag: "Nasional",
-    date: "08 Jun 2026",
-    title: "UMS Galakkan Zero Waste, Ikhtiar Kurangi Sampah Plastik",
-    image:
-      "https://www.ums.ac.id/__gambars__/uploads/LGWtScdV89eyA9wyzMSIiMvhQvXmDrUOe0ZY6B0Y.webp",
-    href: "https://jateng.antaranews.com/berita/634320/ums-galakkan-zero-waste-ikhtiar-kurangi-sampah-plastik",
-  },
-  {
-    tag: "Nasional",
-    date: "awal Jul 2026",
-    title: "UNJ Resmikan TPST dan Waste Management Center",
-    image:
-      "https://cdn2.timesmedia.co.id/cdn-times/uploads/assets/2026/07/01/unj-resmikan-tpst-dan-waste-management-center-untuk-perkuat-komitmen-menuju-kamp-x9mo7260.webp?v=7.0.0#",
-    href: "https://times.co.id/unj-resmikan-tpst-dan-waste-management-center-untuk-perkuat-komitmen-menuju-kampus-zero-waste",
-  },
-];
-
-const POSTERS = [
-  {
-    title: "Pilah dari Sumbernya",
-    tag: "Dasar",
-    note: "Kenapa pemilahan harus dimulai dari tiap sub-area, bukan di akhir.",
-    image:
-      "https://images.unsplash.com/photo-1532996122724-e3c354a0b15b?auto=format&fit=crop&w=1200&q=80",
-  },
-  {
-    title: "Ranting: Besar vs Kecil",
-    tag: "Organik",
-    note: "Ranting besar dicatat sebagai aset, ranting kecil dikembalikan ke tanah.",
-    image:
-      "https://images.unsplash.com/photo-1416879595882-3373a0480b5b?auto=format&fit=crop&w=1200&q=80",
-  },
-  {
-    title: "Sisa Makanan Jadi Kompos",
-    tag: "Organik",
-    note: "Jejak sisa makanan dari area baca sampai kantor, diolah jadi kompos.",
-    image:
-      "https://images.pexels.com/photos/5479034/pexels-photo-5479034.jpeg",
-  },
-  {
-    title: "Plastik & Styrofoam",
-    tag: "Anorganik",
-    note: "Pemisahan plastik berwarna dan bening, serta penanganan styrofoam.",
-    image:
-      "https://images.unsplash.com/photo-1611284446314-60a58ac0deb9?auto=format&fit=crop&w=1200&q=80",
-  },
-  {
-    title: "Kardus & Kertas",
-    tag: "Daur Ulang",
-    note: "Dirajang atau disalurkan jadi karya kreativitas, sebelum ke TPS.",
-    image:
-      "https://images.unsplash.com/photo-1595278069441-2cf29f8005a4?auto=format&fit=crop&w=1200&q=80",
-  },
-  {
-    title: "Distribusi Akhir",
-    tag: "Alur",
-    note: "Ke TPS, ditimbun jadi pupuk, atau disetor lewat Plasticpay.",
-    image:
-      "https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?auto=format&fit=crop&w=1200&q=80",
-  },
-];
-
 // Dua salinan berita digabung biar carousel-nya bisa looping mulus tanpa
 // "lompat" kelihatan — begitu geser sejauh satu set pertama, posisinya
 // digeser balik ke awal set (bukan direset ke 0), jadi mulus.
-const NEWS_LOOP = [...NEWS, ...NEWS];
+function makeNewsLoop(news: NewsItem[]): NewsItem[] {
+  return [...news, ...news];
+}
 
 const SOCIALS = [
   { icon: Globe, label: "Website Resmi", href: "https://digilib.undip.ac.id/" },
@@ -391,7 +305,30 @@ function formatDateInput(d: Date): string {
     return d.toISOString().split('T')[0];
 }
 
+type NewsItem = {
+    id: number;
+    tag: string;
+    date: string;
+    title: string;
+    image: string;
+    href: string;
+    is_published: boolean;
+    order: number;
+};
+
+type PosterItem = {
+    id: number;
+    title: string;
+    tag: string;
+    note: string | null;
+    image: string;
+    order: number;
+    is_published: boolean;
+};
+
 type PageProps = {
+    news: NewsItem[];
+    posters: PosterItem[];
     penimbanganByArea: ChartData;
     pilahByJenis: ChartData;
     distribusiByTujuan: ChartData;
@@ -573,7 +510,14 @@ function LaporanCharts({ data }: { data: PageProps }) {
 }
 
 export default function Dashboard() {
-    const pageProps = usePage().props as unknown as PageProps;
+    const rawProps = usePage().props as unknown as Record<string, unknown>;
+    const rawNews = (rawProps.news as Array<Record<string, unknown>>) || [];
+    const rawPosters = (rawProps.posters as Array<Record<string, unknown>>) || [];
+    const news: NewsItem[] = rawNews.map((n) => ({ id: n.id as number, tag: n.tag as string, date: n.date as string, title: n.title as string, image: n.image_url as string, href: n.href as string, is_published: n.is_published as boolean, order: n.order as number }));
+    const posters: PosterItem[] = rawPosters.map((p) => ({ id: p.id as number, title: p.title as string, tag: p.tag as string, note: p.note as string | null, image: p.image_url as string, order: p.order as number, is_published: p.is_published as boolean }));
+    const pageProps = rawProps as unknown as PageProps;
+    const NEWS_LOOP = makeNewsLoop(news);
+    const POSTERS = posters;
     const [activePreset, setActivePreset] = useState<PresetKey>('all');
     const [startDate, setStartDate] = useState(pageProps.filters?.start_date ?? '');
     const [endDate, setEndDate] = useState(pageProps.filters?.end_date ?? '');
@@ -984,6 +928,7 @@ export default function Dashboard() {
 
       {/* ---- Berita ---- */}
       <section id="berita" ref={setSectionRef("berita")} className="pt-6 sm:pt-8" style={{ backgroundColor: C.navy900, scrollMarginTop: 64 }}>
+        {news.length > 0 ? (
         <div className="max-w-6xl mx-auto px-5 sm:px-8 pb-12">
           <Reveal>
             <div className="flex items-end justify-between flex-wrap gap-3 mb-8">
@@ -1013,7 +958,7 @@ export default function Dashboard() {
           >
             <div ref={newsTrackRef} className="flex gap-5 pb-2" style={{ willChange: "transform" }}>
               {NEWS_LOOP.map((n, i) => (
-                <Reveal key={i} delay={(i % NEWS.length) * 80} className="shrink-0 w-64 sm:w-72">
+                <Reveal key={i} delay={(i % news.length) * 80} className="shrink-0 w-64 sm:w-72">
                   <a
                     href={n.href}
                     target="_blank"
@@ -1048,10 +993,17 @@ export default function Dashboard() {
             </div>
           </div>
         </div>
+        ) : (
+          <div className="max-w-6xl mx-auto px-5 sm:px-8 py-12 text-center">
+            <p className="text-sm" style={{ color: "#8A8FB3" }}>Belum ada berita.</p>
+          </div>
+        )}
       </section>
 
       {/* ---- Edukasi: poster slideshow ---- */}
       <section id="edukasi" ref={setSectionRef("edukasi")} className="max-w-6xl mx-auto px-5 sm:px-8 pt-6 sm:pt-8 pb-20" style={{ scrollMarginTop: 64 }}>
+        {posters.length > 0 ? (
+        <>
         <Reveal>
           <h2 className="text-2xl sm:text-3xl font-semibold mb-2" style={{ ...display, color: C.navy900 }}>
             Poster Edukasi
@@ -1074,7 +1026,10 @@ export default function Dashboard() {
               </span>
             </div>
 
-            {/* Frame poster — rasio A3 vertikal (297 x 420), gambar dipusatkan */}
+            {/* Frame poster — rasio A3 vertikal (297 x 420), gambar dipusatkan.
+                Sengaja tidak ada overlay teks di atas gambar (judul/catatan),
+                supaya posternya kelihatan bersih & jelas. Tag di atas frame
+                (di luar gambar) sudah cukup jadi label. */}
             <div
               className="mx-auto rounded-2xl overflow-hidden relative mb-3"
               style={{ aspectRatio: "297 / 420", width: "min(100%, 420px)", backgroundColor: C.navy050 }}
@@ -1087,15 +1042,6 @@ export default function Dashboard() {
                 className="w-full h-full object-cover"
                 style={{ objectPosition: "center 65%" }}
               />
-              <div
-                className="absolute inset-0 flex flex-col items-center justify-end text-center px-6 py-8"
-                style={{ background: "linear-gradient(0deg, rgba(10,20,64,0.88) 15%, rgba(10,20,64,0.05) 65%)" }}
-              >
-                <h3 className="text-white text-xl sm:text-2xl font-semibold mb-2" style={display}>
-                  {activePoster.title}
-                </h3>
-                <p className="text-sm max-w-md" style={{ color: "#D6D9EC" }}>{activePoster.note}</p>
-              </div>
             </div>
 
             <div className="flex items-center justify-between mb-4">
@@ -1164,6 +1110,12 @@ export default function Dashboard() {
             </div>
           </div>
         </Reveal>
+        </>
+        ) : (
+          <div className="py-12 text-center">
+            <p className="text-sm" style={{ color: C.ink500 }}>Belum ada poster edukasi.</p>
+          </div>
+        )}
       </section>
 
       {/* ---- Footer ---- */}
