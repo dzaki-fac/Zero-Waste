@@ -6,14 +6,12 @@ use App\Models\KelolaData;
 
 class OptionHelper
 {
-    private static ?array $cache = null;
-
     private static function defaults(): array
     {
         return [
             'area' => [
                 'Lantai 1', 'Lantai 2', 'Lantai 3', 'Lantai 4',
-                'Area Teras', 'Area Halaman', 'Area Parkir',
+                'Area Teras', 'Area Halaman', 'Area Parkir', 'UNDIP Press',
             ],
             'jenis_sampah' => [
                 'Daun', 'Ranting besar', 'Ranting kecil', 'Sisa makanan',
@@ -38,19 +36,13 @@ class OptionHelper
 
     public static function all(): array
     {
-        if (self::$cache !== null) {
-            return self::$cache;
-        }
-
         $rows = KelolaData::all()->keyBy('key');
 
         if ($rows->isNotEmpty()) {
-            self::$cache = $rows->map(fn ($r) => $r->value)->toArray();
-            return self::$cache;
+            return $rows->map(fn ($r) => $r->value)->toArray();
         }
 
-        self::$cache = self::defaults();
-        return self::$cache;
+        return self::defaults();
     }
 
     public static function get(string $key, mixed $default = []): mixed
@@ -63,11 +55,5 @@ class OptionHelper
         foreach ($data as $key => $value) {
             KelolaData::updateOrCreate(['key' => $key], ['value' => $value]);
         }
-        self::$cache = $data;
-    }
-
-    public static function flush(): void
-    {
-        self::$cache = null;
     }
 }

@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { Head, useForm } from '@inertiajs/react';
 import { CheckCircle2, Edit3, FileDown, Leaf, MapPin, Save, X } from 'lucide-react';
 import Heading from '@/components/heading';
@@ -99,16 +99,7 @@ export default function DataDasarIndex({ dataDasar, rincianArea: rincianAreaProp
         rincian_area: [] as RincianAreaDetail[],
     });
 
-    const [rincianArea, setRincianArea] = useState<RincianAreaDetail[]>(
-        rincianAreaProp ?? [],
-    );
-
-    useEffect(() => {
-        if (rincianAreaProp) {
-            setRincianArea(rincianAreaProp);
-            setData('rincian_area', rincianAreaProp);
-        }
-    }, [rincianAreaProp]);
+    const [rincianArea, setRincianArea] = useState<RincianAreaDetail[]>([]);
 
     const jumlahMahasiswa = Number(data.jumlah_mahasiswa || 0);
     const jumlahDosen = Number(data.jumlah_dosen || 0);
@@ -165,6 +156,14 @@ export default function DataDasarIndex({ dataDasar, rincianArea: rincianAreaProp
             'data-dasar-form',
         ) as HTMLFormElement | null;
         form?.requestSubmit();
+    };
+
+    const enterEditMode = () => {
+        if (rincianAreaProp) {
+            setRincianArea(rincianAreaProp);
+            setData('rincian_area', rincianAreaProp);
+        }
+        setIsEditing(true);
     };
 
     const handleCancel = () => {
@@ -241,7 +240,7 @@ export default function DataDasarIndex({ dataDasar, rincianArea: rincianAreaProp
                                 )}
                                 <Button
                                     type="button"
-                                    onClick={() => setIsEditing(true)}
+                                    onClick={enterEditMode}
                                     className="bg-green-600 hover:bg-green-700"
                                 >
                                     <Edit3 className="h-4 w-4" />
@@ -767,7 +766,7 @@ export default function DataDasarIndex({ dataDasar, rincianArea: rincianAreaProp
                             </h4>
                         </div>
 
-                        {(rincianArea ?? []).map((item, i) => (
+                        {(isEditing ? rincianArea : (rincianAreaProp ?? [])).map((item, i) => (
                             <div
                                 key={item.nama}
                                 className="grid grid-cols-1 gap-2 px-6 py-3 sm:grid-cols-3 sm:items-center sm:gap-4"
@@ -825,7 +824,7 @@ export default function DataDasarIndex({ dataDasar, rincianArea: rincianAreaProp
                             </dd>
                             <dd>
                                 <span className="text-sm font-semibold tabular-nums text-green-900">
-                                    {(rincianArea ?? []).reduce(
+                                    {(isEditing ? rincianArea : (rincianAreaProp ?? [])).reduce(
                                         (sum, item) =>
                                             sum + (Number(item.luas) || 0),
                                         0,

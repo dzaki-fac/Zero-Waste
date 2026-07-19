@@ -1,5 +1,5 @@
 import { Head, router, usePage } from '@inertiajs/react';
-import { Plus, X } from 'lucide-react';
+import { CheckCircle, Plus, X } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import Heading from '@/components/heading';
 import { Button } from '@/components/ui/button';
@@ -22,9 +22,10 @@ type Options = {
     rincian_area: RincianArea[];
 };
 
-type ListKey = 'jenis_sampah' | 'tujuan_distribusi';
+type ListKey = 'area' | 'jenis_sampah' | 'tujuan_distribusi';
 
 const sections: { key: ListKey; label: string; title: string; placeholder: string }[] = [
+    { key: 'area', label: 'Area', title: 'Tambah Area', placeholder: 'Masukkan nama area' },
     { key: 'jenis_sampah', label: 'Jenis Sampah', title: 'Tambah Jenis Sampah', placeholder: 'Masukkan nama jenis sampah' },
     { key: 'tujuan_distribusi', label: 'Tujuan Distribusi', title: 'Tambah Tujuan Distribusi', placeholder: 'Masukkan nama tujuan distribusi' },
 ];
@@ -35,20 +36,39 @@ export default function Settings() {
         success?: string;
     };
 
-    const [activeKey, setActiveKey] = useState<ListKey>('jenis_sampah');
+    const [activeKey, setActiveKey] = useState<ListKey>('area');
     const [dialogOpen, setDialogOpen] = useState(false);
     const [newItem, setNewItem] = useState('');
     const [confirm, setConfirm] = useState<{ open: boolean; title: string; message: string; onConfirm: () => void }>({
         open: false, title: '', message: '', onConfirm: () => {},
     });
 
-    const [rincianArea, setRincianArea] = useState<RincianArea[]>(options.rincian_area ?? []);
+    const initRincianArea = (): RincianArea[] => {
+        const existing = options.rincian_area ?? [];
+        const areaNames = options.area ?? [];
+        return areaNames.map((nama) => {
+            const found = existing.find((r) => r.nama === nama);
+            return found ?? { nama, deskripsi: '', luas: 0 };
+        });
+    };
+
+    const [rincianArea, setRincianArea] = useState<RincianArea[]>(initRincianArea);
+
+    const [showSuccess, setShowSuccess] = useState(false);
 
     useEffect(() => {
-        if (options.rincian_area) {
-            setRincianArea(options.rincian_area);
+        if (options.area && options.rincian_area) {
+            setRincianArea(initRincianArea());
         }
-    }, [options.rincian_area]);
+    }, [options.area, options.rincian_area]);
+
+    useEffect(() => {
+        if (success) {
+            setShowSuccess(true);
+            const timer = setTimeout(() => setShowSuccess(false), 3500);
+            return () => clearTimeout(timer);
+        }
+    }, [success]);
 
     const current = sections.find((s) => s.key === activeKey)!;
 
@@ -65,20 +85,37 @@ export default function Settings() {
     const addItem = () => {
         const name = newItem.trim();
         if (!name || options[activeKey].includes(name)) return;
-        save({ ...options, [activeKey]: [...options[activeKey], name] });
+
+        const next = { ...options, [activeKey]: [...options[activeKey], name] };
+
+        if (activeKey === 'area') {
+            const updatedRincian = [...rincianArea, { nama: name, deskripsi: '', luas: 0 }];
+            setRincianArea(updatedRincian);
+            next.rincian_area = updatedRincian;
+        }
+
+        save(next);
         setNewItem('');
         setDialogOpen(false);
     };
 
     const openRemove = (key: ListKey, i: number) => {
         const name = options[key][i];
-        const labelMap: Record<ListKey, string> = { jenis_sampah: 'jenis sampah', tujuan_distribusi: 'tujuan distribusi' };
+        const labelMap: Record<ListKey, string> = { area: 'area', jenis_sampah: 'jenis sampah', tujuan_distribusi: 'tujuan distribusi' };
         setConfirm({
             open: true,
             title: 'Hapus Data',
             message: `Yakin ingin menghapus ${labelMap[key]} "${name}"?`,
             onConfirm: () => {
-                save({ ...options, [key]: options[key].filter((_, idx) => idx !== i) });
+                const next = { ...options, [key]: options[key].filter((_, idx) => idx !== i) };
+
+                if (key === 'area') {
+                    const updatedRincian = rincianArea.filter((item) => item.nama !== name);
+                    setRincianArea(updatedRincian);
+                    next.rincian_area = updatedRincian;
+                }
+
+                save(next);
             },
         });
     };
@@ -96,9 +133,13 @@ export default function Settings() {
             <div className="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
                 <Heading title="Pengaturan Data" description="Kelola area, jenis sampah, dan tujuan distribusi" />
 
-                {success && (
-                    <div className="rounded-lg border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-700 whitespace-pre-wrap">
-                        {success}
+                {showSuccess && success && (
+                    <div className="flex items-center gap-3 rounded-lg border border-green-300 bg-green-50 px-4 py-3 text-sm text-green-800 shadow-sm transition-opacity duration-300">
+                        <CheckCircle className="h-5 w-5 shrink-0 text-green-600" />
+                        <span className="flex-1">{success}</span>
+                        <button type="button" onClick={() => setShowSuccess(false)} className="rounded-full p-0.5 text-green-500 hover:bg-green-200 hover:text-green-700">
+                            <X className="h-4 w-4" />
+                        </button>
                     </div>
                 )}
 

@@ -82,17 +82,17 @@ const jenisSampahColors: Record<string, string> = {
     'Lainnya': 'bg-gray-100 text-gray-700',
 };
 
-const jenisSampahOptions = Object.keys(jenisSampahColors);
-const tujuanOptions = ['TPS', 'Pupuk/kompos', 'PlasticPay', 'Tujuan lainnya'];
-
 const months = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
 const currentYear = new Date().getFullYear();
 const years = Array.from({ length: 11 }, (_, i) => currentYear - i);
 
 export default function DistribusiIndex({ distribusi }: Props) {
-    const { auth } = usePage().props as { auth: Auth };
+    const { auth, options } = usePage().props as unknown as { auth: Auth; options: { jenis_sampah: string[]; tujuan_distribusi: string[] } };
     const prefix = auth.user.role === 'admin' ? '/admin' : '/petugas';
     const isAdmin = auth.user.role === 'admin';
+
+    const jenisSampahOptions = options.jenis_sampah;
+    const tujuanOptions = options.tujuan_distribusi;
 
     const [search, setSearch] = useState('');
     const [filterJenis, setFilterJenis] = useState('all');
