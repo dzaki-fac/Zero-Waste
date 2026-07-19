@@ -12,8 +12,10 @@ return new class extends Migration
             $table->id();
             $table->string('nama');
             $table->dateTime('tanggal');
+            $table->string('area')->nullable();
             $table->decimal('berat', 10, 2);
-            $table->string('jenis_sampah');
+            $table->string('jenis_sampah')->nullable();
+            $table->string('subjenis_sampah')->nullable();
             $table->foreignId('user_id')->nullable()->constrained('users')->nullOnDelete();
             $table->timestamps();
         });

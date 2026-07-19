@@ -13,7 +13,7 @@ return new class extends Migration
             $table->string('nama');
             $table->dateTime('tanggal');
             $table->decimal('berat', 10, 2);
-            $table->string('jenis_sampah');
+            $table->string('jenis_sampah')->nullable();
             $table->string('tujuan_distribusi');
             $table->string('lokasi');
             $table->foreignId('user_id')->nullable()->constrained('users')->nullOnDelete();

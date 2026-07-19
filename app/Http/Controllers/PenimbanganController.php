@@ -67,6 +67,7 @@ class PenimbanganController extends Controller
             return redirect('/form/penimbangan')->with('submitted', [
                 'nama' => $nama,
                 'tanggal' => $request->input('tanggal'),
+                'area' => $request->input('area'),
                 'items' => $created,
                 'total_berat' => array_sum(array_column($created, 'berat_sampah')),
             ]);

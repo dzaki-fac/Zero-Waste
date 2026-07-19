@@ -12,6 +12,7 @@ import { Label } from '@/components/ui/label';
 type Options = {
     area: string[];
     jenis_sampah: string[];
+    subjenis_sampah: string[];
     tujuan_distribusi: string[];
 };
 
@@ -20,6 +21,7 @@ type ListKey = keyof Options;
 const sections: { key: ListKey; label: string; title: string; placeholder: string }[] = [
     { key: 'area', label: 'Area', title: 'Tambah Area', placeholder: 'Masukkan nama area' },
     { key: 'jenis_sampah', label: 'Jenis Sampah', title: 'Tambah Jenis Sampah', placeholder: 'Masukkan nama jenis sampah' },
+    { key: 'subjenis_sampah', label: 'Sub Jenis Sampah', title: 'Tambah Sub Jenis Sampah', placeholder: 'Masukkan nama sub jenis sampah' },
     { key: 'tujuan_distribusi', label: 'Tujuan Distribusi', title: 'Tambah Tujuan Distribusi', placeholder: 'Masukkan nama tujuan distribusi' },
 ];
 
@@ -58,7 +60,7 @@ export default function Settings() {
 
     const openRemove = (key: ListKey, i: number) => {
         const name = options[key][i];
-        const labelMap: Record<ListKey, string> = { area: 'area', jenis_sampah: 'jenis sampah', tujuan_distribusi: 'tujuan distribusi' };
+        const labelMap: Record<ListKey, string> = { area: 'area', jenis_sampah: 'jenis sampah', subjenis_sampah: 'sub jenis sampah', tujuan_distribusi: 'tujuan distribusi' };
         setConfirm({
             open: true,
             title: 'Hapus Data',
@@ -74,7 +76,7 @@ export default function Settings() {
             <Head title="Pengaturan Data" />
 
             <div className="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
-                <Heading title="Pengaturan Data" description="Kelola area, jenis sampah, dan tujuan distribusi" />
+                <Heading title="Pengaturan Data" description="Kelola area, jenis sampah, sub jenis sampah, dan tujuan distribusi" />
 
                 {success && (
                     <div className="rounded-lg border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-700 whitespace-pre-wrap">
