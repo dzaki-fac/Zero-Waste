@@ -909,16 +909,16 @@ export default function Dashboard() {
 
                 <div className="grid gap-4 lg:grid-cols-3">
                     <PieChartCard
-                        title="Distribusi per Tujuan"
-                        icon={Truck}
-                        data={distribusiByTujuan}
-                        totalLabel="Total berat didistribusikan"
-                    />
-                    <PieChartCard
                         title="Pilah Sampah per Jenis"
                         icon={Recycle}
                         data={pilahByJenis}
                         totalLabel="Total berat dipilah"
+                    />
+                    <PieChartCard
+                        title="Distribusi per Tujuan"
+                        icon={Truck}
+                        data={distribusiByTujuan}
+                        totalLabel="Total berat didistribusikan"
                     />
                     <Card className="border-green-200">
                         <CardHeader className="pb-2">

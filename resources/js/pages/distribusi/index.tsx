@@ -48,12 +48,6 @@ type Props = {
     distribusi: Distribusi[];
 };
 
-const subjenisSampahOptions = [
-    'Daun', 'Ranting besar', 'Ranting kecil', 'Sisa makanan',
-    'Plastik berwarna', 'Plastik putih', 'Styrofoam', 'Kardus',
-    'Kertas', 'B3', 'Wadah', 'Botol', 'Tisu',
-];
-
 const statusConfig: Record<DistribusiReviewStatus, { label: string; className: string; icon: React.ComponentType<{ className?: string }> }> = {
     pending: { label: 'Menunggu Review', className: 'bg-gray-100 text-gray-800', icon: Clock },
     approved: { label: 'Disetujui', className: 'bg-green-100 text-green-800', icon: CheckCircle2 },
@@ -94,11 +88,12 @@ const currentYear = new Date().getFullYear();
 const years = Array.from({ length: 11 }, (_, i) => currentYear - i);
 
 export default function DistribusiIndex({ distribusi }: Props) {
-    const { auth, options } = usePage().props as unknown as { auth: Auth; options: { jenis_sampah: string[]; tujuan_distribusi: string[] } };
+    const { auth, options } = usePage().props as unknown as { auth: Auth; options: { jenis_sampah: string[]; subjenis_sampah: string[]; tujuan_distribusi: string[] } };
     const prefix = auth.user.role === 'admin' ? '/admin' : '/petugas';
     const isAdmin = auth.user.role === 'admin';
 
     const jenisSampahOptions = options.jenis_sampah;
+    const subjenisSampahOptions = options.subjenis_sampah;
     const tujuanOptions = options.tujuan_distribusi;
 
     const [search, setSearch] = useState('');

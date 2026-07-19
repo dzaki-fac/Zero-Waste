@@ -52,13 +52,25 @@ export function SectionLabel({ children }: { children: ReactNode }) {
 }
 
 export function SafeImage({ src, alt, icon: Icon, gradient, className, style }: { src: string; alt: string; icon?: LucideIcon; gradient: string; className?: string; style?: CSSProperties }) {
-  const [failed, setFailed] = useState(false);
-  if (failed) {
+  const [state, setState] = useState<'loading' | 'loaded' | 'failed'>('loading');
+
+  useEffect(() => {
+    let cancelled = false;
+    setState('loading');
+    const img = new Image();
+    img.onload = () => { if (!cancelled) setState('loaded'); };
+    img.onerror = () => { if (!cancelled) setState('failed'); };
+    img.src = src;
+    return () => { cancelled = true; img.onload = null; img.onerror = null; };
+  }, [src]);
+
+  if (state === 'failed' || state === 'loading') {
     return (
       <div className={className} style={{ ...style, background: gradient, display: "flex", alignItems: "center", justifyContent: "center" }}>
         {Icon && <Icon size={36} color="rgba(255,255,255,0.85)" strokeWidth={1.5} />}
       </div>
     );
   }
-  return <img src={src} alt={alt} className={className} style={style} onError={() => setFailed(true)} />;
+
+  return <img src={src} alt={alt} className={className} style={style} />;
 }
