@@ -34,7 +34,7 @@ export default function Login({ status }: Props) {
                                     autoFocus
                                     tabIndex={1}
                                     autoComplete="email"
-                                    placeholder="email@example.com / NIP"
+                                    placeholder="Masukkan email atau  NIP"
                                 />
                                 <InputError message={errors.email} />
                             </div>
@@ -60,7 +60,7 @@ export default function Login({ status }: Props) {
                                 data-test="login-button"
                             >
                                 {processing && <Spinner />}
-                                Log in
+                                Masuk
                             </Button>
                         </div>
                     </>
@@ -78,5 +78,5 @@ export default function Login({ status }: Props) {
 
 Login.layout = {
     title: 'Log in to your account',
-    description: 'Masukkan email/NIP dan password untuk masuk',
+    description: 'Masukkan Email/NIP dan password untuk masuk',
 };

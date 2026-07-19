@@ -3,8 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\DistribusiRequest;
+use App\Http\Requests\ReviewDistribusiRequest;
 use App\Models\Distribusi;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -97,7 +99,22 @@ class DistribusiController extends Controller
     {
         $this->authorize('update', $distribusi);
 
-        $distribusi->update($request->validated());
+        $data = $request->validated();
+
+        if ($distribusi->review_status === 'needs_revision') {
+            $data['review_status'] = 'pending';
+            $data['review_note'] = null;
+            $data['reviewed_by'] = null;
+            $data['reviewed_at'] = null;
+            $data['revision_submitted_at'] = now();
+        }
+
+        $distribusi->forceFill($data)->save();
+
+        if ($distribusi->wasChanged('review_status') && $distribusi->review_status === 'pending') {
+            return to_route($this->routePrefix() . '.distribusi.index')
+                ->with('success', 'Perbaikan berhasil dikirim dan menunggu peninjauan admin.');
+        }
 
         return to_route($this->routePrefix() . '.distribusi.index');
     }
@@ -111,6 +128,27 @@ class DistribusiController extends Controller
         return to_route($this->routePrefix() . '.distribusi.index');
     }
 
+    public function review(ReviewDistribusiRequest $request, Distribusi $distribusi): RedirectResponse
+    {
+        $admin = $request->user();
+
+        abort_unless($admin !== null && $admin->role === 'admin', 403);
+
+        $validated = $request->validated();
+        $status = $validated['status'];
+
+        DB::transaction(function () use ($distribusi, $validated, $admin, $status) {
+            $distribusi->forceFill([
+                'review_status' => $status,
+                'review_note' => $status === 'needs_revision' ? $validated['note'] : null,
+                'reviewed_by' => $admin->id,
+                'reviewed_at' => now(),
+            ])->save();
+        });
+
+        return back()->with('success', 'Status distribusi berhasil diperbarui.');
+    }
+
     public function export(): \Symfony\Component\HttpFoundation\StreamedResponse
     {
         $user = auth()->user();
@@ -120,12 +158,19 @@ class DistribusiController extends Controller
 
         $filename = 'distribusi_' . now()->toDateString() . '.csv';
 
-        $headers = ['No', 'Nama', 'Tanggal', 'Berat (kg)', 'Subjenis', 'Tujuan', 'Lokasi'];
+        $headers = ['No', 'Nama', 'Tanggal', 'Berat (kg)', 'Jenis Sampah', 'Tujuan', 'Lokasi', 'Status Review', 'Catatan Perbaikan', 'Ditinjau Oleh', 'Tanggal Ditinjau'];
 
         $callback = function () use ($records, $headers) {
             $file = fopen('php://output', 'w');
             fprintf($file, chr(0xEF) . chr(0xBB) . chr(0xBF));
             fputcsv($file, $headers);
+
+            $statusLabels = [
+                'pending' => 'Menunggu Review',
+                'approved' => 'Disetujui',
+                'needs_revision' => 'Butuh Perbaikan',
+                'rejected' => 'Ditolak',
+            ];
 
             $index = 1;
             foreach ($records as $record) {
@@ -134,9 +179,13 @@ class DistribusiController extends Controller
                     $record->nama,
                     $record->tanggal,
                     $record->berat,
-                    $record->jenis_sampah,
+                    $record->subjenis_sampah ?? $record->jenis_sampah,
                     $record->tujuan_distribusi,
                     $record->lokasi,
+                    $statusLabels[$record->review_status] ?? 'Menunggu Review',
+                    $record->review_note ?? '',
+                    $record->reviewedBy?->name ?? '',
+                    $record->reviewed_at ?? '',
                 ]);
             }
 

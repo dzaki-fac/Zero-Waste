@@ -40,6 +40,10 @@ type DataDasarType = {
     baseline_sampah_periode: 'hari' | 'minggu';
     jenis_sampah_dominan: JenisSampahItem[];
     kondisi_fasilitas: string | null;
+    sampah_residu_akhir: number;
+    total_sampah_terkelola: number;
+    jumlah_warga_terlibat_aktif: number;
+    luas_area_zero_waste: number;
 };
 
 type Props = {
@@ -103,6 +107,14 @@ export default function DataDasarIndex({ dataDasar }: Props) {
         jenis_sampah_dominan:
             dataDasar?.jenis_sampah_dominan ?? defaultJenisSampah,
         kondisi_fasilitas: dataDasar?.kondisi_fasilitas ?? '',
+        sampah_residu_akhir:
+            dataDasar?.sampah_residu_akhir?.toString() ?? '',
+        total_sampah_terkelola:
+            dataDasar?.total_sampah_terkelola?.toString() ?? '',
+        jumlah_warga_terlibat_aktif:
+            dataDasar?.jumlah_warga_terlibat_aktif?.toString() ?? '',
+        luas_area_zero_waste:
+            dataDasar?.luas_area_zero_waste?.toString() ?? '',
     });
 
     const jumlahMahasiswa = Number(data.jumlah_mahasiswa || 0);
@@ -111,6 +123,27 @@ export default function DataDasarIndex({ dataDasar }: Props) {
     const jumlahTenagaPendukung = Number(data.jumlah_tenaga_pendukung || 0);
     const totalWarga =
         jumlahMahasiswa + jumlahDosen + jumlahTendik + jumlahTenagaPendukung;
+
+    const baselineSampah = Number(data.baseline_sampah || 0);
+    const sampahResidu = Number(data.sampah_residu_akhir || 0);
+    const totalSampahTerkelola = Number(data.total_sampah_terkelola || 0);
+    const jumlahWargaTerlibat = Number(data.jumlah_warga_terlibat_aktif || 0);
+    const luasAreaZeroWaste = Number(data.luas_area_zero_waste || 0);
+    const luasAreaFakultas = Number(data.luas_area_fakultas || 0);
+
+    const hasilPenguranganSampah =
+        baselineSampah
+            ? ((baselineSampah - sampahResidu) / baselineSampah) * 100
+            : null;
+    const hasilSampahPerKapita = totalWarga
+        ? totalSampahTerkelola / totalWarga
+        : null;
+    const hasilPartisipasi = totalWarga
+        ? (jumlahWargaTerlibat / totalWarga) * 100
+        : null;
+    const hasilCakupanArea = luasAreaFakultas
+        ? (luasAreaZeroWaste / luasAreaFakultas) * 100
+        : null;
 
     const filledRequired = REQUIRED_FIELDS.filter(
         (f) => String(data[f] ?? '').trim() !== '',
@@ -229,6 +262,238 @@ export default function DataDasarIndex({ dataDasar }: Props) {
                     onSubmit={handleSubmit}
                     className="flex flex-col gap-6"
                 >
+                    {/* Rumus Penilaian */}
+                    <SectionCard
+                        icon={Leaf}
+                        title="Rumus Penilaian"
+                        subtitle="Indikator dan rumus yang digunakan dalam penilaian program Zero Waste"
+                    >
+                        <div className="overflow-x-auto">
+                            <table className="w-full text-sm">
+                                <thead>
+                                    <tr className="border-b border-green-100 bg-green-50/60">
+                                        <th className="px-6 py-3 text-left text-xs font-semibold tracking-wider text-green-700 uppercase w-1/3">
+                                            Indikator
+                                        </th>
+                                        <th className="px-6 py-3 text-left text-xs font-semibold tracking-wider text-green-700 uppercase">
+                                            Rumus
+                                        </th>
+                                        <th className="px-6 py-3 text-center text-xs font-semibold tracking-wider text-green-700 uppercase w-28">
+                                            Hasil
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody className="divide-y divide-green-100">
+                                    <tr className="hover:bg-green-50/30 transition-colors">
+                                        <td className="px-6 py-3 text-sm font-medium text-green-900">
+                                            Persentase Pengurangan Sampah
+                                        </td>
+                                        <td className="px-6 py-3">
+                                            {isEditing ? (
+                                                <div className="flex flex-col gap-1 text-xs">
+                                                    <div className="leading-relaxed text-green-800">
+                                                        <span className="text-green-600">(</span>{' '}
+                                                        <span className="font-medium text-green-700">Baseline Sampah Awal: </span>
+                                                        <span className="tabular-nums font-semibold text-green-900">{data.baseline_sampah || '0'}</span>{' '}
+                                                        <span className="text-xs text-slate-500">kg</span>{' '}
+                                                        <span className="text-green-600">-</span>{' '}
+                                                        <span className="font-medium text-green-700">Sampah Residu Akhir: </span>
+                                                        <Input
+                                                            type="number"
+                                                            min="0"
+                                                            step="0.01"
+                                                            value={data.sampah_residu_akhir}
+                                                            onChange={(e) =>
+                                                                setData('sampah_residu_akhir', e.target.value)
+                                                            }
+                                                            className="inline-flex w-20 border-green-200 text-xs text-center focus-visible:border-green-500 focus-visible:ring-green-500/20"
+                                                            placeholder="0"
+                                                        />{' '}
+                                                        <span className="text-xs text-slate-500">kg</span>{' '}
+                                                        <span className="text-green-600">) / </span>{' '}
+                                                        <span className="font-medium text-green-700">Baseline Sampah Awal: </span>
+                                                        <span className="tabular-nums font-semibold text-green-900">{data.baseline_sampah || '0'}</span>{' '}
+                                                        <span className="text-xs text-slate-500">kg</span>{' '}
+                                                        <span className="text-green-600">× 100%</span>
+                                                    </div>
+                                                </div>
+                                            ) : (
+                                                <div className="flex flex-col gap-1 text-xs">
+                                                    <div className="leading-relaxed text-green-800">
+                                                        <span className="text-green-600">(</span>{' '}
+                                                        <span className="font-medium text-green-700">Baseline Sampah Awal: </span>
+                                                        <span className="tabular-nums font-semibold text-green-900">{data.baseline_sampah || '0'}</span>{' '}
+                                                        <span className="text-xs text-slate-500">kg</span>{' '}
+                                                        <span className="text-green-600">-</span>{' '}
+                                                        <span className="font-medium text-green-700">Sampah Residu Akhir: </span>
+                                                        <span className="tabular-nums font-semibold text-green-900">{data.sampah_residu_akhir || '0'}</span>{' '}
+                                                        <span className="text-xs text-slate-500">kg</span>{' '}
+                                                        <span className="text-green-600">) / </span>{' '}
+                                                        <span className="font-medium text-green-700">Baseline Sampah Awal: </span>
+                                                        <span className="tabular-nums font-semibold text-green-900">{data.baseline_sampah || '0'}</span>{' '}
+                                                        <span className="text-xs text-slate-500">kg</span>{' '}
+                                                        <span className="text-green-600">× 100%</span>
+                                                    </div>
+                                                </div>
+                                            )}
+                                        </td>
+                                        <td className="px-6 py-3 text-center">
+                                            <span className="text-sm tabular-nums font-medium text-green-900">
+                                                {hasilPenguranganSampah !== null ? `${hasilPenguranganSampah.toFixed(2)}%` : '-'}
+                                            </span>
+                                        </td>
+                                    </tr>
+                                    <tr className="hover:bg-green-50/30 transition-colors">
+                                        <td className="px-6 py-3 text-sm font-medium text-green-900">
+                                            Sampah Terkelola per Kapita
+                                        </td>
+                                        <td className="px-6 py-3">
+                                            {isEditing ? (
+                                                <div className="flex flex-col gap-1 text-xs">
+                                                    <div className="leading-relaxed text-green-800">
+                                                        <span className="font-medium text-green-700">Total Sampah Terkelola: </span>
+                                                        <Input
+                                                            type="number"
+                                                            min="0"
+                                                            step="0.01"
+                                                            value={data.total_sampah_terkelola}
+                                                            onChange={(e) =>
+                                                                setData('total_sampah_terkelola', e.target.value)
+                                                            }
+                                                            className="inline-flex w-20 border-green-200 text-xs text-center focus-visible:border-green-500 focus-visible:ring-green-500/20"
+                                                            placeholder="0"
+                                                        />{' '}
+                                                        <span className="text-xs text-slate-500">kg</span>{' '}
+                                                        <span className="text-green-600">/</span>{' '}
+                                                        <span className="font-medium text-green-700">Total Warga Fakultas atau Unit: </span>
+                                                        <span className="tabular-nums font-semibold text-green-900">{totalWarga.toLocaleString('id-ID')}</span>{' '}
+                                                        <span className="text-xs text-slate-500">orang</span>
+                                                    </div>
+                                                </div>
+                                            ) : (
+                                                <div className="flex flex-col gap-1 text-xs">
+                                                    <div className="leading-relaxed text-green-800">
+                                                        <span className="font-medium text-green-700">Total Sampah Terkelola: </span>
+                                                        <span className="tabular-nums font-semibold text-green-900">{data.total_sampah_terkelola || '0'}</span>{' '}
+                                                        <span className="text-xs text-slate-500">kg</span>{' '}
+                                                        <span className="text-green-600">/</span>{' '}
+                                                        <span className="font-medium text-green-700">Total Warga Fakultas atau Unit: </span>
+                                                        <span className="tabular-nums font-semibold text-green-900">{totalWarga.toLocaleString('id-ID')}</span>{' '}
+                                                        <span className="text-xs text-slate-500">orang</span>
+                                                    </div>
+                                                </div>
+                                            )}
+                                        </td>
+                                        <td className="px-6 py-3 text-center">
+                                            <span className="text-sm tabular-nums font-medium text-green-900">
+                                                {hasilSampahPerKapita !== null ? hasilSampahPerKapita.toFixed(2) : '-'}
+                                                <span className="text-xs text-slate-500"> kg/orang</span>
+                                            </span>
+                                        </td>
+                                    </tr>
+                                    <tr className="hover:bg-green-50/30 transition-colors">
+                                        <td className="px-6 py-3 text-sm font-medium text-green-900">
+                                            Persentase Partisipasi
+                                        </td>
+                                        <td className="px-6 py-3">
+                                            {isEditing ? (
+                                                <div className="flex flex-col gap-1 text-xs">
+                                                    <div className="leading-relaxed text-green-800">
+                                                        <span className="font-medium text-green-700">Jumlah Warga yang Terlibat Aktif: </span>
+                                                        <Input
+                                                            type="number"
+                                                            min="0"
+                                                            step="1"
+                                                            value={data.jumlah_warga_terlibat_aktif}
+                                                            onChange={(e) =>
+                                                                setData('jumlah_warga_terlibat_aktif', e.target.value)
+                                                            }
+                                                            className="inline-flex w-20 border-green-200 text-xs text-center focus-visible:border-green-500 focus-visible:ring-green-500/20"
+                                                            placeholder="0"
+                                                        />{' '}
+                                                        <span className="text-xs text-slate-500">orang</span>{' '}
+                                                        <span className="text-green-600">/</span>{' '}
+                                                        <span className="font-medium text-green-700">Total Warga Fakultas atau Unit: </span>
+                                                        <span className="tabular-nums font-semibold text-green-900">{totalWarga.toLocaleString('id-ID')}</span>{' '}
+                                                        <span className="text-xs text-slate-500">orang</span>{' '}
+                                                        <span className="text-green-600">× 100%</span>
+                                                    </div>
+                                                </div>
+                                            ) : (
+                                                <div className="flex flex-col gap-1 text-xs">
+                                                    <div className="leading-relaxed text-green-800">
+                                                        <span className="font-medium text-green-700">Jumlah Warga yang Terlibat Aktif: </span>
+                                                        <span className="tabular-nums font-semibold text-green-900">{data.jumlah_warga_terlibat_aktif || '0'}</span>{' '}
+                                                        <span className="text-xs text-slate-500">orang</span>{' '}
+                                                        <span className="text-green-600">/</span>{' '}
+                                                        <span className="font-medium text-green-700">Total Warga Fakultas atau Unit: </span>
+                                                        <span className="tabular-nums font-semibold text-green-900">{totalWarga.toLocaleString('id-ID')}</span>{' '}
+                                                        <span className="text-xs text-slate-500">orang</span>{' '}
+                                                        <span className="text-green-600">× 100%</span>
+                                                    </div>
+                                                </div>
+                                            )}
+                                        </td>
+                                        <td className="px-6 py-3 text-center">
+                                            <span className="text-sm tabular-nums font-medium text-green-900">
+                                                {hasilPartisipasi !== null ? `${hasilPartisipasi.toFixed(2)}%` : '-'}
+                                            </span>
+                                        </td>
+                                    </tr>
+                                    <tr className="hover:bg-green-50/30 transition-colors">
+                                        <td className="px-6 py-3 text-sm font-medium text-green-900">
+                                            Cakupan Area Terkelola
+                                        </td>
+                                        <td className="px-6 py-3">
+                                            {isEditing ? (
+                                                <div className="flex flex-col gap-1 text-xs">
+                                                    <div className="leading-relaxed text-green-800">
+                                                        <span className="font-medium text-green-700">Luas Area yang Menerapkan Zero Waste: </span>
+                                                        <Input
+                                                            type="number"
+                                                            min="0"
+                                                            step="0.01"
+                                                            value={data.luas_area_zero_waste}
+                                                            onChange={(e) =>
+                                                                setData('luas_area_zero_waste', e.target.value)
+                                                            }
+                                                            className="inline-flex w-20 border-green-200 text-xs text-center focus-visible:border-green-500 focus-visible:ring-green-500/20"
+                                                            placeholder="0"
+                                                        />{' '}
+                                                        <span className="text-xs text-slate-500">m²</span>{' '}
+                                                        <span className="text-green-600">/</span>{' '}
+                                                        <span className="font-medium text-green-700">Total Luas Area Fakultas atau Unit: </span>
+                                                        <span className="tabular-nums font-semibold text-green-900">{data.luas_area_fakultas || '0'}</span>{' '}
+                                                        <span className="text-xs text-slate-500">m²</span>{' '}
+                                                        <span className="text-green-600">× 100%</span>
+                                                    </div>
+                                                </div>
+                                            ) : (
+                                                <div className="flex flex-col gap-1 text-xs">
+                                                    <div className="leading-relaxed text-green-800">
+                                                        <span className="font-medium text-green-700">Luas Area yang Menerapkan Zero Waste: </span>
+                                                        <span className="tabular-nums font-semibold text-green-900">{data.luas_area_zero_waste || '0'}</span>{' '}
+                                                        <span className="text-xs text-slate-500">m²</span>{' '}
+                                                        <span className="text-green-600">/</span>{' '}
+                                                        <span className="font-medium text-green-700">Total Luas Area Fakultas atau Unit: </span>
+                                                        <span className="tabular-nums font-semibold text-green-900">{data.luas_area_fakultas || '0'}</span>{' '}
+                                                        <span className="text-xs text-slate-500">m²</span>{' '}
+                                                        <span className="text-green-600">× 100%</span>
+                                                    </div>
+                                                </div>
+                                            )}
+                                        </td>
+                                        <td className="px-6 py-3 text-center">
+                                            <span className="text-sm tabular-nums font-medium text-green-900">
+                                                {hasilCakupanArea !== null ? `${hasilCakupanArea.toFixed(2)}%` : '-'}
+                                            </span>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </SectionCard>
+
                     {/* Identitas Peserta */}
                     <SectionCard
                         icon={MapPin}

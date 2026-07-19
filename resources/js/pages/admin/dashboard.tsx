@@ -1,9 +1,9 @@
-import { Head, router, usePage } from '@inertiajs/react';
+import { Head, Link, router, usePage } from '@inertiajs/react';
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from 'recharts';
 import type { PieLabelRenderProps } from 'recharts';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Scale, Recycle, Truck, Users, CalendarIcon, Clock, Package, CheckCircle, ChevronLeft, ChevronRight, Send, Leaf } from 'lucide-react';
+import { Scale, Recycle, Truck, Users, CalendarIcon, Clock, Package, CheckCircle, ChevronLeft, ChevronRight, Send, Leaf, ClipboardCheck } from 'lucide-react';
 import { useState, useRef, useEffect } from 'react';
 import type { Auth } from '@/types';
 
@@ -49,6 +49,10 @@ type DataDasarType = {
     baseline_sampah_periode: 'hari' | 'minggu';
     jenis_sampah_dominan: JenisSampahItem[];
     kondisi_fasilitas: string | null;
+    sampah_residu_akhir: number;
+    total_sampah_terkelola: number;
+    jumlah_warga_terlibat_aktif: number;
+    luas_area_zero_waste: number;
 };
 
 type PageProps = {
@@ -63,6 +67,18 @@ type PageProps = {
         sudah_didistribusikan: number;
     };
     siapDidistribusikanByJenis: ChartData;
+    checklistStats: {
+        total: number;
+        selesai: number;
+        belum: number;
+        petugas: {
+            name: string;
+            nip: string;
+            total: number;
+            selesai: number;
+            belum: number;
+        }[];
+    } | null;
     filters: {
         start_date: string | null;
         end_date: string | null;
@@ -490,26 +506,91 @@ function DataDasarSummary({ dataDasar }: { dataDasar: DataDasarType | null }) {
           })
         : '';
 
+    const baselineSampah = dataDasar.baseline_sampah || 0;
+    const sampahResidu = dataDasar.sampah_residu_akhir || 0;
+    const totalSampahTerkelola = dataDasar.total_sampah_terkelola || 0;
+    const jumlahWargaTerlibat = dataDasar.jumlah_warga_terlibat_aktif || 0;
+    const luasAreaZeroWaste = dataDasar.luas_area_zero_waste || 0;
+    const luasAreaFakultas = dataDasar.luas_area_fakultas || 0;
+    const totalWarga = dataDasar.total_warga || 0;
+
+    const hasilPenguranganSampah = baselineSampah ? ((baselineSampah - sampahResidu) / baselineSampah) * 100 : null;
+    const hasilSampahPerKapita = totalWarga ? totalSampahTerkelola / totalWarga : null;
+    const hasilPartisipasi = totalWarga ? (jumlahWargaTerlibat / totalWarga) * 100 : null;
+    const hasilCakupanArea = luasAreaFakultas ? (luasAreaZeroWaste / luasAreaFakultas) * 100 : null;
+
     return (
         <Card className="border-green-200">
             <CardHeader className="pb-2">
-                <CardTitle className="flex items-center gap-2 text-base text-green-900">
-                    <Leaf className="size-5 text-green-600" />
-                    Data Dasar
-                </CardTitle>
-                <p className="text-xs text-green-700">
-                    Informasi dasar unit/fakultas sebagai baseline program Zero Waste
-                </p>
+                <div className="flex items-start justify-between gap-4">
+                    <div className="min-w-0">
+                        <h4 className="flex items-center gap-2 text-sm font-semibold text-green-900">
+                            <Leaf className="size-4 text-green-600 shrink-0" />
+                            Data Dasar
+                        </h4>
+                        <p className="text-xs text-green-700">
+                            Informasi dasar unit/fakultas sebagai baseline program Zero Waste
+                        </p>
+                    </div>
+                    <div className="shrink-0 text-right">
+                        <h4 className="flex items-center justify-end gap-2 text-sm font-semibold text-green-900">
+                            Indikator Zero Waste
+                            <Leaf className="size-4 text-green-600 shrink-0" />
+                        </h4>
+                        <p className="text-[11px] text-green-700">
+                            Indikator dan hasil penilaian program Zero Waste
+                        </p>
+                    </div>
+                </div>
             </CardHeader>
             <CardContent className="space-y-5">
-                {/* Identitas: 2 kolom x 3 baris */}
-                <div className="grid grid-cols-1 gap-4 rounded-lg border border-green-100 bg-green-50/30 p-4 sm:grid-cols-3 sm:grid-rows-2">
-                    <ReadField label="Nama Tim / Unit" value={dataDasar.nama_tim} />
-                    <ReadField label="Fakultas / Unit" value={dataDasar.fakultas} />
-                    <ReadField label="Alamat / Lokasi Program" value={dataDasar.alamat} />
-                    <ReadField label="Penanggung Jawab" value={dataDasar.penanggung_jawab} />
-                    <ReadField label="Nomor HP / Email" value={dataDasar.nomor_hp_email} />
-                    <ReadField label="Tanggal Pengisian" value={formattedTanggal} />
+                <div className="flex flex-col gap-4 lg:flex-row">
+                    {/* Identitas */}
+                    <div className="grid grid-cols-1 gap-4 rounded-lg border border-green-100 bg-green-50/30 p-4 sm:grid-cols-3 sm:grid-rows-2 lg:w-2/3">
+                        <ReadField label="Nama Tim / Unit" value={dataDasar.nama_tim} />
+                        <ReadField label="Fakultas / Unit" value={dataDasar.fakultas} />
+                        <ReadField label="Alamat / Lokasi Program" value={dataDasar.alamat} />
+                        <ReadField label="Penanggung Jawab" value={dataDasar.penanggung_jawab} />
+                        <ReadField label="Nomor HP / Email" value={dataDasar.nomor_hp_email} />
+                        <ReadField label="Tanggal Pengisian" value={formattedTanggal} />
+                    </div>
+                    {/* Rumus Penilaian */}
+                    <div className="overflow-hidden rounded-lg border border-green-100 lg:w-1/3">
+                        <table className="w-full text-sm">
+                            <thead>
+                                <tr className="border-b border-green-100 bg-green-50/30">
+                                    <th className="px-3 py-2 text-left text-xs font-semibold tracking-wide text-green-700 uppercase">Indikator</th>
+                                    <th className="px-3 py-2 text-right text-xs font-semibold tracking-wide text-green-700 uppercase">Hasil</th>
+                                </tr>
+                            </thead>
+                            <tbody className="divide-y divide-green-100">
+                                <tr>
+                                    <td className="px-3 py-2 text-xs text-green-800">Persentase Pengurangan Sampah</td>
+                                    <td className="px-3 py-2 text-right text-xs tabular-nums font-medium text-green-900">
+                                        {hasilPenguranganSampah !== null ? `${hasilPenguranganSampah.toFixed(2)}%` : '-'}
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td className="px-3 py-2 text-xs text-green-800">Sampah Terkelola per Kapita</td>
+                                    <td className="px-3 py-2 text-right text-xs tabular-nums font-medium text-green-900">
+                                        {hasilSampahPerKapita !== null ? `${hasilSampahPerKapita.toFixed(2)} kg/orang` : '-'}
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td className="px-3 py-2 text-xs text-green-800">Persentase Partisipasi</td>
+                                    <td className="px-3 py-2 text-right text-xs tabular-nums font-medium text-green-900">
+                                        {hasilPartisipasi !== null ? `${hasilPartisipasi.toFixed(2)}%` : '-'}
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td className="px-3 py-2 text-xs text-green-800">Cakupan Area Terkelola</td>
+                                    <td className="px-3 py-2 text-right text-xs tabular-nums font-medium text-green-900">
+                                        {hasilCakupanArea !== null ? `${hasilCakupanArea.toFixed(2)}%` : '-'}
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
 
                 <div className="grid gap-4 lg:grid-cols-2">
@@ -596,8 +677,8 @@ function DataDasarSummary({ dataDasar }: { dataDasar: DataDasarType | null }) {
                                     </td>
                                 </tr>
                                 <tr>
-                                    <td className="px-3 py-2 align-top text-green-800">Jenis Sampah Dominan</td>
-                                    <td className="px-3 py-2 align-top text-xs text-gray-500">Timbulan tiap jenis</td>
+                                    <td className="px-3 py-2 text-green-800">Jenis Sampah Dominan</td>
+                                    <td className="px-3 py-2 text-xs text-gray-500">Timbulan tiap jenis</td>
                                     <td className="px-3 py-2 text-right text-xs text-green-900">
                                         <div className="space-y-0.5">
                                             {dataDasar.jenis_sampah_dominan?.map((item) => (
@@ -609,8 +690,8 @@ function DataDasarSummary({ dataDasar }: { dataDasar: DataDasarType | null }) {
                                     </td>
                                 </tr>
                                 <tr>
-                                    <td className="px-3 py-2 align-top text-green-800">Kondisi Fasilitas</td>
-                                    <td className="px-3 py-2 align-top text-xs text-gray-500" colSpan={2}>
+                                    <td className="px-3 py-2 text-green-800">Kondisi Fasilitas</td>
+                                    <td className="px-3 py-2 text-xs text-gray-500" colSpan={2}>
                                         {dataDasar.kondisi_fasilitas || <span className="text-slate-400 italic">Belum diisi</span>}
                                     </td>
                                 </tr>
@@ -624,7 +705,7 @@ function DataDasarSummary({ dataDasar }: { dataDasar: DataDasarType | null }) {
 }
 
 export default function Dashboard() {
-    const { dataDasar, penimbanganByArea, pilahByJenis, distribusiByTujuan, petugasStats, statusBerat, siapDidistribusikanByJenis, filters } = usePage<PageProps>().props;
+    const { dataDasar, penimbanganByArea, pilahByJenis, distribusiByTujuan, petugasStats, statusBerat, siapDidistribusikanByJenis, checklistStats, filters } = usePage<PageProps>().props;
 
     const siapSortedData = siapDidistribusikanByJenis.slice().sort((a, b) => b.value - a.value);
     const siapTotal = siapDidistribusikanByJenis.reduce((s, d) => s + d.value, 0);
@@ -736,7 +817,7 @@ export default function Dashboard() {
                                 const STATUS_ICONS = [Clock, Package, CheckCircle];
                                 const chartData = [
                                     { key: 'menunggu_pemilahan', name: 'Menunggu Pemilahan', value: statusBerat.menunggu_pemilahan },
-                                    { key: 'siap_didistribusikan', name: 'Siap Didistribusikan', value: statusBerat.siap_didistribusikan },
+                                    { key: 'siap_didistribusikan', name: 'Sisa & Siap Didistribusikan', value: statusBerat.siap_didistribusikan },
                                     { key: 'sudah_didistribusikan', name: 'Sudah Didistribusikan', value: statusBerat.sudah_didistribusikan },
                                 ];
                                 const total = chartData.reduce((s, d) => s + d.value, 0);
@@ -999,6 +1080,94 @@ export default function Dashboard() {
                         )}
                     </CardContent>
                 </Card>
+
+                {checklistStats && checklistStats.total > 0 && (
+                    <Card className="border-green-200">
+                        <CardHeader className="pb-2">
+                            <CardTitle className="flex items-center gap-2 text-base text-green-900">
+                                <ClipboardCheck className="size-5 text-green-600" />
+                                Checklist Pekerjaan
+                            </CardTitle>
+                            <p className="text-xs text-green-700">
+                                Rekap progres checklist pekerjaan petugas
+                            </p>
+                        </CardHeader>
+                        <CardContent>
+                            <div className="mb-4 flex items-center gap-6 rounded-lg border border-green-100 bg-green-50/40 p-4">
+                                <div className="text-center">
+                                    <p className="text-2xl font-bold text-green-900">{checklistStats.total}</p>
+                                    <p className="text-xs text-green-700">Total Tugas</p>
+                                </div>
+                                <div className="text-center">
+                                    <p className="text-2xl font-bold text-green-600">{checklistStats.selesai}</p>
+                                    <p className="text-xs text-green-700">Selesai</p>
+                                </div>
+                                <div className="text-center">
+                                    <p className="text-2xl font-bold text-red-500">{checklistStats.belum}</p>
+                                    <p className="text-xs text-green-700">Belum</p>
+                                </div>
+                                <div className="flex-1">
+                                    <div className="h-3 w-full overflow-hidden rounded-full bg-red-100">
+                                        {checklistStats.total > 0 && (
+                                            <div
+                                                className="h-full rounded-full bg-green-500 transition-all"
+                                                style={{ width: `${(checklistStats.selesai / checklistStats.total) * 100}%` }}
+                                            />
+                                        )}
+                                    </div>
+                                    <p className="mt-1 text-xs text-green-700">
+                                        {checklistStats.total > 0
+                                            ? `${((checklistStats.selesai / checklistStats.total) * 100).toFixed(1)}% selesai`
+                                            : 'Belum ada data'}
+                                    </p>
+                                </div>
+                            </div>
+
+                            {checklistStats.petugas.length > 0 && (
+                                <div className="overflow-x-auto">
+                                    <table className="w-full text-sm">
+                                        <thead>
+                                            <tr className="border-b border-green-100">
+                                                <th className="px-3 py-2 text-left text-xs font-semibold text-green-700">Petugas</th>
+                                                <th className="px-3 py-2 text-right text-xs font-semibold text-green-700">Total</th>
+                                                <th className="px-3 py-2 text-right text-xs font-semibold text-green-700">Selesai</th>
+                                                <th className="px-3 py-2 text-right text-xs font-semibold text-green-700">Belum</th>
+                                                <th className="px-3 py-2 text-right text-xs font-semibold text-green-700">Progres</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody className="divide-y divide-green-50">
+                                            {checklistStats.petugas
+                                                .slice()
+                                                .sort((a, b) => b.total - a.total)
+                                                .map((p) => {
+                                                    const pct = p.total > 0 ? (p.selesai / p.total) * 100 : 0;
+                                                    return (
+                                                        <tr key={p.nip} className="hover:bg-green-50/30">
+                                                            <td className="px-3 py-2 font-medium text-green-900">{p.name}</td>
+                                                            <td className="px-3 py-2 text-right tabular-nums text-green-800">{p.total}</td>
+                                                            <td className="px-3 py-2 text-right tabular-nums text-green-600">{p.selesai}</td>
+                                                            <td className="px-3 py-2 text-right tabular-nums text-red-500">{p.belum}</td>
+                                                            <td className="px-3 py-2 text-right">
+                                                                <div className="flex items-center justify-end gap-2">
+                                                                    <div className="h-2 w-24 overflow-hidden rounded-full bg-red-100">
+                                                                        <div
+                                                                            className="h-full rounded-full bg-green-500 transition-all"
+                                                                            style={{ width: `${pct}%` }}
+                                                                        />
+                                                                    </div>
+                                                                    <span className="text-xs tabular-nums text-green-700 w-10">{pct.toFixed(0)}%</span>
+                                                                </div>
+                                                            </td>
+                                                        </tr>
+                                                    );
+                                                })}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            )}
+                        </CardContent>
+                    </Card>
+                )}
             </div>
         </>
     );

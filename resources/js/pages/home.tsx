@@ -20,9 +20,20 @@ import {
   Globe,
   Phone,
   Mail,
+  Scale,
+  Truck,
+  Package,
+  Clock,
+  CheckCircle,
+  Send,
+  CalendarIcon,
 } from "lucide-react";
+import { usePage, router } from '@inertiajs/react';
+import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from 'recharts';
 import { C, display, body } from "../theme";
 import Navbar from "../components/Navbar";
+import { ChartTooltip, ChartLabel, getCategoryColor, PieLegend } from "../components/charts";
+import type { ChartData } from "../components/charts";
 
 // ---- Tiktok Icon --------------------------------------------------------
 function TiktokIcon({ size = 16, color = "currentColor" }: { size?: number; color?: string }) {
@@ -116,98 +127,12 @@ const MENU_DECK = [
   },
 ];
 
-const NEWS = [
-  {
-    tag: "UNDIP",
-    date: "04 Apr 2026",
-    title: "K3L Sosialisasikan Pemilahan Sampah Residu di TPST Kampus UNDIP",
-    image:
-      "https://i.ytimg.com/vi/ne1zRy1AOOM/hq720.jpg?sqp=-oaymwEhCK4FEIIDSFryq4qpAxMIARUAAAAAGAElAADIQj0AgKJD&rs=AOn4CLDjk6kykjZwKXx6RaQdlDsDhyqU6g",
-    href: "https://kemdiktisaintek.go.id/news/article/implementasi-undip-zero-waste-k3l-sosialisasikan-pemilahan-sampah-residu",
-  },
-  {
-    tag: "UNDIP",
-    date: "Jun 2026",
-    title: "SV Zero Discharge: Langkah Strategis Sekolah Vokasi UNDIP",
-    image:
-      "https://undip.ac.id/wp-content/uploads/2026/06/1-ezgif.com-jpg-to-webp-converter-5.webp",
-    href: "https://undip.ac.id/post/57036/sv-zero-discharge-langkah-strategis-sekolah-vokasi-undip-menuju-kampus-berkelanjutan-berkelas-dunia.html",
-  },
-  {
-    tag: "Nasional",
-    date: "15 Jul 2026",
-    title: "UI Gandeng BRIN dan Industri Kembangkan Model Zero Waste",
-    image:
-      "https://apakabar.co.id/uploads/2026/07/post_6a50fe5d0bca19.37943188.jpg",
-    href: "https://www.kompas.com/edu/read/2026/07/15/101720771/gaet-brin-dan-industri-ui-kembangkan-pengolahan-sampah-model-zero-waste",
-  },
-  {
-    tag: "Nasional",
-    date: "08 Jun 2026",
-    title: "UMS Galakkan Zero Waste, Ikhtiar Kurangi Sampah Plastik",
-    image:
-      "https://www.ums.ac.id/__gambars__/uploads/LGWtScdV89eyA9wyzMSIiMvhQvXmDrUOe0ZY6B0Y.webp",
-    href: "https://jateng.antaranews.com/berita/634320/ums-galakkan-zero-waste-ikhtiar-kurangi-sampah-plastik",
-  },
-  {
-    tag: "Nasional",
-    date: "awal Jul 2026",
-    title: "UNJ Resmikan TPST dan Waste Management Center",
-    image:
-      "https://cdn2.timesmedia.co.id/cdn-times/uploads/assets/2026/07/01/unj-resmikan-tpst-dan-waste-management-center-untuk-perkuat-komitmen-menuju-kamp-x9mo7260.webp?v=7.0.0#",
-    href: "https://times.co.id/unj-resmikan-tpst-dan-waste-management-center-untuk-perkuat-komitmen-menuju-kampus-zero-waste",
-  },
-];
-
-const POSTERS = [
-  {
-    title: "Pilah dari Sumbernya",
-    tag: "Dasar",
-    note: "Kenapa pemilahan harus dimulai dari tiap sub-area, bukan di akhir.",
-    image:
-      "https://images.unsplash.com/photo-1532996122724-e3c354a0b15b?auto=format&fit=crop&w=1200&q=80",
-  },
-  {
-    title: "Ranting: Besar vs Kecil",
-    tag: "Organik",
-    note: "Ranting besar dicatat sebagai aset, ranting kecil dikembalikan ke tanah.",
-    image:
-      "https://images.unsplash.com/photo-1416879595882-3373a0480b5b?auto=format&fit=crop&w=1200&q=80",
-  },
-  {
-    title: "Sisa Makanan Jadi Kompos",
-    tag: "Organik",
-    note: "Jejak sisa makanan dari area baca sampai kantor, diolah jadi kompos.",
-    image:
-      "https://images.pexels.com/photos/5479034/pexels-photo-5479034.jpeg",
-  },
-  {
-    title: "Plastik & Styrofoam",
-    tag: "Anorganik",
-    note: "Pemisahan plastik berwarna dan bening, serta penanganan styrofoam.",
-    image:
-      "https://images.unsplash.com/photo-1611284446314-60a58ac0deb9?auto=format&fit=crop&w=1200&q=80",
-  },
-  {
-    title: "Kardus & Kertas",
-    tag: "Daur Ulang",
-    note: "Dirajang atau disalurkan jadi karya kreativitas, sebelum ke TPS.",
-    image:
-      "https://images.unsplash.com/photo-1595278069441-2cf29f8005a4?auto=format&fit=crop&w=1200&q=80",
-  },
-  {
-    title: "Distribusi Akhir",
-    tag: "Alur",
-    note: "Ke TPS, ditimbun jadi pupuk, atau disetor lewat Plasticpay.",
-    image:
-      "https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?auto=format&fit=crop&w=1200&q=80",
-  },
-];
-
 // Dua salinan berita digabung biar carousel-nya bisa looping mulus tanpa
 // "lompat" kelihatan — begitu geser sejauh satu set pertama, posisinya
 // digeser balik ke awal set (bukan direset ke 0), jadi mulus.
-const NEWS_LOOP = [...NEWS, ...NEWS];
+function makeNewsLoop(news: NewsItem[]): NewsItem[] {
+  return [...news, ...news];
+}
 
 const SOCIALS = [
   { icon: Globe, label: "Website Resmi", href: "https://digilib.undip.ac.id/" },
@@ -358,26 +283,276 @@ function SafeImage({ src, alt, icon: Icon, gradient, className, style }: { src: 
   );
 }
 
-function PlaceholderPanel({ item }: { item: (typeof MENU_DECK)[number] }) {
-  const Icon = item.icon;
-  return (
-    <div className="mt-4 rounded-2xl border border-dashed p-6 sm:p-8" style={{ borderColor: "#B9C0D6", backgroundColor: C.navy050 }}>
-      <div className="flex items-center gap-2 mb-2">
-        <Icon size={16} color={C.navy700} />
-        <span className="text-xs font-semibold uppercase tracking-wider" style={{ ...body, color: C.navy700 }}>
-          Ruang konten — {item.title}
-        </span>
-      </div>
-      <p className="text-sm leading-relaxed" style={{ ...body, color: C.ink500 }}>
-        {item.placeholder}
-      </p>
-    </div>
-  );
+// ---- Page props -------------------------------------------------------
+
+type PresetKey = 'all' | 'today' | '7d' | '30d' | '3m';
+
+const PRESETS: { key: PresetKey; label: string; days: number | null }[] = [
+    { key: 'all', label: 'Semua', days: null },
+    { key: 'today', label: 'Hari Ini', days: 0 },
+    { key: '7d', label: '7 Hari', days: 7 },
+    { key: '30d', label: '30 Hari', days: 30 },
+    { key: '3m', label: '3 Bulan', days: 90 },
+];
+
+function daysAgo(n: number): string {
+    const d = new Date();
+    d.setDate(d.getDate() - n);
+    return d.toISOString().split('T')[0];
 }
+
+function formatDateInput(d: Date): string {
+    return d.toISOString().split('T')[0];
+}
+
+type NewsItem = {
+    id: number;
+    tag: string;
+    date: string;
+    title: string;
+    image: string;
+    href: string;
+    is_published: boolean;
+    order: number;
+};
+
+type PosterItem = {
+    id: number;
+    title: string;
+    tag: string;
+    note: string | null;
+    image: string;
+    order: number;
+    is_published: boolean;
+};
+
+type PageProps = {
+    news: NewsItem[];
+    posters: PosterItem[];
+    penimbanganByArea: ChartData;
+    pilahByJenis: ChartData;
+    distribusiByTujuan: ChartData;
+    statusBerat: {
+        menunggu_pemilahan: number;
+        siap_didistribusikan: number;
+        sudah_didistribusikan: number;
+    };
+    siapDidistribusikanByJenis: ChartData;
+    filters?: {
+        start_date: string | null;
+        end_date: string | null;
+    };
+};
 
 // ---- Main component ---------------------------------------------------
 
+function LaporanCharts({ data }: { data: PageProps }) {
+    const { penimbanganByArea, pilahByJenis, distribusiByTujuan, statusBerat, siapDidistribusikanByJenis } = data;
+
+    const siapSorted = siapDidistribusikanByJenis.slice().sort((a, b) => b.value - a.value);
+    const siapTotal = siapDidistribusikanByJenis.reduce((s, d) => s + d.value, 0);
+
+    const STATUS_DATA = [
+        { key: 'menunggu_pemilahan', name: 'Menunggu Pemilahan', value: statusBerat.menunggu_pemilahan, color: '#ef4444', icon: Clock },
+        { key: 'siap_didistribusikan', name: 'Siap Didistribusikan', value: statusBerat.siap_didistribusikan, color: '#f59e0b', icon: Package },
+        { key: 'sudah_didistribusikan', name: 'Sudah Didistribusikan', value: statusBerat.sudah_didistribusikan, color: '#22c55e', icon: CheckCircle },
+    ];
+    const statusTotal = STATUS_DATA.reduce((s, d) => s + d.value, 0);
+
+    return (
+        <div className="flex flex-col gap-6">
+            <div className="grid gap-6 lg:grid-cols-2">
+                {/* Status Berat Sampah - Donut */}
+                <div className="rounded-2xl border bg-white p-5" style={{ borderColor: C.line }}>
+                    <div className="mb-1 flex items-center gap-2">
+                        <Package className="size-5" style={{ color: C.leaf500 }} />
+                        <h3 className="text-sm font-semibold" style={{ color: C.navy900 }}>Status Berat Sampah</h3>
+                    </div>
+                    <p className="mb-4 text-xs" style={{ color: C.ink500 }}>Alur berat sampah dari penimbangan hingga distribusi</p>
+                    <div className="flex flex-col items-center gap-6 lg:flex-row lg:items-center">
+                        <div className="relative h-[220px] w-[220px] shrink-0">
+                            <ResponsiveContainer width="100%" height="100%">
+                                <PieChart>
+                                    <Pie data={STATUS_DATA} cx="50%" cy="50%" innerRadius={58} outerRadius={95} paddingAngle={3} dataKey="value" stroke="none">
+                                        {STATUS_DATA.map((_, i) => <Cell key={i} fill={STATUS_DATA[i].color} />)}
+                                    </Pie>
+                                    <Tooltip content={<ChartTooltip />} />
+                                    <text x="50%" y="46%" textAnchor="middle" dominantBaseline="middle" className="fill-gray-900 text-xl font-bold tabular-nums">
+                                        {statusTotal.toLocaleString('id-ID', { minimumFractionDigits: 1, maximumFractionDigits: 1 })}
+                                    </text>
+                                    <text x="50%" y="58%" textAnchor="middle" dominantBaseline="middle" className="fill-gray-500 text-[10px]">
+                                        kg total
+                                    </text>
+                                </PieChart>
+                            </ResponsiveContainer>
+                        </div>
+                        <div className="flex w-full flex-col gap-2.5">
+                            {STATUS_DATA.map((item) => {
+                                const pct = statusTotal > 0 ? (item.value / statusTotal) * 100 : 0;
+                                const Icon = item.icon;
+                                return (
+                                    <div key={item.key} className="flex items-center gap-3 rounded-lg p-3" style={{ backgroundColor: `${item.color}0d` }}>
+                                        <div className="flex size-8 shrink-0 items-center justify-center rounded-lg" style={{ backgroundColor: `${item.color}1a` }}>
+                                            <Icon className="size-4" style={{ color: item.color }} />
+                                        </div>
+                                        <div className="min-w-0 flex-1">
+                                            <p className="text-xs font-medium" style={{ color: C.ink900 }}>{item.name}</p>
+                                            <div className="mt-1 h-1.5 w-full overflow-hidden rounded-full" style={{ backgroundColor: `${item.color}20` }}>
+                                                <div className="h-full rounded-full transition-all" style={{ width: `${pct}%`, backgroundColor: item.color }} />
+                                            </div>
+                                        </div>
+                                        <div className="shrink-0 text-right">
+                                            <p className="text-sm font-bold tabular-nums" style={{ color: C.ink900 }}>
+                                                {item.value.toLocaleString('id-ID', { minimumFractionDigits: 1, maximumFractionDigits: 1 })}
+                                            </p>
+                                            <p className="text-[10px]" style={{ color: C.ink500 }}>kg &middot; {pct.toFixed(1)}%</p>
+                                        </div>
+                                    </div>
+                                );
+                            })}
+                        </div>
+                    </div>
+                </div>
+
+                {/* Penimbangan per Area */}
+                {(() => {
+                    const data = penimbanganByArea;
+                    const total = data.reduce((s, d) => s + d.value, 0);
+                    const sorted = data.slice().sort((a, b) => b.value - a.value);
+                    return (
+                        <div className="rounded-2xl border bg-white p-5" style={{ borderColor: C.line }}>
+                            <div className="mb-1 flex items-center gap-2">
+                                <Scale className="size-5" style={{ color: C.leaf500 }} />
+                                <h3 className="text-sm font-semibold" style={{ color: C.navy900 }}>Penimbangan per Area</h3>
+                            </div>
+                            <p className="mb-4 text-xs" style={{ color: C.ink500 }}>
+                                Total berat ditimbang: {total.toLocaleString('id-ID', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} kg
+                            </p>
+                            {data.length > 0 ? (
+                                <div className="flex flex-col gap-4 lg:flex-row lg:items-center">
+                                    <div className="h-[240px] shrink-0 lg:w-1/2">
+                                        <ResponsiveContainer width="100%" height="100%">
+                                            <PieChart>
+                                                <defs>
+                                                    <filter id="homePieShadow1" x="-50%" y="-50%" width="200%" height="200%">
+                                                        <feDropShadow dx="0" dy="1" stdDeviation="1.2" floodColor="#000000" floodOpacity="0.65" />
+                                                    </filter>
+                                                </defs>
+                                                <Pie data={sorted} cx="50%" cy="50%" labelLine={false} label={ChartLabel} outerRadius={100} dataKey="value" stroke="none">
+                                                    {sorted.map((entry) => <Cell key={entry.name} fill={getCategoryColor(entry.name)} />)}
+                                                </Pie>
+                                                <Tooltip content={<ChartTooltip />} />
+                                            </PieChart>
+                                        </ResponsiveContainer>
+                                    </div>
+                                    <div className="w-full space-y-1.5 lg:pl-4">
+                                        <PieLegend data={sorted} total={total} />
+                                    </div>
+                                </div>
+                            ) : (
+                                <div className="flex h-48 items-center justify-center text-sm" style={{ color: C.ink500 }}>
+                                    Belum ada data
+                                </div>
+                            )}
+                        </div>
+                    );
+                })()}
+            </div>
+
+            {/* Tiga Pie Chart: Penimbangan, Pilah, Distribusi */}
+            <div className="grid gap-6 md:grid-cols-3">
+                {([
+                    { title: 'Distribusi per Tujuan', icon: Truck, data: distribusiByTujuan, totalLabel: 'Total berat didistribusikan' },
+                    { title: 'Pilah Sampah per Jenis', icon: Recycle, data: pilahByJenis, totalLabel: 'Total berat dipilah' },
+                    { title: 'Sisa & Siap Didistribusikan', icon: Send, data: siapDidistribusikanByJenis, totalLabel: 'Total sisa dan siap didistribusikan' },
+                ] as const).map((card) => {
+                    const total = card.data.reduce((s, d) => s + d.value, 0);
+                    const sorted = card.data.slice().sort((a, b) => b.value - a.value);
+                    return (
+                        <div key={card.title} className="rounded-2xl border bg-white p-5" style={{ borderColor: C.line }}>
+                            <div className="mb-1 flex items-center gap-2">
+                                <card.icon className="size-5" style={{ color: C.leaf500 }} />
+                                <h3 className="text-sm font-semibold" style={{ color: C.navy900 }}>{card.title}</h3>
+                            </div>
+                            <p className="mb-4 text-xs" style={{ color: C.ink500 }}>
+                                {card.totalLabel}: {total.toLocaleString('id-ID', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} kg
+                            </p>
+                            {card.data.length > 0 ? (
+                                <>
+                                    <div className="h-64">
+                                        <ResponsiveContainer width="100%" height="100%">
+                                            <PieChart>
+                                                <defs>
+                                                    <filter id="homePieShadowSm" x="-50%" y="-50%" width="200%" height="200%">
+                                                        <feDropShadow dx="0" dy="1" stdDeviation="1.2" floodColor="#000000" floodOpacity="0.65" />
+                                                    </filter>
+                                                </defs>
+                                                <Pie data={sorted} cx="50%" cy="50%" labelLine={false} label={ChartLabel} outerRadius={100} dataKey="value" stroke="none">
+                                                    {sorted.map((entry) => <Cell key={entry.name} fill={getCategoryColor(entry.name)} />)}
+                                                </Pie>
+                                                <Tooltip content={<ChartTooltip />} />
+                                            </PieChart>
+                                        </ResponsiveContainer>
+                                    </div>
+                                    <PieLegend data={sorted} total={total} />
+                                </>
+                            ) : (
+                                <div className="flex h-48 items-center justify-center text-sm" style={{ color: C.ink500 }}>
+                                    Belum ada data
+                                </div>
+                            )}
+                        </div>
+                    );
+                })}
+            </div>
+        </div>
+    );
+}
+
 export default function Dashboard() {
+    const rawProps = usePage().props as unknown as Record<string, unknown>;
+    const rawNews = (rawProps.news as Array<Record<string, unknown>>) || [];
+    const rawPosters = (rawProps.posters as Array<Record<string, unknown>>) || [];
+    const news: NewsItem[] = rawNews.map((n) => ({ id: n.id as number, tag: n.tag as string, date: n.date as string, title: n.title as string, image: n.image_url as string, href: n.href as string, is_published: n.is_published as boolean, order: n.order as number }));
+    const posters: PosterItem[] = rawPosters.map((p) => ({ id: p.id as number, title: p.title as string, tag: p.tag as string, note: p.note as string | null, image: p.image_url as string, order: p.order as number, is_published: p.is_published as boolean }));
+    const pageProps = rawProps as unknown as PageProps;
+    const NEWS_LOOP = makeNewsLoop(news);
+    const POSTERS = posters;
+    const [activePreset, setActivePreset] = useState<PresetKey>('all');
+    const [startDate, setStartDate] = useState(pageProps.filters?.start_date ?? '');
+    const [endDate, setEndDate] = useState(pageProps.filters?.end_date ?? '');
+
+    function applyFilter(params: { start_date?: string | null; end_date?: string | null }) {
+        const query: Record<string, string> = {};
+        if (params.start_date) query.start_date = params.start_date;
+        if (params.end_date) query.end_date = params.end_date;
+        router.get('/', query, { preserveState: true, preserveScroll: true, replace: true });
+    }
+
+    function handlePreset(preset: typeof PRESETS[number]) {
+        setActivePreset(preset.key);
+        if (preset.days === null) {
+            setStartDate('');
+            setEndDate('');
+            applyFilter({});
+        } else if (preset.days === 0) {
+            const today = formatDateInput(new Date());
+            setStartDate(today);
+            setEndDate(today);
+            applyFilter({ start_date: today, end_date: today });
+        } else {
+            const s = daysAgo(preset.days);
+            const e = formatDateInput(new Date());
+            setStartDate(s);
+            setEndDate(e);
+            applyFilter({ start_date: s, end_date: e });
+        }
+    }
+
+    function handleCustomDate() {
+        setActivePreset('all');
+        applyFilter({ start_date: startDate || null, end_date: endDate || null });
+    }
   const [heroIndex, setHeroIndex] = useState(0);
   const [posterIndex, setPosterIndex] = useState(0);
   const [posterPaused, setPosterPaused] = useState(false);
@@ -698,17 +873,62 @@ export default function Dashboard() {
       {/* ---- Laporan ---- */}
       <section id="laporan" ref={setSectionRef("laporan")} className="max-w-6xl mx-auto px-5 sm:px-8 pt-6 sm:pt-8 pb-8 sm:pb-10" style={{ scrollMarginTop: 72 }}>
         <Reveal>
-          <h2 className="text-2xl sm:text-3xl font-semibold mb-2" style={{ ...display, color: C.navy900 }}>
-            Laporan
-          </h2>
+          <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+            <div>
+              <h2 className="text-2xl sm:text-3xl font-semibold mb-1" style={{ ...display, color: C.navy900 }}>
+                Laporan
+              </h2>
+              <p className="text-sm" style={{ color: C.ink500 }}>Rekap data pengelolaan sampah</p>
+            </div>
+            <div className="flex flex-wrap items-center gap-2 shrink-0">
+              <div className="flex items-center rounded-lg border bg-white p-0.5" style={{ borderColor: C.line }}>
+                {PRESETS.map((preset) => (
+                  <button
+                    key={preset.key}
+                    onClick={() => handlePreset(preset)}
+                    className={`rounded-md px-3 py-1.5 text-xs font-medium transition-colors ${
+                      activePreset === preset.key
+                        ? 'bg-green-600 text-white shadow-sm'
+                        : 'text-gray-600 hover:text-gray-900'
+                    }`}
+                  >
+                    {preset.label}
+                  </button>
+                ))}
+              </div>
+              <div className="flex items-center gap-1.5 rounded-lg border bg-white px-2 py-1" style={{ borderColor: C.line }}>
+                <CalendarIcon className="size-3.5 text-gray-400" />
+                <input
+                  type="date"
+                  value={startDate}
+                  onChange={(e) => setStartDate(e.target.value)}
+                  className="w-28 border-0 bg-transparent text-xs text-gray-700 outline-none hover:text-gray-900 [color-scheme:light]"
+                />
+                <span className="text-xs text-gray-400">&ndash;</span>
+                <input
+                  type="date"
+                  value={endDate}
+                  onChange={(e) => setEndDate(e.target.value)}
+                  className="w-28 border-0 bg-transparent text-xs text-gray-700 outline-none hover:text-gray-900 [color-scheme:light]"
+                />
+                <button
+                  onClick={handleCustomDate}
+                  className="h-6 rounded-md px-2 text-xs font-medium text-green-700 hover:bg-green-50 hover:text-green-800 transition-colors"
+                >
+                  Terapkan
+                </button>
+              </div>
+            </div>
+          </div>
         </Reveal>
         <Reveal delay={80}>
-          <PlaceholderPanel item={MENU_DECK.find((item) => item.id === "laporan")!} />
+          <LaporanCharts data={pageProps} />
         </Reveal>
       </section>
 
       {/* ---- Berita ---- */}
       <section id="berita" ref={setSectionRef("berita")} className="pt-6 sm:pt-8" style={{ backgroundColor: C.navy900, scrollMarginTop: 64 }}>
+        {news.length > 0 ? (
         <div className="max-w-6xl mx-auto px-5 sm:px-8 pb-12">
           <Reveal>
             <div className="flex items-end justify-between flex-wrap gap-3 mb-8">
@@ -738,7 +958,7 @@ export default function Dashboard() {
           >
             <div ref={newsTrackRef} className="flex gap-5 pb-2" style={{ willChange: "transform" }}>
               {NEWS_LOOP.map((n, i) => (
-                <Reveal key={i} delay={(i % NEWS.length) * 80} className="shrink-0 w-64 sm:w-72">
+                <Reveal key={i} delay={(i % news.length) * 80} className="shrink-0 w-64 sm:w-72">
                   <a
                     href={n.href}
                     target="_blank"
@@ -773,10 +993,17 @@ export default function Dashboard() {
             </div>
           </div>
         </div>
+        ) : (
+          <div className="max-w-6xl mx-auto px-5 sm:px-8 py-12 text-center">
+            <p className="text-sm" style={{ color: "#8A8FB3" }}>Belum ada berita.</p>
+          </div>
+        )}
       </section>
 
       {/* ---- Edukasi: poster slideshow ---- */}
       <section id="edukasi" ref={setSectionRef("edukasi")} className="max-w-6xl mx-auto px-5 sm:px-8 pt-6 sm:pt-8 pb-20" style={{ scrollMarginTop: 64 }}>
+        {posters.length > 0 ? (
+        <>
         <Reveal>
           <h2 className="text-2xl sm:text-3xl font-semibold mb-2" style={{ ...display, color: C.navy900 }}>
             Poster Edukasi
@@ -799,7 +1026,10 @@ export default function Dashboard() {
               </span>
             </div>
 
-            {/* Frame poster — rasio A3 vertikal (297 x 420), gambar dipusatkan */}
+            {/* Frame poster — rasio A3 vertikal (297 x 420), gambar dipusatkan.
+                Sengaja tidak ada overlay teks di atas gambar (judul/catatan),
+                supaya posternya kelihatan bersih & jelas. Tag di atas frame
+                (di luar gambar) sudah cukup jadi label. */}
             <div
               className="mx-auto rounded-2xl overflow-hidden relative mb-3"
               style={{ aspectRatio: "297 / 420", width: "min(100%, 420px)", backgroundColor: C.navy050 }}
@@ -812,15 +1042,6 @@ export default function Dashboard() {
                 className="w-full h-full object-cover"
                 style={{ objectPosition: "center 65%" }}
               />
-              <div
-                className="absolute inset-0 flex flex-col items-center justify-end text-center px-6 py-8"
-                style={{ background: "linear-gradient(0deg, rgba(10,20,64,0.88) 15%, rgba(10,20,64,0.05) 65%)" }}
-              >
-                <h3 className="text-white text-xl sm:text-2xl font-semibold mb-2" style={display}>
-                  {activePoster.title}
-                </h3>
-                <p className="text-sm max-w-md" style={{ color: "#D6D9EC" }}>{activePoster.note}</p>
-              </div>
             </div>
 
             <div className="flex items-center justify-between mb-4">
@@ -889,6 +1110,12 @@ export default function Dashboard() {
             </div>
           </div>
         </Reveal>
+        </>
+        ) : (
+          <div className="py-12 text-center">
+            <p className="text-sm" style={{ color: C.ink500 }}>Belum ada poster edukasi.</p>
+          </div>
+        )}
       </section>
 
       {/* ---- Footer ---- */}

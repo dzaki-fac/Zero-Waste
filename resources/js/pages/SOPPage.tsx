@@ -1,49 +1,227 @@
-import { motion } from "framer-motion";
+import { useState, useRef, useEffect } from "react";
+import { Document, Page, pdfjs } from "react-pdf";
+import { ChevronLeft, ChevronRight, ZoomIn, ZoomOut, Download, ScrollText, FileText } from "lucide-react";
+import "react-pdf/dist/Page/AnnotationLayer.css";
+import "react-pdf/dist/Page/TextLayer.css";
 import { C, display, body } from "../theme";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
+import { Reveal } from "../components/shared";
 
-const fadeUp = {
-  hidden: { opacity: 0, y: 28 },
-  visible: (i: number) => ({
-    opacity: 1,
-    y: 0,
-    transition: {
-      duration: 0.75,
-      ease: [0.16, 1, 0.3, 1] as [number, number, number, number],
-      delay: i * 0.12,
-    },
-  }),
-};
+pdfjs.GlobalWorkerOptions.workerSrc = new URL(
+  "pdfjs-dist/build/pdf.worker.min.mjs",
+  import.meta.url
+).toString();
+
+const SOP_FILE = "/documents/sop.pdf";
 
 export default function SOPPage() {
+  const [numPages, setNumPages] = useState<number>(0);
+  const [pageNumber, setPageNumber] = useState(1);
+  const [scale, setScale] = useState(1.1);
+  const [mode, setMode] = useState<"single" | "all">("single");
+
+  const pageRefs = useRef<Record<number, HTMLDivElement | null>>({});
+  const suppressObserverUntilRef = useRef(0);
+
+  useEffect(() => {
+    if (mode !== "all" || numPages === 0) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (Date.now() < suppressObserverUntilRef.current) return;
+        let bestPage = pageNumber;
+        let bestRatio = 0;
+        entries.forEach((entry) => {
+          const page = Number((entry.target as HTMLElement).dataset.page);
+          if (entry.intersectionRatio > bestRatio) {
+            bestRatio = entry.intersectionRatio;
+            bestPage = page;
+          }
+        });
+        if (bestRatio > 0) setPageNumber(bestPage);
+      },
+      { threshold: [0.25, 0.5, 0.75, 1] }
+    );
+
+    Object.values(pageRefs.current).forEach((el) => {
+      if (el) observer.observe(el);
+    });
+
+    return () => observer.disconnect();
+  }, [mode, numPages]);
+
+  const goToPage = (target: number) => {
+    const clamped = Math.min(Math.max(1, target), numPages || 1);
+    setPageNumber(clamped);
+    if (mode === "all") {
+      suppressObserverUntilRef.current = Date.now() + 700;
+      const el = pageRefs.current[clamped];
+      if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+  };
+
   return (
     <div style={{ ...body, backgroundColor: C.paper50, color: C.ink900 }} className="min-h-screen flex flex-col">
       <Navbar activeSection="sop" />
-      <main className="flex-1 max-w-4xl mx-auto px-5 sm:px-8 py-16 sm:py-20 w-full">
-        <motion.h1
-          className="text-3xl sm:text-4xl font-semibold mb-4"
-          style={{ ...display, color: C.navy900 }}
-          variants={fadeUp}
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, margin: "-8%" }}
-          custom={0}
-        >
-          SOP
-        </motion.h1>
-        <motion.p
-          className="text-base leading-relaxed"
-          style={{ color: C.ink500 }}
-          variants={fadeUp}
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, margin: "-8%" }}
-          custom={1}
-        >
-          Halaman SOP — konten akan ditambahkan di sini.
-        </motion.p>
-      </main>
+      <section className="flex-1 max-w-6xl mx-auto px-5 sm:px-8 pt-8 sm:pt-10 pb-24 w-full">
+        <Reveal>
+          <div className="flex items-end justify-between mb-6 gap-4 flex-wrap">
+            <h2 className="text-2xl sm:text-3xl font-semibold" style={{ ...display, color: C.navy900 }}>
+              SOP
+            </h2>
+            <a
+              href={SOP_FILE}
+              download
+              className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-wider px-4 py-2.5 rounded-md border transition-colors"
+              style={{ ...body, color: C.navy900, borderColor: C.navy900 }}
+              onMouseOver={(e) => {
+                e.currentTarget.style.backgroundColor = C.navy900;
+                e.currentTarget.style.color = "#fff";
+              }}
+              onMouseOut={(e) => {
+                e.currentTarget.style.backgroundColor = "transparent";
+                e.currentTarget.style.color = C.navy900;
+              }}
+            >
+              <Download size={14} />
+              Unduh SOP
+            </a>
+          </div>
+        </Reveal>
+
+        <Reveal delay={80}>
+          <div className="border" style={{ borderColor: "#B9C0D6" }}>
+            <div
+              className="flex items-center justify-between px-4 sm:px-6 py-3 border-b flex-wrap gap-3"
+              style={{ backgroundColor: C.navy900, borderColor: "#B9C0D6" }}
+            >
+              <div className="flex items-center gap-4">
+                <button
+                  onClick={() => goToPage(pageNumber - 1)}
+                  disabled={pageNumber <= 1}
+                  className="flex items-center justify-center w-7 h-7 border disabled:opacity-30 transition-colors"
+                  style={{ borderColor: "rgba(255,255,255,0.35)", color: "#fff" }}
+                  aria-label="Halaman sebelumnya"
+                >
+                  <ChevronLeft size={14} />
+                </button>
+                <span className="text-xs font-semibold uppercase tracking-wider" style={{ ...body, color: "#fff" }}>
+                  Halaman {pageNumber} / {numPages || "-"}
+                </span>
+                <button
+                  onClick={() => goToPage(pageNumber + 1)}
+                  disabled={pageNumber >= numPages}
+                  className="flex items-center justify-center w-7 h-7 border disabled:opacity-30 transition-colors"
+                  style={{ borderColor: "rgba(255,255,255,0.35)", color: "#fff" }}
+                  aria-label="Halaman berikutnya"
+                >
+                  <ChevronRight size={14} />
+                </button>
+              </div>
+
+              <div className="flex items-center gap-3">
+                <button
+                  onClick={() => setScale((s) => Math.max(0.6, +(s - 0.15).toFixed(2)))}
+                  className="flex items-center justify-center w-7 h-7 border transition-colors"
+                  style={{ borderColor: "rgba(255,255,255,0.35)", color: "#fff" }}
+                  aria-label="Perkecil"
+                >
+                  <ZoomOut size={14} />
+                </button>
+                <span className="text-xs font-semibold w-10 text-center" style={{ ...body, color: "#fff" }}>
+                  {Math.round(scale * 100)}%
+                </span>
+                <button
+                  onClick={() => setScale((s) => Math.min(2.5, +(s + 0.15).toFixed(2)))}
+                  className="flex items-center justify-center w-7 h-7 border transition-colors"
+                  style={{ borderColor: "rgba(255,255,255,0.35)", color: "#fff" }}
+                  aria-label="Perbesar"
+                >
+                  <ZoomIn size={14} />
+                </button>
+
+                <button
+                  onClick={() => setMode((m) => (m === "single" ? "all" : "single"))}
+                  className="flex items-center gap-1.5 px-2.5 h-7 border text-[11px] font-semibold uppercase tracking-wide transition-colors ml-1"
+                  style={{ borderColor: "rgba(255,255,255,0.35)", color: "#fff" }}
+                  aria-label={mode === "single" ? "Tampilkan semua halaman (scroll)" : "Tampilkan satu halaman"}
+                >
+                  {mode === "single" ? <ScrollText size={13} /> : <FileText size={13} />}
+                  {mode === "single" ? "Scroll" : "1 Halaman"}
+                </button>
+              </div>
+            </div>
+
+            {mode === "single" ? (
+              <div className="flex justify-center py-10 overflow-x-auto" style={{ backgroundColor: "#E3E6EE" }}>
+                <Document
+                  file={SOP_FILE}
+                  onLoadSuccess={({ numPages }) => setNumPages(numPages)}
+                  loading={
+                    <p className="text-sm py-20" style={{ ...body, color: C.ink500 }}>
+                      Memuat dokumen...
+                    </p>
+                  }
+                  error={
+                    <p className="text-sm py-20" style={{ ...body, color: C.ink500 }}>
+                      Gagal memuat dokumen SOP.
+                    </p>
+                  }
+                >
+                  <Page
+                    pageNumber={pageNumber}
+                    scale={scale}
+                    className="shadow-md"
+                    renderTextLayer={false}
+                    renderAnnotationLayer={false}
+                  />
+                </Document>
+              </div>
+            ) : (
+              <div
+                className="flex flex-col items-center gap-10 py-10 overflow-y-auto"
+                style={{
+                  backgroundColor: "#D5D9E3",
+                  maxHeight: "80vh",
+                  scrollbarWidth: "thin",
+                  scrollbarColor: `${C.navy700} #D5D9E3`,
+                }}
+              >
+                <Document
+                  file={SOP_FILE}
+                  onLoadSuccess={({ numPages }) => setNumPages(numPages)}
+                  loading={
+                    <p className="text-sm py-20" style={{ ...body, color: C.ink500 }}>
+                      Memuat dokumen...
+                    </p>
+                  }
+                  error={
+                    <p className="text-sm py-20" style={{ ...body, color: C.ink500 }}>
+                      Gagal memuat dokumen SOP.
+                    </p>
+                  }
+                >
+                  {Array.from({ length: numPages }, (_, i) => i + 1).map((p) => (
+                    <div key={p} data-page={p} ref={(el) => { pageRefs.current[p] = el; }} className="flex flex-col items-center gap-2">
+                      <Page
+                        pageNumber={p}
+                        scale={scale}
+                        className="shadow-lg rounded-sm overflow-hidden"
+                        renderTextLayer={false}
+                        renderAnnotationLayer={false}
+                      />
+                      <span className="text-[11px] font-semibold" style={{ ...body, color: C.ink500 }}>
+
+                      </span>
+                    </div>
+                  ))}
+                </Document>
+              </div>
+            )}
+          </div>
+        </Reveal>
+      </section>
       <Footer />
     </div>
   );

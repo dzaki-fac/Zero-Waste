@@ -15,6 +15,7 @@ class DatabaseSeeder extends Seeder
             PilahSampahSeeder::class,
             DistribusiSeeder::class,
             KelolaDataSeeder::class,
+            DataDasarSeeder::class,
         ]);
     }
 }

@@ -87,7 +87,7 @@ export default function FormPekerjaan() {
         if (debounceRef.current) clearTimeout(debounceRef.current);
         debounceRef.current = setTimeout(() => {
             router.post(
-                '/petugas/checklist-pekerjaan',
+                '/form/checklist-pekerjaan',
                 {
                     _redirect: '/form',
                     nip: auth.user.nip,
