@@ -23,6 +23,16 @@ class OptionHelper
             'tujuan_distribusi' => [
                 'TPS', 'Pupuk/kompos', 'PlasticPay', 'Tujuan lainnya',
             ],
+            'rincian_area' => [
+                ['nama' => 'Lantai 1', 'deskripsi' => 'Ruang baca utama, lobby, dan area administrasi', 'luas' => 1200],
+                ['nama' => 'Lantai 2', 'deskripsi' => 'Ruang koleksi, sirkulasi, dan ruang diskusi', 'luas' => 1200],
+                ['nama' => 'Lantai 3', 'deskripsi' => 'Ruang referensi, jurnal, dan ruang baca tenang', 'luas' => 1200],
+                ['nama' => 'Lantai 4', 'deskripsi' => 'Ruang audio visual, ruang rapat, dan multimedia', 'luas' => 1000],
+                ['nama' => 'Area Teras', 'deskripsi' => 'Teras depan dan belakang gedung', 'luas' => 300],
+                ['nama' => 'Area Halaman', 'deskripsi' => 'Halaman, taman, dan area penghijauan', 'luas' => 1800],
+                ['nama' => 'Area Parkir', 'deskripsi' => 'Area parkir kendaraan roda dua dan roda empat', 'luas' => 1500],
+                ['nama' => 'UNDIP Press', 'deskripsi' => 'Kantor penerbitan UNDIP Press', 'luas' => 300],
+            ],
         ];
     }
 

@@ -1,6 +1,6 @@
 import { Head, router, usePage } from '@inertiajs/react';
 import { Plus, X } from 'lucide-react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Heading from '@/components/heading';
 import { Button } from '@/components/ui/button';
 import {
@@ -9,16 +9,22 @@ import {
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 
+type RincianArea = {
+    nama: string;
+    deskripsi: string;
+    luas: number;
+};
+
 type Options = {
     area: string[];
     jenis_sampah: string[];
     tujuan_distribusi: string[];
+    rincian_area: RincianArea[];
 };
 
-type ListKey = keyof Options;
+type ListKey = 'jenis_sampah' | 'tujuan_distribusi';
 
 const sections: { key: ListKey; label: string; title: string; placeholder: string }[] = [
-    { key: 'area', label: 'Area', title: 'Tambah Area', placeholder: 'Masukkan nama area' },
     { key: 'jenis_sampah', label: 'Jenis Sampah', title: 'Tambah Jenis Sampah', placeholder: 'Masukkan nama jenis sampah' },
     { key: 'tujuan_distribusi', label: 'Tujuan Distribusi', title: 'Tambah Tujuan Distribusi', placeholder: 'Masukkan nama tujuan distribusi' },
 ];
@@ -29,12 +35,20 @@ export default function Settings() {
         success?: string;
     };
 
-    const [activeKey, setActiveKey] = useState<ListKey>('area');
+    const [activeKey, setActiveKey] = useState<ListKey>('jenis_sampah');
     const [dialogOpen, setDialogOpen] = useState(false);
     const [newItem, setNewItem] = useState('');
     const [confirm, setConfirm] = useState<{ open: boolean; title: string; message: string; onConfirm: () => void }>({
         open: false, title: '', message: '', onConfirm: () => {},
     });
+
+    const [rincianArea, setRincianArea] = useState<RincianArea[]>(options.rincian_area ?? []);
+
+    useEffect(() => {
+        if (options.rincian_area) {
+            setRincianArea(options.rincian_area);
+        }
+    }, [options.rincian_area]);
 
     const current = sections.find((s) => s.key === activeKey)!;
 
@@ -58,7 +72,7 @@ export default function Settings() {
 
     const openRemove = (key: ListKey, i: number) => {
         const name = options[key][i];
-        const labelMap: Record<ListKey, string> = { area: 'area', jenis_sampah: 'jenis sampah', tujuan_distribusi: 'tujuan distribusi' };
+        const labelMap: Record<ListKey, string> = { jenis_sampah: 'jenis sampah', tujuan_distribusi: 'tujuan distribusi' };
         setConfirm({
             open: true,
             title: 'Hapus Data',
@@ -68,6 +82,12 @@ export default function Settings() {
             },
         });
     };
+
+    const saveRincianArea = () => {
+        save({ ...options, rincian_area: rincianArea });
+    };
+
+    const totalLuas = rincianArea.reduce((sum, item) => sum + (Number(item.luas) || 0), 0);
 
     return (
         <>
@@ -81,6 +101,69 @@ export default function Settings() {
                         {success}
                     </div>
                 )}
+
+                <div className="rounded-xl border bg-white p-5 shadow-sm">
+                    <div className="flex items-center justify-between">
+                        <h3 className="text-sm font-semibold text-gray-800">Rincian Luas Area</h3>
+                        <Button type="button" onClick={saveRincianArea} className="bg-green-600 text-white hover:bg-green-700">
+                            Simpan
+                        </Button>
+                    </div>
+                    <p className="mt-1 text-xs text-gray-500">Kelola luas area per klasifikasi</p>
+
+                    <div className="mt-4 overflow-x-auto">
+                        <table className="w-full text-sm">
+                            <thead>
+                                <tr className="border-b bg-green-50/60">
+                                    <th className="px-3 py-2 text-left text-xs font-semibold tracking-wide text-green-700 uppercase">Area</th>
+                                    <th className="px-3 py-2 text-left text-xs font-semibold tracking-wide text-green-700 uppercase">Keterangan</th>
+                                    <th className="px-3 py-2 text-right text-xs font-semibold tracking-wide text-green-700 uppercase">Luas (m&sup2;)</th>
+                                </tr>
+                            </thead>
+                            <tbody className="divide-y divide-green-100">
+                                {rincianArea.map((item, i) => (
+                                    <tr key={item.nama}>
+                                        <td className="whitespace-nowrap px-3 py-2 font-medium text-green-800">{item.nama}</td>
+                                        <td className="px-3 py-2">
+                                            <Input
+                                                value={item.deskripsi}
+                                                onChange={(e) => {
+                                                    const copy = [...rincianArea];
+                                                    copy[i] = { ...copy[i], deskripsi: e.target.value };
+                                                    setRincianArea(copy);
+                                                }}
+                                                className="h-9 text-sm"
+                                                placeholder="Deskripsi area"
+                                            />
+                                        </td>
+                                        <td className="px-3 py-2">
+                                            <Input
+                                                type="number"
+                                                value={item.luas}
+                                                onChange={(e) => {
+                                                    const copy = [...rincianArea];
+                                                    copy[i] = { ...copy[i], luas: Number(e.target.value) };
+                                                    setRincianArea(copy);
+                                                }}
+                                                className="h-9 w-28 text-right text-sm"
+                                                min={0}
+                                            />
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                            <tfoot>
+                                <tr className="bg-green-50/40 font-semibold">
+                                    <td className="px-3 py-2 text-green-900">Total</td>
+                                    <td className="px-3 py-2 text-xs text-gray-500">Jumlah keseluruhan</td>
+                                    <td className="px-3 py-2 text-right tabular-nums text-green-900">
+                                        {totalLuas.toLocaleString('id-ID')} m&sup2;
+                                    </td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                </div>
 
                 {sections.map((section) => (
                     <div key={section.key} className="rounded-xl border bg-white p-5 shadow-sm">

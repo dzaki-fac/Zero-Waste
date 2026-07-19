@@ -66,6 +66,7 @@ Route::middleware(['auth', CheckRole::class . ':admin'])
             ->parameters(['kelola-pekerjaan' => 'masterPekerjaan'])
             ->names('kelola-pekerjaan');
 
+        Route::get('data-dasar/export', [DataDasarController::class, 'export'])->name('data-dasar.export');
         Route::get('data-dasar', [DataDasarController::class, 'index'])->name('data-dasar.index');
         Route::post('data-dasar', [DataDasarController::class, 'update'])->name('data-dasar.update');
     });
