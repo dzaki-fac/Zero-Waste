@@ -184,7 +184,7 @@ export default function AdminAccounts() {
             return;
         }
 
-        editForm.patch(`/akun/${editingUser.id}`, {
+        editForm.patch(`/admin/akun/${editingUser.id}`, {
             preserveScroll: true,
             onSuccess: () => {
                 setEditOpen(false);
@@ -199,7 +199,7 @@ export default function AdminAccounts() {
         }
 
         setDeleteProcessing(true);
-        router.delete(`/akun/${deletingUser.id}`, {
+        router.delete(`/admin/akun/${deletingUser.id}`, {
             preserveScroll: true,
             onSuccess: () => {
                 setDeleteOpen(false);

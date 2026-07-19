@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\StoreAccountRequest;
 use App\Http\Requests\Admin\UpdateAccountRequest;
+use App\Models\ChecklistPekerjaan;
 use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -95,6 +96,10 @@ class AkunController extends Controller
 
         if ($authUser->id === $user->id) {
             abort(403, 'You cannot delete your own account.');
+        }
+
+        if ($user->nip) {
+            ChecklistPekerjaan::where('nip', $user->nip)->delete();
         }
 
         $user->delete();

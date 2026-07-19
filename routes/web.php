@@ -7,8 +7,10 @@ use App\Http\Controllers\DistribusiController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\KelolaDataController;
 use App\Http\Controllers\MasterPekerjaanController;
+use App\Http\Controllers\NewsController;
 use App\Http\Controllers\PenimbanganController;
 use App\Http\Controllers\PilahSampahController;
+use App\Http\Controllers\PosterController;
 use App\Http\Middleware\CheckRole;
 use Illuminate\Support\Facades\Route;
 
@@ -31,6 +33,7 @@ Route::middleware(['auth'])->group(function () {
     Route::post('form/pilah-sampah', [PilahSampahController::class, 'store'])->name('form.pilah-sampah.store');
     Route::post('form/distribusi', [DistribusiController::class, 'store'])->name('form.distribusi.store');
     Route::get('form/pekerjaan', [ChecklistPekerjaanController::class, 'formPage'])->name('form.pekerjaan');
+    Route::post('form/checklist-pekerjaan', [ChecklistPekerjaanController::class, 'store'])->name('form.checklist-pekerjaan.store');
 
     Route::middleware([CheckRole::class . ':admin'])->prefix('admin')->group(function () {
         Route::get('kelola-data', [KelolaDataController::class, 'index'])->name('settings.index');
@@ -52,6 +55,7 @@ Route::middleware(['auth', CheckRole::class . ':admin'])
         Route::resource('pilah-sampah', PilahSampahController::class)->names('pilah-sampah');
 
         Route::get('distribusi/export', [DistribusiController::class, 'export'])->name('distribusi.export');
+        Route::patch('distribusi/{distribusi}/review', [DistribusiController::class, 'review'])->name('distribusi.review');
         Route::resource('distribusi', DistribusiController::class)->names('distribusi');
 
         Route::get('checklist-pekerjaan/export', [ChecklistPekerjaanController::class, 'export'])->name('checklist-pekerjaan.export');
@@ -66,6 +70,16 @@ Route::middleware(['auth', CheckRole::class . ':admin'])
             ->parameters(['kelola-pekerjaan' => 'masterPekerjaan'])
             ->names('kelola-pekerjaan');
 
+        Route::resource('berita', NewsController::class)
+            ->only(['index', 'store', 'update', 'destroy'])
+            ->parameters(['berita' => 'news'])
+            ->names('berita');
+
+        Route::resource('poster', PosterController::class)
+            ->only(['index', 'store', 'update', 'destroy'])
+            ->parameters(['poster' => 'poster'])
+            ->names('poster');
+
         Route::get('data-dasar', [DataDasarController::class, 'index'])->name('data-dasar.index');
         Route::post('data-dasar', [DataDasarController::class, 'update'])->name('data-dasar.update');
     });
@@ -76,6 +90,8 @@ Route::middleware(['auth', CheckRole::class . ':petugas'])
     ->name('petugas.')
     ->group(function () {
         Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard');
+
+        Route::get('checklist-pekerjaan', [ChecklistPekerjaanController::class, 'showForAuthPetugas'])->name('checklist-pekerjaan.index');
 
         Route::get('penimbangan/export', [PenimbanganController::class, 'export'])->name('penimbangan.export');
         Route::resource('penimbangan', PenimbanganController::class)->names('penimbangan');

@@ -1,6 +1,6 @@
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { Document, Page, pdfjs } from "react-pdf";
-import { ChevronLeft, ChevronRight, ZoomIn, ZoomOut, Download } from "lucide-react";
+import { ChevronLeft, ChevronRight, ZoomIn, ZoomOut, Download, ScrollText, FileText } from "lucide-react";
 import "react-pdf/dist/Page/AnnotationLayer.css";
 import "react-pdf/dist/Page/TextLayer.css";
 import { C, display, body } from "../theme";
@@ -19,6 +19,47 @@ export default function PeraturanPage() {
   const [numPages, setNumPages] = useState<number>(0);
   const [pageNumber, setPageNumber] = useState(1);
   const [scale, setScale] = useState(1.1);
+  const [mode, setMode] = useState<"single" | "all">("single");
+
+  const pageRefs = useRef<Record<number, HTMLDivElement | null>>({});
+  const suppressObserverUntilRef = useRef(0);
+
+  useEffect(() => {
+    if (mode !== "all" || numPages === 0) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (Date.now() < suppressObserverUntilRef.current) return;
+        let bestPage = pageNumber;
+        let bestRatio = 0;
+        entries.forEach((entry) => {
+          const page = Number((entry.target as HTMLElement).dataset.page);
+          if (entry.intersectionRatio > bestRatio) {
+            bestRatio = entry.intersectionRatio;
+            bestPage = page;
+          }
+        });
+        if (bestRatio > 0) setPageNumber(bestPage);
+      },
+      { threshold: [0.25, 0.5, 0.75, 1] }
+    );
+
+    Object.values(pageRefs.current).forEach((el) => {
+      if (el) observer.observe(el);
+    });
+
+    return () => observer.disconnect();
+  }, [mode, numPages]);
+
+  const goToPage = (target: number) => {
+    const clamped = Math.min(Math.max(1, target), numPages || 1);
+    setPageNumber(clamped);
+    if (mode === "all") {
+      suppressObserverUntilRef.current = Date.now() + 700;
+      const el = pageRefs.current[clamped];
+      if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+  };
 
   return (
     <div style={{ ...body, backgroundColor: C.paper50, color: C.ink900 }} className="min-h-screen flex flex-col">
@@ -51,14 +92,13 @@ export default function PeraturanPage() {
 
         <Reveal delay={80}>
           <div className="border" style={{ borderColor: "#B9C0D6" }}>
-            {/* Toolbar */}
             <div
               className="flex items-center justify-between px-4 sm:px-6 py-3 border-b flex-wrap gap-3"
               style={{ backgroundColor: C.navy900, borderColor: "#B9C0D6" }}
             >
               <div className="flex items-center gap-4">
                 <button
-                  onClick={() => setPageNumber((p) => Math.max(1, p - 1))}
+                  onClick={() => goToPage(pageNumber - 1)}
                   disabled={pageNumber <= 1}
                   className="flex items-center justify-center w-7 h-7 border disabled:opacity-30 transition-colors"
                   style={{ borderColor: "rgba(255,255,255,0.35)", color: "#fff" }}
@@ -70,7 +110,7 @@ export default function PeraturanPage() {
                   Halaman {pageNumber} / {numPages || "-"}
                 </span>
                 <button
-                  onClick={() => setPageNumber((p) => Math.min(numPages, p + 1))}
+                  onClick={() => goToPage(pageNumber + 1)}
                   disabled={pageNumber >= numPages}
                   className="flex items-center justify-center w-7 h-7 border disabled:opacity-30 transition-colors"
                   style={{ borderColor: "rgba(255,255,255,0.35)", color: "#fff" }}
@@ -100,34 +140,85 @@ export default function PeraturanPage() {
                 >
                   <ZoomIn size={14} />
                 </button>
+
+                <button
+                  onClick={() => setMode((m) => (m === "single" ? "all" : "single"))}
+                  className="flex items-center gap-1.5 px-2.5 h-7 border text-[11px] font-semibold uppercase tracking-wide transition-colors ml-1"
+                  style={{ borderColor: "rgba(255,255,255,0.35)", color: "#fff" }}
+                  aria-label={mode === "single" ? "Tampilkan semua halaman (scroll)" : "Tampilkan satu halaman"}
+                >
+                  {mode === "single" ? <ScrollText size={13} /> : <FileText size={13} />}
+                  {mode === "single" ? "Scroll" : "1 Halaman"}
+                </button>
               </div>
             </div>
 
-            {/* Halaman PDF */}
-            <div className="flex justify-center py-10 overflow-x-auto" style={{ backgroundColor: "#E3E6EE" }}>
-              <Document
-                file={PERATURAN_FILE}
-                onLoadSuccess={({ numPages }) => setNumPages(numPages)}
-                loading={
-                  <p className="text-sm py-20" style={{ ...body, color: C.ink500 }}>
-                    Memuat dokumen...
-                  </p>
-                }
-                error={
-                  <p className="text-sm py-20" style={{ ...body, color: C.ink500 }}>
-                    Gagal memuat dokumen Peraturan.
-                  </p>
-                }
+            {mode === "single" ? (
+              <div className="flex justify-center py-10 overflow-x-auto" style={{ backgroundColor: "#E3E6EE" }}>
+                <Document
+                  file={PERATURAN_FILE}
+                  onLoadSuccess={({ numPages }) => setNumPages(numPages)}
+                  loading={
+                    <p className="text-sm py-20" style={{ ...body, color: C.ink500 }}>
+                      Memuat dokumen...
+                    </p>
+                  }
+                  error={
+                    <p className="text-sm py-20" style={{ ...body, color: C.ink500 }}>
+                      Gagal memuat dokumen Peraturan.
+                    </p>
+                  }
+                >
+                  <Page
+                    pageNumber={pageNumber}
+                    scale={scale}
+                    className="shadow-md"
+                    renderTextLayer={false}
+                    renderAnnotationLayer={false}
+                  />
+                </Document>
+              </div>
+            ) : (
+              <div
+                className="flex flex-col items-center gap-10 py-10 overflow-y-auto"
+                style={{
+                  backgroundColor: "#D5D9E3",
+                  maxHeight: "80vh",
+                  scrollbarWidth: "thin",
+                  scrollbarColor: `${C.navy700} #D5D9E3`,
+                }}
               >
-                <Page
-                  pageNumber={pageNumber}
-                  scale={scale}
-                  className="shadow-md"
-                  renderTextLayer={false}
-                  renderAnnotationLayer={false}
-                />
-              </Document>
-            </div>
+                <Document
+                  file={PERATURAN_FILE}
+                  onLoadSuccess={({ numPages }) => setNumPages(numPages)}
+                  loading={
+                    <p className="text-sm py-20" style={{ ...body, color: C.ink500 }}>
+                      Memuat dokumen...
+                    </p>
+                  }
+                  error={
+                    <p className="text-sm py-20" style={{ ...body, color: C.ink500 }}>
+                      Gagal memuat dokumen SOP.
+                    </p>
+                  }
+                >
+                  {Array.from({ length: numPages }, (_, i) => i + 1).map((p) => (
+                    <div key={p} data-page={p} ref={(el) => { pageRefs.current[p] = el; }} className="flex flex-col items-center gap-2">
+                      <Page
+                        pageNumber={p}
+                        scale={scale}
+                        className="shadow-lg rounded-sm overflow-hidden"
+                        renderTextLayer={false}
+                        renderAnnotationLayer={false}
+                      />
+                      <span className="text-[11px] font-semibold" style={{ ...body, color: C.ink500 }}>
+                        
+                      </span>
+                    </div>
+                  ))}
+                </Document>
+              </div>
+            )}
           </div>
         </Reveal>
       </section>

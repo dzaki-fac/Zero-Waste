@@ -1,10 +1,12 @@
 import { Head, Link, router, usePage } from '@inertiajs/react';
 import {
+    ClipboardCheck,
     LayoutDashboard,
-    Leaf,
     LogOut,
     Recycle,
+    Scale,
     TreePine,
+    Truck,
     User,
 } from 'lucide-react';
 
@@ -65,7 +67,7 @@ export default function Welcome() {
                                 className="inline-flex items-center gap-2 rounded-lg border border-green-200 bg-white px-4 py-2.5 text-sm font-medium text-green-700 shadow-sm transition hover:bg-green-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-500"
                             >
                                 <LogOut className="h-4 w-4" />
-                                Logout
+                                Keluar
                             </button>
                         </>
                     ) : (
@@ -96,7 +98,7 @@ export default function Welcome() {
                     </Link>
 
                     {/* Description */}
-                    <p className="max-w-md text-lg leading-relaxed text-green-700/70">
+                    <p className="max-w-md text-lg leading-relaxed text-green-800">
                         Sistem pengelolaan sampah untuk lingkungan yang lebih
                         bersih dan berkelanjutan.
                     </p>
@@ -120,7 +122,7 @@ export default function Welcome() {
                             href="/form/penimbangan"
                             className="inline-flex items-center gap-2 rounded-lg bg-green-600 px-6 py-2.5 text-sm font-medium text-white shadow-sm transition hover:bg-green-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-500 focus-visible:ring-offset-2"
                         >
-                            <Leaf className="h-4 w-4" />
+                            <Scale className="h-4 w-4" />
                             Penimbangan
                         </Link>
 
@@ -128,7 +130,7 @@ export default function Welcome() {
                             href="/form/pilah-sampah"
                             className="inline-flex items-center gap-2 rounded-lg bg-green-600 px-6 py-2.5 text-sm font-medium text-white shadow-sm transition hover:bg-green-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-500 focus-visible:ring-offset-2"
                         >
-                            <Leaf className="h-4 w-4" />
+                            <Recycle className="h-4 w-4" />
                             Pilah Sampah
                         </Link>
 
@@ -136,7 +138,7 @@ export default function Welcome() {
                             href="/form/distribusi"
                             className="inline-flex items-center gap-2 rounded-lg bg-green-600 px-6 py-2.5 text-sm font-medium text-white shadow-sm transition hover:bg-green-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-500 focus-visible:ring-offset-2"
                         >
-                            <Leaf className="h-4 w-4" />
+                            <Truck className="h-4 w-4" />
                             Distribusi
                         </Link>
 
@@ -144,8 +146,8 @@ export default function Welcome() {
                             href="/form/pekerjaan"
                             className="inline-flex items-center gap-2 rounded-lg bg-green-600 px-6 py-2.5 text-sm font-medium text-white shadow-sm transition hover:bg-green-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-500 focus-visible:ring-offset-2"
                         >
-                            <Leaf className="h-4 w-4" />
-                            Pekerjaan
+                            <ClipboardCheck className="h-4 w-4" />
+                            Checklist Pekerjaan
                         </Link>
                     </div>
                 </section>

@@ -1,5 +1,5 @@
 import { Link, usePage } from '@inertiajs/react';
-import { Database, LayoutDashboard, ListTodo, Recycle, Scale, Settings, Truck, Users } from 'lucide-react';
+import { ClipboardCheck, Database, Globe, LayoutDashboard, ListTodo, Recycle, Scale, Settings, Truck, Users } from 'lucide-react';
 import AppLogo from '@/components/app-logo';
 import { NavMain } from '@/components/nav-main';
 import { NavUser } from '@/components/nav-user';
@@ -25,15 +25,27 @@ export function AppSidebar() {
 
     const adminNavItems: NavItem[] = [
         { title: 'Checklist Pekerjaan', href: '/admin/checklist-pekerjaan', icon: LayoutDashboard },
-        { title: 'Data Dasar', href: '/admin/data-dasar', icon: Database },
         { title: 'Kelola Pekerjaan', href: '/admin/kelola-pekerjaan', icon: ListTodo },
+        {
+            title: 'Kelola Website',
+            icon: Globe,
+            items: [
+                { title: 'Berita', href: '/admin/berita' },
+                { title: 'Poster Edukasi', href: '/admin/poster' },
+            ],
+        },
+        { title: 'Data Dasar', href: '/admin/data-dasar', icon: Database },
         { title: 'Kelola Data', href: '/admin/kelola-data', icon: Settings },
         { title: 'Akun', href: '/admin/akun', icon: Users },
     ];
 
+    const petugasNavItems: NavItem[] = [
+        { title: 'Checklist Pekerjaan', href: '/petugas/checklist-pekerjaan', icon: ClipboardCheck },
+    ];
+
     const navItems: NavItem[] = auth.user.role === 'admin'
         ? [...sharedNavItems, ...adminNavItems]
-        : sharedNavItems;
+        : [...sharedNavItems, ...petugasNavItems];
 
     return (
         <Sidebar collapsible="icon">

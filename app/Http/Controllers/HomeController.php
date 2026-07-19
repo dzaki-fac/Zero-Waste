@@ -3,8 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Models\Distribusi;
+use App\Models\News;
 use App\Models\Penimbangan;
 use App\Models\PilahSampah;
+use App\Models\Poster;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
@@ -90,7 +92,12 @@ class HomeController extends Controller
             ->values()
             ->toArray();
 
+        $news = News::published()->ordered()->get();
+        $posters = Poster::published()->ordered()->get();
+
         return Inertia::render('home', [
+            'news' => $news,
+            'posters' => $posters,
             'penimbanganByArea' => $penimbanganByArea,
             'pilahByJenis' => $pilahByJenis,
             'distribusiByTujuan' => $distribusiByTujuan,
