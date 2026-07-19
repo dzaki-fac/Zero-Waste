@@ -525,8 +525,8 @@ function LaporanCharts({ data }: { data: PageProps }) {
             {/* Tiga Pie Chart: Penimbangan, Pilah, Distribusi */}
             <div className="grid gap-6 md:grid-cols-3">
                 {([
-                    { title: 'Distribusi per Tujuan', icon: Truck, data: distribusiByTujuan, totalLabel: 'Total berat didistribusikan' },
                     { title: 'Pilah Sampah per Jenis', icon: Recycle, data: pilahByJenis, totalLabel: 'Total berat dipilah' },
+                    { title: 'Distribusi per Tujuan', icon: Truck, data: distribusiByTujuan, totalLabel: 'Total berat didistribusikan' },
                     { title: 'Sisa & Siap Didistribusikan', icon: Send, data: siapDidistribusikanByJenis, totalLabel: 'Total sisa dan siap didistribusikan' },
                 ] as const).map((card) => {
                     const total = card.data.reduce((s, d) => s + d.value, 0);
