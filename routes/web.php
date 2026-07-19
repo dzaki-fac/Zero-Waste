@@ -70,6 +70,8 @@ Route::middleware(['auth', CheckRole::class . ':admin'])
             ->parameters(['kelola-pekerjaan' => 'masterPekerjaan'])
             ->names('kelola-pekerjaan');
 
+        Route::get('data-dasar/export', [DataDasarController::class, 'export'])->name('data-dasar.export');
+
         Route::resource('berita', NewsController::class)
             ->only(['index', 'store', 'update', 'destroy'])
             ->parameters(['berita' => 'news'])
@@ -79,7 +81,6 @@ Route::middleware(['auth', CheckRole::class . ':admin'])
             ->only(['index', 'store', 'update', 'destroy'])
             ->parameters(['poster' => 'poster'])
             ->names('poster');
-
         Route::get('data-dasar', [DataDasarController::class, 'index'])->name('data-dasar.index');
         Route::post('data-dasar', [DataDasarController::class, 'update'])->name('data-dasar.update');
     });

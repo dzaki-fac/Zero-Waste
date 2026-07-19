@@ -15,9 +15,6 @@ import {
   Newspaper,
   Info,
   Users,
-  Instagram,
-  Youtube,
-  Globe,
   Phone,
   Mail,
   Scale,
@@ -35,11 +32,41 @@ import Navbar from "../components/Navbar";
 import { ChartTooltip, ChartLabel, getCategoryColor, PieLegend } from "../components/charts";
 import type { ChartData } from "../components/charts";
 
-// ---- Tiktok Icon --------------------------------------------------------
+// ---- Ikon media sosial ----
+function WebsiteIcon({ size = 16, color = "currentColor" }: { size?: number; color?: string }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+      <circle cx="12" cy="12" r="9" />
+      <path d="M3 12h18" />
+      <path d="M12 3c2.5 2.5 3.8 5.7 3.8 9s-1.3 6.5-3.8 9c-2.5-2.5-3.8-5.7-3.8-9s1.3-6.5 3.8-9Z" />
+    </svg>
+  );
+}
+
+function YoutubeIcon({ size = 16, color = "currentColor" }: { size?: number; color?: string }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M21.6 7.6c-.2-1-1-1.8-2-2C17.9 5.2 12 5.2 12 5.2s-5.9 0-7.6.4c-1 .2-1.8 1-2 2C2 9.3 2 12 2 12s0 2.7.4 4.4c.2 1 1 1.8 2 2 1.7.4 7.6.4 7.6.4s5.9 0 7.6-.4c1-.2 1.8-1 2-2 .4-1.7.4-4.4.4-4.4s0-2.7-.4-4.4Z" />
+      <path d="M10 9.6 15 12l-5 2.4V9.6Z" fill={color} stroke="none" />
+    </svg>
+  );
+}
+
+function InstagramIcon({ size = 16, color = "currentColor" }: { size?: number; color?: string }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+      <rect x="3" y="3" width="18" height="18" rx="5" />
+      <circle cx="12" cy="12" r="4" />
+      <circle cx="17.2" cy="6.8" r="1.1" fill={color} stroke="none" />
+    </svg>
+  );
+}
+
 function TiktokIcon({ size = 16, color = "currentColor" }: { size?: number; color?: string }) {
   return (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M9 12a4 4 0 1 0 4 4V4a5 5 0 0 0 5 5" />
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M14 4v9.5a3.5 3.5 0 1 1-3.5-3.5" />
+      <path d="M14 4c.3 2 1.8 3.5 4 3.8" />
     </svg>
   );
 }
@@ -135,9 +162,9 @@ function makeNewsLoop(news: NewsItem[]): NewsItem[] {
 }
 
 const SOCIALS = [
-  { icon: Globe, label: "Website Resmi", href: "https://digilib.undip.ac.id/" },
-  { icon: Youtube, label: "YouTube", href: "https://youtube.com/@perpustakaanundip?si=RgDQgwp-UlPD7ryq" },
-  { icon: Instagram, label: "Instagram", href: "https://www.instagram.com/perpus.undip?igsh=MTh4bXFtd3AzbmRmdQ==" },
+  { icon: WebsiteIcon, label: "Website Resmi", href: "https://digilib.undip.ac.id/" },
+  { icon: YoutubeIcon, label: "YouTube", href: "https://youtube.com/@perpustakaanundip?si=RgDQgwp-UlPD7ryq" },
+  { icon: InstagramIcon, label: "Instagram", href: "https://www.instagram.com/perpus.undip?igsh=MTh4bXFtd3AzbmRmdQ==" },
   { icon: TiktokIcon, label: "TikTok", href: "https://www.tiktok.com/@perpus.undip.press?_r=1&_t=ZS-97okoKr4q4S" },
 ];
 
@@ -462,8 +489,8 @@ function LaporanCharts({ data }: { data: PageProps }) {
             {/* Tiga Pie Chart: Penimbangan, Pilah, Distribusi */}
             <div className="grid gap-6 md:grid-cols-3">
                 {([
-                    { title: 'Distribusi per Tujuan', icon: Truck, data: distribusiByTujuan, totalLabel: 'Total berat didistribusikan' },
                     { title: 'Pilah Sampah per Jenis', icon: Recycle, data: pilahByJenis, totalLabel: 'Total berat dipilah' },
+                    { title: 'Distribusi per Tujuan', icon: Truck, data: distribusiByTujuan, totalLabel: 'Total berat didistribusikan' },
                     { title: 'Sisa & Siap Didistribusikan', icon: Send, data: siapDidistribusikanByJenis, totalLabel: 'Total sisa dan siap didistribusikan' },
                 ] as const).map((card) => {
                     const total = card.data.reduce((s, d) => s + d.value, 0);
@@ -772,7 +799,7 @@ export default function Dashboard() {
 
       {/* ---- Hero ---- */}
       <section id="beranda" ref={setSectionRef("beranda")}>
-        <div className="relative w-full overflow-hidden" style={{ height: "33dvh", minHeight: 320 }}>
+        <div className="relative w-full overflow-hidden" style={{ height: "33dvh", minHeight: 280 }}>
           {HERO_SLIDES.map((s, i) => (
             <div
               key={i}
@@ -804,21 +831,25 @@ export default function Dashboard() {
           <button
             onClick={prevHero}
             aria-label="Slide sebelumnya"
-            className="absolute left-4 top-1/2 -translate-y-1/2 z-50 w-8 h-8 rounded-full flex items-center justify-center"
-            style={{ backgroundColor: "rgba(10,20,64,0.45)", border: "1px solid rgba(255,255,255,0.25)" }}
+            className="absolute left-2 sm:left-4 top-1/2 -translate-y-1/2 z-50 size-7 sm:size-8 rounded-full flex items-center justify-center transition-all duration-150 active:scale-90"
+            style={{ backgroundColor: "rgba(10,20,64,0.6)", border: "1px solid rgba(255,255,255,0.25)" }}
+            onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = "rgba(10,20,64,0.8)"; }}
+            onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = "rgba(10,20,64,0.6)"; }}
           >
-            <ChevronLeft size={14} color="#fff" />
+            <ChevronLeft size={12} color="#fff" />
           </button>
           <button
             onClick={nextHero}
             aria-label="Slide berikutnya"
-            className="absolute right-4 top-1/2 -translate-y-1/2 z-50 w-8 h-8 rounded-full flex items-center justify-center"
-            style={{ backgroundColor: "rgba(10,20,64,0.45)", border: "1px solid rgba(255,255,255,0.25)" }}
+            className="absolute right-2 sm:right-4 top-1/2 -translate-y-1/2 z-50 size-7 sm:size-8 rounded-full flex items-center justify-center transition-all duration-150 active:scale-90"
+            style={{ backgroundColor: "rgba(10,20,64,0.6)", border: "1px solid rgba(255,255,255,0.25)" }}
+            onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = "rgba(10,20,64,0.8)"; }}
+            onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = "rgba(10,20,64,0.6)"; }}
           >
-            <ChevronRight size={14} color="#fff" />
+            <ChevronRight size={12} color="#fff" />
           </button>
 
-          <div className="relative h-full max-w-6xl mx-auto px-5 sm:px-8 flex flex-col justify-between pt-8 sm:pt-10 pb-6 sm:pb-8">
+          <div className="relative h-full max-w-6xl mx-auto px-4 sm:px-8 flex flex-col justify-between pt-6 sm:pt-10 pb-4 sm:pb-8">
             <div
               style={{
                 opacity: heroMounted ? 1 : 0,
@@ -827,18 +858,18 @@ export default function Dashboard() {
               }}
             >
               <SectionLabel hideLine>
-                <span style={{ color: C.gold500, fontSize: "0.7rem" }}>Sistem Informasi Pengelolaan Sampah</span>
+                <span style={{ color: C.gold500, fontSize: "0.65rem" }}>Sistem Informasi Pengelolaan Sampah</span>
               </SectionLabel>
-              <h1 key={activeHero.title} className="text-2xl sm:text-3xl lg:text-4xl font-semibold max-w-4xl leading-tight text-white mb-3 hero-fade whitespace-normal sm:whitespace-nowrap" style={display}>
+              <h1 key={activeHero.title} className="text-xl sm:text-3xl lg:text-4xl font-semibold max-w-4xl leading-tight text-white mb-2 sm:mb-3 hero-fade whitespace-normal" style={display}>
                 {activeHero.title}
               </h1>
-              <p className="max-w-xl text-sm sm:text-base" style={{ color: "#C3C6DE" }}>
+              <p className="max-w-xl text-xs sm:text-base leading-relaxed" style={{ color: "#C3C6DE" }}>
                 {activeHero.desc}
               </p>
             </div>
 
             <div
-              className="flex flex-wrap gap-4 sm:gap-8"
+              className="flex flex-wrap gap-3 sm:gap-8"
               style={{
                 opacity: heroMounted ? 1 : 0,
                 transform: heroMounted ? "translateY(0)" : "translateY(16px)",
@@ -857,12 +888,11 @@ export default function Dashboard() {
                 key={i}
                 onClick={() => setHeroIndex(i)}
                 aria-label={`Ke slide ${i + 1}`}
-                className="rounded-full"
+                className="rounded-full transition-all duration-200 active:scale-75 hover:opacity-80"
                 style={{
                   width: i === heroIndex ? 22 : 7,
                   height: 7,
                   backgroundColor: i === heroIndex ? C.leaf400 : "rgba(255,255,255,0.4)",
-                  transition: "width 200ms ease, background-color 200ms ease",
                 }}
               />
             ))}
@@ -939,10 +969,10 @@ export default function Dashboard() {
                 </h2>
               </div>
               <div className="flex items-center gap-3">
-                <button onClick={() => scrollNews(-1)} className="w-9 h-9 rounded-full flex items-center justify-center border" style={{ borderColor: "rgba(255,255,255,0.25)" }} aria-label="Sebelumnya">
+                <button onClick={() => scrollNews(-1)} className="w-9 h-9 rounded-full flex items-center justify-center border transition-all duration-200 hover:scale-105 active:scale-90" style={{ borderColor: "rgba(255,255,255,0.25)" }} aria-label="Sebelumnya">
                   <ChevronLeft size={16} color="#fff" />
                 </button>
-                <button onClick={() => scrollNews(1)} className="w-9 h-9 rounded-full flex items-center justify-center border" style={{ borderColor: "rgba(255,255,255,0.25)" }} aria-label="Berikutnya">
+                <button onClick={() => scrollNews(1)} className="w-9 h-9 rounded-full flex items-center justify-center border transition-all duration-200 hover:scale-105 active:scale-90" style={{ borderColor: "rgba(255,255,255,0.25)" }} aria-label="Berikutnya">
                   <ChevronRight size={16} color="#fff" />
                 </button>
               </div>
@@ -958,17 +988,17 @@ export default function Dashboard() {
           >
             <div ref={newsTrackRef} className="flex gap-5 pb-2" style={{ willChange: "transform" }}>
               {NEWS_LOOP.map((n, i) => (
-                <Reveal key={i} delay={(i % news.length) * 80} className="shrink-0 w-64 sm:w-72">
+                <Reveal key={i} delay={(i % news.length) * 80} className="shrink-0 w-60 sm:w-64 lg:w-72">
                   <a
                     href={n.href}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="rounded-2xl overflow-hidden block"
-                    style={{ backgroundColor: C.navy800, transition: "transform 220ms ease" }}
-                    onMouseEnter={(e) => (e.currentTarget.style.transform = "translateY(-4px)")}
-                    onMouseLeave={(e) => (e.currentTarget.style.transform = "translateY(0)")}
+                    className="rounded-2xl overflow-hidden block flex flex-col h-full"
+                    style={{ backgroundColor: C.navy800, transition: "transform 220ms ease, box-shadow 220ms ease" }}
+                    onMouseEnter={(e) => { e.currentTarget.style.transform = "translateY(-4px)"; e.currentTarget.style.boxShadow = "0 8px 24px rgba(0,0,0,0.3)"; }}
+                    onMouseLeave={(e) => { e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.boxShadow = "none"; }}
                   >
-                    <div className="h-36 relative overflow-hidden">
+                    <div className="h-36 relative overflow-hidden shrink-0">
                       <SafeImage
                         src={n.image}
                         alt={n.title}
@@ -980,10 +1010,10 @@ export default function Dashboard() {
                         {n.tag}
                       </span>
                     </div>
-                    <div className="p-4">
+                    <div className="p-4 flex flex-col flex-1">
                       <div className="text-[11px] mb-1.5" style={{ color: "#8A8FB3" }}>{n.date}</div>
-                      <div className="text-sm font-medium leading-snug text-white mb-3" style={display}>{n.title}</div>
-                      <span className="inline-flex items-center gap-1.5 text-xs font-semibold" style={{ color: C.leaf400 }}>
+                      <div className="text-sm font-medium leading-snug text-white mb-3 line-clamp-2" style={display}>{n.title}</div>
+                      <span className="inline-flex items-center gap-1.5 text-xs font-semibold mt-auto" style={{ color: C.leaf400 }}>
                         Baca selengkapnya <ArrowRight size={13} />
                       </span>
                     </div>
@@ -1032,7 +1062,7 @@ export default function Dashboard() {
                 (di luar gambar) sudah cukup jadi label. */}
             <div
               className="mx-auto rounded-2xl overflow-hidden relative mb-3"
-              style={{ aspectRatio: "297 / 420", width: "min(100%, 420px)", backgroundColor: C.navy050 }}
+              style={{ aspectRatio: "297 / 420", width: "min(100%, min(420px, 85vw))", backgroundColor: C.navy050 }}
             >
               <SafeImage
                 src={activePoster.image}
@@ -1045,8 +1075,8 @@ export default function Dashboard() {
             </div>
 
             <div className="flex items-center justify-between mb-4">
-              <button onClick={prevPoster} className="w-10 h-10 rounded-full flex items-center justify-center border" style={{ borderColor: C.line }} aria-label="Poster sebelumnya">
-                <ChevronLeft size={18} color={C.navy900} />
+              <button onClick={prevPoster} className="w-9 sm:w-10 h-9 sm:h-10 rounded-full flex items-center justify-center border transition-all duration-200 hover:scale-105 active:scale-90" style={{ borderColor: C.line }} aria-label="Poster sebelumnya">
+                <ChevronLeft size={16} color={C.navy900} />
               </button>
               <div className="flex gap-1.5">
                 {POSTERS.map((_, i) => (
@@ -1054,13 +1084,13 @@ export default function Dashboard() {
                     key={i}
                     onClick={() => setPosterIndex(i)}
                     aria-label={`Ke poster ${i + 1}`}
-                    className="rounded-full"
-                    style={{ width: i === posterIndex ? 20 : 6, height: 6, backgroundColor: i === posterIndex ? C.leaf500 : C.line, transition: "width 200ms ease, background-color 200ms ease" }}
+                    className="rounded-full transition-all duration-200 active:scale-75 hover:opacity-80"
+                    style={{ width: i === posterIndex ? 20 : 6, height: 6, backgroundColor: i === posterIndex ? C.leaf500 : C.line }}
                   />
                 ))}
               </div>
-              <button onClick={nextPoster} className="w-10 h-10 rounded-full flex items-center justify-center border" style={{ borderColor: C.line }} aria-label="Poster berikutnya">
-                <ChevronRight size={18} color={C.navy900} />
+              <button onClick={nextPoster} className="w-9 sm:w-10 h-9 sm:h-10 rounded-full flex items-center justify-center border transition-all duration-200 hover:scale-105 active:scale-90" style={{ borderColor: C.line }} aria-label="Poster berikutnya">
+                <ChevronRight size={16} color={C.navy900} />
               </button>
             </div>
 
@@ -1073,11 +1103,10 @@ export default function Dashboard() {
                   <button
                     key={i}
                     onClick={() => setPosterIndex(i)}
-                    className="shrink-0 w-20 h-16 rounded-lg overflow-hidden relative snap-start"
+                    className="shrink-0 w-20 h-16 rounded-lg overflow-hidden relative snap-start transition-all duration-150 active:scale-95"
                     style={{
                       outline: isActive ? `2px solid ${C.leaf500}` : "none",
                       outlineOffset: "2px",
-                      transition: "transform 180ms ease",
                     }}
                     onMouseEnter={(e) => (e.currentTarget.style.transform = "scale(1.06)")}
                     onMouseLeave={(e) => (e.currentTarget.style.transform = "scale(1)")}
@@ -1170,12 +1199,28 @@ export default function Dashboard() {
                       target="_blank"
                       rel="noopener noreferrer"
                       aria-label={s.label}
-                      className="w-10 h-10 rounded-full flex items-center justify-center shrink-0 border transition-colors"
-                      style={{ backgroundColor: C.navy800, borderColor: C.navy700 }}
-                      onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = C.navy700; e.currentTarget.style.borderColor = C.leaf500; }}
-                      onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = C.navy800; e.currentTarget.style.borderColor = C.navy700; }}
+                      className="w-10 h-10 rounded-full flex items-center justify-center shrink-0 border transition-all duration-200"
+                      style={{
+                        backgroundColor: C.navy800,
+                        borderColor: C.navy700,
+                        boxShadow: "0 1px 3px rgba(0,0,0,0.12)",
+                      }}
+                      onMouseEnter={(e) => {
+                        const el = e.currentTarget;
+                        el.style.backgroundColor = C.navy700;
+                        el.style.borderColor = C.leaf500;
+                        el.style.transform = "scale(1.1)";
+                        el.style.boxShadow = `0 4px 12px ${C.leaf500}44`;
+                      }}
+                      onMouseLeave={(e) => {
+                        const el = e.currentTarget;
+                        el.style.backgroundColor = C.navy800;
+                        el.style.borderColor = C.navy700;
+                        el.style.transform = "scale(1)";
+                        el.style.boxShadow = "0 1px 3px rgba(0,0,0,0.12)";
+                      }}
                     >
-                      <SIcon size={16} color={C.leaf400} />
+                      <SIcon size={20} color={C.leaf400} />
                     </a>
                   );
                 })}

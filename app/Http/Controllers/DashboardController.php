@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Helpers\OptionHelper;
 use App\Models\ChecklistPekerjaan;
 use App\Models\DataDasar;
 use App\Models\Distribusi;
@@ -188,6 +189,7 @@ class DashboardController extends Controller
 
         return Inertia::render('admin/dashboard', [
             'dataDasar' => $dataDasar,
+            'rincianArea' => OptionHelper::get('rincian_area', []),
             'penimbanganByArea' => $penimbanganByArea,
             'pilahByJenis' => $pilahByJenis,
             'distribusiByTujuan' => $distribusiByTujuan,
