@@ -55,8 +55,15 @@ type DataDasarType = {
     luas_area_zero_waste: number;
 };
 
+type RincianAreaDetail = {
+    nama: string;
+    deskripsi: string;
+    luas: number;
+};
+
 type PageProps = {
     dataDasar: DataDasarType | null;
+    rincianArea: RincianAreaDetail[];
     penimbanganByArea: ChartData;
     pilahByJenis: ChartData;
     distribusiByTujuan: ChartData;
@@ -487,7 +494,7 @@ function ReadField({ label, value }: { label: string; value: React.ReactNode }) 
     );
 }
 
-function DataDasarSummary({ dataDasar }: { dataDasar: DataDasarType | null }) {
+function DataDasarSummary({ dataDasar, rincianArea }: { dataDasar: DataDasarType | null; rincianArea: RincianAreaDetail[] }) {
     if (!dataDasar) {
         return (
             <Card className="border-green-200">
@@ -593,92 +600,97 @@ function DataDasarSummary({ dataDasar }: { dataDasar: DataDasarType | null }) {
                     </div>
                 </div>
 
-                <div className="grid gap-4 lg:grid-cols-2">
-                    {/* Tabel 1: Data Warga, 5 baris x 3 kolom */}
+                <div className="grid gap-4 lg:grid-cols-3">
+                    {/* Tabel 1: Data Warga */}
                     <div className="overflow-hidden rounded-lg border border-green-100">
                         <table className="w-full text-sm">
                             <thead>
                                 <tr className="bg-green-50/60">
                                     <th className="px-3 py-2 text-left text-xs font-semibold tracking-wide text-green-700 uppercase">Data</th>
-                                    <th className="px-3 py-2 text-left text-xs font-semibold tracking-wide text-green-700 uppercase">Keterangan</th>
                                     <th className="px-3 py-2 text-right text-xs font-semibold tracking-wide text-green-700 uppercase">Nilai</th>
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-green-100">
                                 <tr>
                                     <td className="px-3 py-2 text-green-800">Jumlah Mahasiswa</td>
-                                    <td className="px-3 py-2 text-xs text-gray-500">Mahasiswa aktif</td>
                                     <td className="px-3 py-2 text-right tabular-nums text-green-900">
                                         {dataDasar.jumlah_mahasiswa.toLocaleString('id-ID')} orang
                                     </td>
                                 </tr>
                                 <tr>
                                     <td className="px-3 py-2 text-green-800">Jumlah Dosen</td>
-                                    <td className="px-3 py-2 text-xs text-gray-500">Dosen aktif</td>
                                     <td className="px-3 py-2 text-right tabular-nums text-green-900">
                                         {dataDasar.jumlah_dosen.toLocaleString('id-ID')} orang
                                     </td>
                                 </tr>
                                 <tr>
                                     <td className="px-3 py-2 text-green-800">Jumlah Tenaga Kependidikan</td>
-                                    <td className="px-3 py-2 text-xs text-gray-500">Tendik aktif</td>
                                     <td className="px-3 py-2 text-right tabular-nums text-green-900">
                                         {dataDasar.jumlah_tendik.toLocaleString('id-ID')} orang
                                     </td>
                                 </tr>
                                 <tr>
                                     <td className="px-3 py-2 text-green-800">Jumlah Tenaga Pendukung</td>
-                                    <td className="px-3 py-2 text-xs text-gray-500">Cleaning service, satpam, dsb.</td>
                                     <td className="px-3 py-2 text-right tabular-nums text-green-900">
                                         {dataDasar.jumlah_tenaga_pendukung.toLocaleString('id-ID')} orang
                                     </td>
                                 </tr>
                                 <tr className="bg-green-50/40">
                                     <td className="px-3 py-2 font-semibold text-green-900">Total Warga</td>
-                                    <td className="px-3 py-2 text-xs text-gray-500">Jumlah keseluruhan</td>
                                     <td className="px-3 py-2 text-right font-semibold tabular-nums text-green-900">
                                         {dataDasar.total_warga.toLocaleString('id-ID')} orang
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td className="px-3 py-2 text-green-800">Luas Area Fakultas</td>
-                                    <td className="px-3 py-2 text-xs text-gray-500">Total luas area</td>
-                                    <td className="px-3 py-2 text-right tabular-nums text-green-900">
-                                        {dataDasar.luas_area_fakultas.toLocaleString('id-ID')} m&sup2;
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td className="px-3 py-2 text-green-800">Luas Area Objek Lomba</td>
-                                    <td className="px-3 py-2 text-xs text-gray-500">Cakupan program</td>
-                                    <td className="px-3 py-2 text-right tabular-nums text-green-900">
-                                        {dataDasar.luas_area_objek_lomba.toLocaleString('id-ID')} m&sup2;
                                     </td>
                                 </tr>
                             </tbody>
                         </table>
                     </div>
 
-                    {/* Tabel 2: Sampah, 3 baris x 3 kolom */}
+                    {/* Tabel 2: Rincian Luas Area */}
+                    <div className="overflow-hidden rounded-lg border border-green-100">
+                        <table className="w-full text-sm">
+                            <thead>
+                                <tr className="bg-green-50/60">
+                                    <th className="px-3 py-2 text-left text-xs font-semibold tracking-wide text-green-700 uppercase">Area</th>
+                                    <th className="px-3 py-2 text-right text-xs font-semibold tracking-wide text-green-700 uppercase">Luas</th>
+                                </tr>
+                            </thead>
+                            <tbody className="divide-y divide-green-100">
+                                {rincianArea.map((item) => (
+                                    <tr key={item.nama}>
+                                        <td className="px-3 py-2 text-green-800">{item.nama}</td>
+                                        <td className="px-3 py-2 text-right tabular-nums text-green-900">
+                                            {item.luas.toLocaleString('id-ID')} m&sup2;
+                                        </td>
+                                    </tr>
+                                ))}
+                                <tr className="bg-green-50/40">
+                                    <td className="px-3 py-2 font-semibold text-green-900">Total Luas Area</td>
+                                    <td className="px-3 py-2 text-right font-semibold tabular-nums text-green-900">
+                                        {rincianArea.reduce((s, i) => s + (i.luas || 0), 0).toLocaleString('id-ID')} m&sup2;
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    {/* Tabel 3: Data Sampah */}
                     <div className="overflow-hidden rounded-lg border border-green-100">
                         <table className="w-full text-sm">
                             <thead>
                                 <tr className="bg-green-50/60">
                                     <th className="px-3 py-2 text-left text-xs font-semibold tracking-wide text-green-700 uppercase">Data</th>
-                                    <th className="px-3 py-2 text-left text-xs font-semibold tracking-wide text-green-700 uppercase">Keterangan</th>
                                     <th className="px-3 py-2 text-right text-xs font-semibold tracking-wide text-green-700 uppercase">Nilai</th>
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-green-100">
                                 <tr>
                                     <td className="px-3 py-2 text-green-800">Baseline Sampah Awal</td>
-                                    <td className="px-3 py-2 text-xs text-gray-500">Sebelum program berjalan</td>
                                     <td className="px-3 py-2 text-right tabular-nums text-green-900">
                                         {dataDasar.baseline_sampah.toLocaleString('id-ID')} kg/{dataDasar.baseline_sampah_periode}
                                     </td>
                                 </tr>
                                 <tr>
                                     <td className="px-3 py-2 text-green-800">Jenis Sampah Dominan</td>
-                                    <td className="px-3 py-2 text-xs text-gray-500">Timbulan tiap jenis</td>
                                     <td className="px-3 py-2 text-right text-xs text-green-900">
                                         <div className="space-y-0.5">
                                             {dataDasar.jenis_sampah_dominan?.map((item) => (
@@ -691,7 +703,7 @@ function DataDasarSummary({ dataDasar }: { dataDasar: DataDasarType | null }) {
                                 </tr>
                                 <tr>
                                     <td className="px-3 py-2 text-green-800">Kondisi Fasilitas</td>
-                                    <td className="px-3 py-2 text-xs text-gray-500" colSpan={2}>
+                                    <td className="px-3 py-2 text-xs text-gray-500">
                                         {dataDasar.kondisi_fasilitas || <span className="text-slate-400 italic">Belum diisi</span>}
                                     </td>
                                 </tr>
@@ -705,7 +717,7 @@ function DataDasarSummary({ dataDasar }: { dataDasar: DataDasarType | null }) {
 }
 
 export default function Dashboard() {
-    const { dataDasar, penimbanganByArea, pilahByJenis, distribusiByTujuan, petugasStats, statusBerat, siapDidistribusikanByJenis, checklistStats, filters } = usePage<PageProps>().props;
+    const { dataDasar, rincianArea, penimbanganByArea, pilahByJenis, distribusiByTujuan, petugasStats, statusBerat, siapDidistribusikanByJenis, checklistStats, filters } = usePage<PageProps>().props;
 
     const siapSortedData = siapDidistribusikanByJenis.slice().sort((a, b) => b.value - a.value);
     const siapTotal = siapDidistribusikanByJenis.reduce((s, d) => s + d.value, 0);
@@ -756,7 +768,7 @@ export default function Dashboard() {
             <Head title="Dashboard" />
 
             <div className="flex h-full flex-1 flex-col gap-4 overflow-x-auto rounded-xl p-4">
-                <DataDasarSummary dataDasar={dataDasar} />
+                <DataDasarSummary dataDasar={dataDasar} rincianArea={rincianArea} />
 
                 <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                     <div>

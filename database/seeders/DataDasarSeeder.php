@@ -32,7 +32,8 @@ class DataDasarSeeder extends Seeder
                 'jumlah_tenaga_pendukung' => 20,
                 'total_warga' => 370,
                 'luas_area_fakultas' => 8500.00,
-                'luas_area_objek_lomba' => 7900.00,
+                'luas_area_objek_lomba' => 8500.00,
+                'kondisi_fasilitas' => 'Fasilitas penunjang program Zero Waste tersedia dan berfungsi dengan baik, meliputi tempat sampah terpilah, komposter, dan bank sampah.',
                 'baseline_sampah' => 145.00,
                 'baseline_sampah_periode' => 'hari',
                 'jenis_sampah_dominan' => [
