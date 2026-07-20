@@ -30,6 +30,9 @@ export function AppSidebar() {
             title: 'Kelola Website',
             icon: Globe,
             items: [
+                { title: 'Peraturan', href: '/admin/dokumen' },
+                { title: 'Struktur', href: '/admin/dokumen' },
+                { title: 'SOP', href: '/admin/dokumen' },
                 { title: 'Berita', href: '/admin/berita' },
                 { title: 'Poster Edukasi', href: '/admin/poster' },
             ],

@@ -13,7 +13,13 @@ pdfjs.GlobalWorkerOptions.workerSrc = new URL(
   import.meta.url
 ).toString();
 
-const STRUKTUR_FILE = "/documents/struktur.pdf";
+type DocumentItem = {
+  id: number;
+  type: string;
+  title: string;
+  pdf_url: string;
+  is_published: boolean;
+};
 
 export default function StrukturPage() {
   const appName = import.meta.env.VITE_APP_NAME || 'ZeroLib';
@@ -22,6 +28,15 @@ export default function StrukturPage() {
   const [pageNumber, setPageNumber] = useState(1);
   const [scale, setScale] = useState(1.1);
   const [mode, setMode] = useState<"single" | "all">("single");
+  const [doc, setDoc] = useState<DocumentItem | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetch('/api/document/struktur')
+      .then((res) => res.json())
+      .then((data) => setDoc(data.document ?? null))
+      .finally(() => setLoading(false));
+  }, []);
 
   const pageRefs = useRef<Record<number, HTMLDivElement | null>>({});
   const suppressObserverUntilRef = useRef(0);
@@ -63,6 +78,8 @@ export default function StrukturPage() {
     }
   };
 
+  const pdfFile = doc?.pdf_url ?? null;
+
   return (
     <div style={{ ...body, backgroundColor: C.paper50, color: C.ink900 }} className="min-h-screen flex flex-col">
       <Navbar activeSection="struktur" />
@@ -72,23 +89,25 @@ export default function StrukturPage() {
             <h2 className="text-2xl sm:text-3xl font-semibold" style={{ ...display, color: C.navy900 }}>
               Struktur Organisasi
             </h2>
-            <a
-              href={STRUKTUR_FILE}
-              download
-              className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-wider px-4 py-2.5 rounded-md border transition-colors"
-              style={{ ...body, color: C.navy900, borderColor: C.navy900 }}
-              onMouseOver={(e) => {
-                e.currentTarget.style.backgroundColor = C.navy900;
-                e.currentTarget.style.color = "#fff";
-              }}
-              onMouseOut={(e) => {
-                e.currentTarget.style.backgroundColor = "transparent";
-                e.currentTarget.style.color = C.navy900;
-              }}
-            >
-              <Download size={14} />
-              Unduh Struktur
-            </a>
+            {pdfFile && (
+              <a
+                href={pdfFile}
+                download
+                className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-wider px-4 py-2.5 rounded-md border transition-colors"
+                style={{ ...body, color: C.navy900, borderColor: C.navy900 }}
+                onMouseOver={(e) => {
+                  e.currentTarget.style.backgroundColor = C.navy900;
+                  e.currentTarget.style.color = "#fff";
+                }}
+                onMouseOut={(e) => {
+                  e.currentTarget.style.backgroundColor = "transparent";
+                  e.currentTarget.style.color = C.navy900;
+                }}
+              >
+                <Download size={14} />
+                Unduh Struktur
+              </a>
+            )}
           </div>
         </Reveal>
 
@@ -155,10 +174,23 @@ export default function StrukturPage() {
               </div>
             </div>
 
-            {mode === "single" ? (
+            {loading ? (
+              <div className="flex flex-col items-center justify-center py-20" style={{ backgroundColor: "#E3E6EE" }}>
+                <p className="text-sm" style={{ ...body, color: C.ink500 }}>
+                  Memuat...
+                </p>
+              </div>
+            ) : !pdfFile ? (
+              <div className="flex flex-col items-center justify-center py-20" style={{ backgroundColor: "#E3E6EE" }}>
+                <FileText size={40} className="mb-3" style={{ color: C.ink500 }} />
+                <p className="text-sm" style={{ ...body, color: C.ink500 }}>
+                  Dokumen belum tersedia.
+                </p>
+              </div>
+            ) : mode === "single" ? (
               <div className="flex justify-center py-10 overflow-x-auto" style={{ backgroundColor: "#E3E6EE" }}>
                 <Document
-                  file={STRUKTUR_FILE}
+                  file={pdfFile}
                   onLoadSuccess={({ numPages }) => setNumPages(numPages)}
                   loading={
                     <p className="text-sm py-20" style={{ ...body, color: C.ink500 }}>
@@ -191,7 +223,7 @@ export default function StrukturPage() {
                 }}
               >
                 <Document
-                  file={STRUKTUR_FILE}
+                  file={pdfFile}
                   onLoadSuccess={({ numPages }) => setNumPages(numPages)}
                   loading={
                     <p className="text-sm py-20" style={{ ...body, color: C.ink500 }}>
