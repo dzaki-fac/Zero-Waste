@@ -111,8 +111,8 @@ const HERO_SLIDES = [
 
 const HERO_STATS = [
   { label: "Lantai dipantau", value: 4, suffix: "" },
-  { label: "Sub-area aktif", value: 12, suffix: "+" },
-  { label: "Titik pemilahan", value: 20, suffix: "+" },
+  { label: "Area aktif", value: 15, suffix: "+" },
+  { label: "Titik pemilahan", value: 10, suffix: "+" },
 ];
 
 const MENU_DECK = [
