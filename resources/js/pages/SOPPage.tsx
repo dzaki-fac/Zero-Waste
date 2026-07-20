@@ -16,6 +16,8 @@ pdfjs.GlobalWorkerOptions.workerSrc = new URL(
 const SOP_FILE = "/documents/sop.pdf";
 
 export default function SOPPage() {
+  const appName = import.meta.env.VITE_APP_NAME || 'ZeroLib';
+  useEffect(() => { document.title = `SOP - ${appName}`; }, []);
   const [numPages, setNumPages] = useState<number>(0);
   const [pageNumber, setPageNumber] = useState(1);
   const [scale, setScale] = useState(1.1);

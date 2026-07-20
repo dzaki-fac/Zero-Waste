@@ -16,6 +16,8 @@ pdfjs.GlobalWorkerOptions.workerSrc = new URL(
 const STRUKTUR_FILE = "/documents/struktur.pdf";
 
 export default function StrukturPage() {
+  const appName = import.meta.env.VITE_APP_NAME || 'ZeroLib';
+  useEffect(() => { document.title = `Struktur Organisasi - ${appName}`; }, []);
   const [numPages, setNumPages] = useState<number>(0);
   const [pageNumber, setPageNumber] = useState(1);
   const [scale, setScale] = useState(1.1);
