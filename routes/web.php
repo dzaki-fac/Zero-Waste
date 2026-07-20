@@ -10,17 +10,18 @@ use App\Http\Controllers\MasterPekerjaanController;
 use App\Http\Controllers\NewsController;
 use App\Http\Controllers\PenimbanganController;
 use App\Http\Controllers\PilahSampahController;
+use App\Http\Controllers\DocumentController;
 use App\Http\Controllers\PosterController;
 use App\Http\Middleware\CheckRole;
 use Illuminate\Support\Facades\Route;
 
 // Public landing page (BrowserRouter-based, no auth required)
-// Public static pages (handled by BrowserRouter in React)
 Route::get('/', [HomeController::class, 'index'])->name('home');
-Route::inertia('/sop', 'SOPPage');
+Route::get('/sop', [DocumentController::class, 'sopPage'])->name('sop');
 Route::inertia('/pengertian', 'pengertian');
-Route::inertia('/struktur', 'struktur');
-Route::inertia('/peraturan', 'peraturan'); 
+Route::get('/struktur', [DocumentController::class, 'strukturPage'])->name('struktur');
+Route::get('/peraturan', [DocumentController::class, 'peraturanPage'])->name('peraturan');
+Route::get('/api/document/{type}', [DocumentController::class, 'show']);
 
 // Shared routes (accessible by both roles, no role check)
 Route::middleware(['auth'])->group(function () {
@@ -72,6 +73,11 @@ Route::middleware(['auth', CheckRole::class . ':admin'])
             ->names('kelola-pekerjaan');
 
         Route::get('data-dasar/export', [DataDasarController::class, 'export'])->name('data-dasar.export');
+
+        Route::resource('dokumen', DocumentController::class)
+            ->only(['index', 'store', 'update', 'destroy'])
+            ->parameters(['dokumen' => 'document'])
+            ->names('dokumen');
 
         Route::resource('berita', NewsController::class)
             ->only(['index', 'store', 'update', 'destroy'])
