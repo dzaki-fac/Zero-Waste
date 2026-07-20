@@ -16,6 +16,8 @@ pdfjs.GlobalWorkerOptions.workerSrc = new URL(
 const PERATURAN_FILE = "/documents/peraturan.pdf";
 
 export default function PeraturanPage() {
+  const appName = import.meta.env.VITE_APP_NAME || 'ZeroLib';
+  useEffect(() => { document.title = `Peraturan - ${appName}`; }, []);
   const [numPages, setNumPages] = useState<number>(0);
   const [pageNumber, setPageNumber] = useState(1);
   const [scale, setScale] = useState(1.1);
