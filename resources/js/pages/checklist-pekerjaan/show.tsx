@@ -4,6 +4,7 @@ import { ArrowLeft, CalendarDays, CheckCircle2, Circle } from 'lucide-react';
 import Heading from '@/components/heading';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
+import ChecklistProgress from '@/components/checklist-progress';
 import {
     Table,
     TableBody,
@@ -33,6 +34,19 @@ type ChecklistItem = {
     jenis_pekerjaan: string;
 };
 
+type ProgressItem = {
+    total: number;
+    selesai: number;
+    persentase: number;
+    periode: string;
+};
+
+type ProgressData = {
+    harian: ProgressItem;
+    mingguan: ProgressItem;
+    bulanan: ProgressItem;
+};
+
 type Props = {
     petugas: {
         id: number;
@@ -46,6 +60,7 @@ type Props = {
     areaFilter: string | null;
     areas: string[];
     readOnly?: boolean;
+    progress: ProgressData;
 };
 
 const GROUP_ORDER = ['harian', 'mingguan', 'bulanan'] as const;
@@ -104,7 +119,7 @@ const COLGROUP = (
     </colgroup>
 );
 
-export default function ChecklistPekerjaanShow({ petugas, tanggal, masterTasks, checklist, filter, areaFilter, areas, readOnly = false }: Props) {
+export default function ChecklistPekerjaanShow({ petugas, tanggal, masterTasks, checklist, filter, areaFilter, areas, readOnly = false, progress }: Props) {
     const dateInputRef = useRef<HTMLInputElement>(null);
     const [selectedDate, setSelectedDate] = useState(tanggal);
     const [activeFilter, setActiveFilter] = useState<string | null>(filter);
@@ -303,6 +318,8 @@ export default function ChecklistPekerjaanShow({ petugas, tanggal, masterTasks, 
                         </Link>
                     </Button>
                 </div>
+
+                <ChecklistProgress progress={progress} />
 
                 <div className="flex flex-wrap items-end gap-4">
                     <div className="grid gap-2">

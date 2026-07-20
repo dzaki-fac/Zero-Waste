@@ -119,6 +119,14 @@ export default function Welcome() {
                     {/* Operational modules */}
                     <div className="flex flex-wrap justify-center gap-3">
                         <Link
+                            href="/form/pekerjaan"
+                            className="inline-flex items-center gap-2 rounded-lg bg-green-600 px-6 py-2.5 text-sm font-medium text-white shadow-sm transition hover:bg-green-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-500 focus-visible:ring-offset-2"
+                        >
+                            <ClipboardCheck className="h-4 w-4" />
+                            Checklist Pekerjaan
+                        </Link>
+
+                        <Link
                             href="/form/penimbangan"
                             className="inline-flex items-center gap-2 rounded-lg bg-green-600 px-6 py-2.5 text-sm font-medium text-white shadow-sm transition hover:bg-green-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-500 focus-visible:ring-offset-2"
                         >
@@ -140,14 +148,6 @@ export default function Welcome() {
                         >
                             <Truck className="h-4 w-4" />
                             Distribusi
-                        </Link>
-
-                        <Link
-                            href="/form/pekerjaan"
-                            className="inline-flex items-center gap-2 rounded-lg bg-green-600 px-6 py-2.5 text-sm font-medium text-white shadow-sm transition hover:bg-green-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-500 focus-visible:ring-offset-2"
-                        >
-                            <ClipboardCheck className="h-4 w-4" />
-                            Checklist Pekerjaan
                         </Link>
                     </div>
                 </section>
