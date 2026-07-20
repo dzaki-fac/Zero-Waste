@@ -21,22 +21,45 @@ type DocumentItem = {
   is_published: boolean;
 };
 
+const MOBILE_BREAKPOINT = 768;
+const DESKTOP_SCALE = 1.1;
+const MOBILE_SCALE = 0.6;
+
+const getScaleForWidth = (width: number) =>
+  width < MOBILE_BREAKPOINT ? MOBILE_SCALE : DESKTOP_SCALE;
+
 export default function PeraturanPage() {
-  const appName = import.meta.env.VITE_APP_NAME || 'ZeroLib';
-  useEffect(() => { document.title = `Peraturan - ${appName}`; }, []);
+  const appName = import.meta.env.VITE_APP_NAME || "ZeroLib";
+  useEffect(() => {
+    document.title = `Peraturan - ${appName}`;
+  }, []);
+
   const [numPages, setNumPages] = useState<number>(0);
   const [pageNumber, setPageNumber] = useState(1);
-  const [scale, setScale] = useState(1.1);
+  const [scale, setScale] = useState(() =>
+    typeof window !== "undefined" ? getScaleForWidth(window.innerWidth) : DESKTOP_SCALE
+  );
+  const [userAdjustedScale, setUserAdjustedScale] = useState(false);
   const [mode, setMode] = useState<"single" | "all">("single");
   const [doc, setDoc] = useState<DocumentItem | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch('/api/document/peraturan')
+    fetch("/api/document/peraturan")
       .then((res) => res.json())
       .then((data) => setDoc(data.document ?? null))
       .finally(() => setLoading(false));
   }, []);
+
+  // Keep scale in sync with viewport size, unless the user has manually zoomed.
+  useEffect(() => {
+    const handleResize = () => {
+      if (userAdjustedScale) return;
+      setScale(getScaleForWidth(window.innerWidth));
+    };
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, [userAdjustedScale]);
 
   const pageRefs = useRef<Record<number, HTMLDivElement | null>>({});
   const suppressObserverUntilRef = useRef(0);
@@ -78,6 +101,16 @@ export default function PeraturanPage() {
     }
   };
 
+  const zoomOut = () => {
+    setUserAdjustedScale(true);
+    setScale((s) => Math.max(0.6, +(s - 0.15).toFixed(2)));
+  };
+
+  const zoomIn = () => {
+    setUserAdjustedScale(true);
+    setScale((s) => Math.min(2.5, +(s + 0.15).toFixed(2)));
+  };
+
   const pdfFile = doc?.pdf_url ?? null;
 
   return (
@@ -114,62 +147,63 @@ export default function PeraturanPage() {
         <Reveal delay={80}>
           <div className="border" style={{ borderColor: "#B9C0D6" }}>
             <div
-              className="flex items-center justify-between px-4 sm:px-6 py-3 border-b flex-wrap gap-3"
+              className="flex items-center justify-between px-2 sm:px-6 py-2 sm:py-3 border-b flex-nowrap gap-1.5 sm:gap-3"
               style={{ backgroundColor: C.navy900, borderColor: "#B9C0D6" }}
             >
-              <div className="flex items-center gap-4">
+              <div className="flex items-center gap-1 sm:gap-4 shrink-0">
                 <button
                   onClick={() => goToPage(pageNumber - 1)}
                   disabled={pageNumber <= 1}
-                  className="flex items-center justify-center w-7 h-7 border disabled:opacity-30 transition-colors"
+                  className="flex items-center justify-center w-6 h-6 sm:w-7 sm:h-7 border disabled:opacity-30 transition-colors shrink-0"
                   style={{ borderColor: "rgba(255,255,255,0.35)", color: "#fff" }}
                   aria-label="Halaman sebelumnya"
                 >
-                  <ChevronLeft size={14} />
+                  <ChevronLeft size={13} />
                 </button>
-                <span className="text-xs font-semibold uppercase tracking-wider" style={{ ...body, color: "#fff" }}>
-                  Halaman {pageNumber} / {numPages || "-"}
+                <span className="text-[10px] sm:text-xs font-semibold uppercase tracking-wider whitespace-nowrap" style={{ ...body, color: "#fff" }}>
+                  <span className="hidden sm:inline">Halaman </span>
+                  {pageNumber}/{numPages || "-"}
                 </span>
                 <button
                   onClick={() => goToPage(pageNumber + 1)}
                   disabled={pageNumber >= numPages}
-                  className="flex items-center justify-center w-7 h-7 border disabled:opacity-30 transition-colors"
+                  className="flex items-center justify-center w-6 h-6 sm:w-7 sm:h-7 border disabled:opacity-30 transition-colors shrink-0"
                   style={{ borderColor: "rgba(255,255,255,0.35)", color: "#fff" }}
                   aria-label="Halaman berikutnya"
                 >
-                  <ChevronRight size={14} />
+                  <ChevronRight size={13} />
                 </button>
               </div>
 
-              <div className="flex items-center gap-3">
+              <div className="flex items-center gap-1 sm:gap-3 shrink-0">
                 <button
-                  onClick={() => setScale((s) => Math.max(0.6, +(s - 0.15).toFixed(2)))}
-                  className="flex items-center justify-center w-7 h-7 border transition-colors"
+                  onClick={zoomOut}
+                  className="flex items-center justify-center w-6 h-6 sm:w-7 sm:h-7 border transition-colors shrink-0"
                   style={{ borderColor: "rgba(255,255,255,0.35)", color: "#fff" }}
                   aria-label="Perkecil"
                 >
-                  <ZoomOut size={14} />
+                  <ZoomOut size={13} />
                 </button>
-                <span className="text-xs font-semibold w-10 text-center" style={{ ...body, color: "#fff" }}>
+                <span className="text-[10px] sm:text-xs font-semibold w-7 sm:w-10 text-center shrink-0" style={{ ...body, color: "#fff" }}>
                   {Math.round(scale * 100)}%
                 </span>
                 <button
-                  onClick={() => setScale((s) => Math.min(2.5, +(s + 0.15).toFixed(2)))}
-                  className="flex items-center justify-center w-7 h-7 border transition-colors"
+                  onClick={zoomIn}
+                  className="flex items-center justify-center w-6 h-6 sm:w-7 sm:h-7 border transition-colors shrink-0"
                   style={{ borderColor: "rgba(255,255,255,0.35)", color: "#fff" }}
                   aria-label="Perbesar"
                 >
-                  <ZoomIn size={14} />
+                  <ZoomIn size={13} />
                 </button>
 
                 <button
                   onClick={() => setMode((m) => (m === "single" ? "all" : "single"))}
-                  className="flex items-center gap-1.5 px-2.5 h-7 border text-[11px] font-semibold uppercase tracking-wide transition-colors ml-1"
+                  className="flex items-center gap-1 sm:gap-1.5 px-1.5 sm:px-2.5 h-6 sm:h-7 border text-[10px] sm:text-[11px] font-semibold uppercase tracking-wide transition-colors ml-0.5 sm:ml-1 shrink-0"
                   style={{ borderColor: "rgba(255,255,255,0.35)", color: "#fff" }}
                   aria-label={mode === "single" ? "Tampilkan semua halaman (scroll)" : "Tampilkan satu halaman"}
                 >
-                  {mode === "single" ? <ScrollText size={13} /> : <FileText size={13} />}
-                  {mode === "single" ? "Scroll" : "1 Halaman"}
+                  {mode === "single" ? <ScrollText size={12} /> : <FileText size={12} />}
+                  <span className="hidden sm:inline">{mode === "single" ? "Scroll" : "1 Halaman"}</span>
                 </button>
               </div>
             </div>
@@ -245,9 +279,7 @@ export default function PeraturanPage() {
                         renderTextLayer={false}
                         renderAnnotationLayer={false}
                       />
-                      <span className="text-[11px] font-semibold" style={{ ...body, color: C.ink500 }}>
-
-                      </span>
+                      <span className="text-[11px] font-semibold" style={{ ...body, color: C.ink500 }}></span>
                     </div>
                   ))}
                 </Document>

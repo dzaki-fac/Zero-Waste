@@ -9,7 +9,7 @@ import { Label } from '@/components/ui/label';
 
 type Options = {
     area: string[];
-    subjenis_sampah: string[];
+    jenis_detail: string[];
     tujuan_distribusi: string[];
 };
 
@@ -19,13 +19,13 @@ export default function DistribusiCreate() {
         options: Options;
     };
 
-    const subjenisOptions = options.subjenis_sampah;
+    const jenisDetailOptions = options.jenis_detail;
     const tujuanOptions = options.tujuan_distribusi;
     const { data, setData, post, processing, errors } = useForm({
         _redirect: '/admin',
         nama: auth.user.name,
         tanggal: new Date(Date.now() - new Date().getTimezoneOffset() * 60000).toISOString().slice(0, 16),
-        items: subjenisOptions.map((sub) => ({ subjenis_sampah: sub, berat: '' })),
+        items: jenisDetailOptions.map((sub) => ({ jenis_sampah: sub, berat: '' })),
         tujuan_distribusi: '',
         tujuan_lainnya: '',
         lokasi: '',
@@ -55,7 +55,7 @@ export default function DistribusiCreate() {
         }
         const hasBerat = data.items.some((item) => parseFloat(item.berat) > 0);
         if (!hasBerat) {
-            setSubmitError('Minimal isi berat pada 1 subjenis sampah');
+            setSubmitError('Minimal isi berat pada 1 jenis sampah');
             return;
         }
         post(`${prefix}/distribusi`, {
@@ -175,13 +175,13 @@ export default function DistribusiCreate() {
                         </div>
 
                         <div className="grid gap-2">
-                            <Label className="text-green-700">Subjenis & Berat Sampah</Label>
-                            <p className="-mt-1 text-xs text-gray-500">Isi berat pada minimal 1 subjenis sampah (boleh lebih dari satu)</p>
+                            <Label className="text-green-700">Jenis & Berat Sampah</Label>
+                            <p className="-mt-1 text-xs text-gray-500">Isi berat pada minimal 1 jenis sampah (boleh lebih dari satu)</p>
 
                             <div className="divide-y divide-green-100 rounded-lg border border-green-200 overflow-hidden">
                                 {data.items.map((item, i) => (
-                                    <div key={item.subjenis_sampah} className="flex items-center gap-3 px-4 py-2 bg-white even:bg-green-50/30">
-                                        <span className="min-w-0 flex-1 text-sm font-medium text-gray-700">{item.subjenis_sampah}</span>
+                                    <div key={item.jenis_sampah} className="flex items-center gap-3 px-4 py-2 bg-white even:bg-green-50/30">
+                                        <span className="min-w-0 flex-1 text-sm font-medium text-gray-700">{item.jenis_sampah}</span>
                                         <div className="relative w-32 shrink-0">
                                             <Input
                                                 type="number"
@@ -212,7 +212,7 @@ export default function DistribusiCreate() {
 
                             <div className="flex items-center justify-between rounded-lg bg-green-100 px-4 py-2">
                                 <span className="text-sm font-medium text-green-700">
-                                    Total{filledCount > 0 ? ` (${filledCount} subjenis)` : ''}
+                                    Total{filledCount > 0 ? ` (${filledCount} jenis)` : ''}
                                 </span>
                                 <span className="text-sm font-bold text-green-800">{totalBerat.toFixed(2)} kg</span>
                             </div>

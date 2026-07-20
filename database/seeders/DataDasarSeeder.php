@@ -10,7 +10,7 @@ class DataDasarSeeder extends Seeder
 {
     public function run(): void
     {
-        $admin = User::where('email', 'admin@example.com')->first();
+        $admin = User::where('email', 'suwondo@perpus.undip')->first();
 
         if (!$admin) {
             $this->command->warn('Admin user not found. Skipping DataDasarSeeder.');

@@ -20,7 +20,6 @@ type Penimbangan = {
     tanggal: string;
     berat_sampah: string;
     jenis_sampah: string | null;
-    subjenis_sampah: string | null;
     area: string;
 };
 
@@ -47,7 +46,7 @@ export default function PenimbanganEdit({ penimbangan }: Props) {
         nama: penimbangan.nama,
         tanggal: initialTanggal,
         berat_sampah: penimbangan.berat_sampah,
-        jenis_sampah: penimbangan.jenis_sampah ?? penimbangan.subjenis_sampah ?? '',
+        jenis_sampah: penimbangan.jenis_sampah ?? '',
         area: penimbangan.area,
     });
 

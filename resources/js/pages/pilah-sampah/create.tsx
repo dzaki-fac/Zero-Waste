@@ -9,7 +9,7 @@ import { Label } from '@/components/ui/label';
 
 type Options = {
     area: string[];
-    subjenis_sampah: string[];
+    jenis_detail: string[];
     tujuan_distribusi: string[];
 };
 
@@ -19,12 +19,12 @@ export default function PilahSampahCreate() {
         options: Options;
     };
 
-    const subjenisOptions = options.subjenis_sampah;
+    const jenisDetailOptions = options.jenis_detail;
     const { data, setData, post, processing, errors } = useForm({
         _redirect: '/admin',
         nama: auth.user.name,
         tanggal: new Date(Date.now() - new Date().getTimezoneOffset() * 60000).toISOString().slice(0, 16),
-        items: subjenisOptions.map((sub) => ({ subjenis_sampah: sub, berat: '' })),
+        items: jenisDetailOptions.map((sub) => ({ jenis_sampah: sub, berat: '' })),
     });
 
     const [submitError, setSubmitError] = useState('');
@@ -37,7 +37,7 @@ export default function PilahSampahCreate() {
         e.preventDefault();
         const filled = data.items.filter((item) => parseFloat(item.berat) > 0).length;
         if (!filled) {
-            setSubmitError('Minimal isi berat pada 1 subjenis sampah');
+            setSubmitError('Minimal isi berat pada 1 jenis sampah');
             return;
         }
         setSubmitError('');
@@ -55,7 +55,7 @@ export default function PilahSampahCreate() {
             <div className="flex h-full flex-1 flex-col gap-4 overflow-x-auto rounded-xl p-4">
                 <Heading
                     title="Tambah Pilah Sampah"
-                    description="Isi berat pada subjenis sampah yang dipilah"
+                    description="Isi berat pada jenis sampah yang dipilah"
                 />
 
                 <div className="rounded-xl border border-green-200 bg-white p-6 shadow-sm">
@@ -103,13 +103,13 @@ export default function PilahSampahCreate() {
                         </div>
 
                         <div className="grid gap-2">
-                            <Label className="text-green-700">Subjenis & Berat Sampah</Label>
-                            <p className="-mt-1 text-xs text-gray-500">Isi berat pada minimal 1 subjenis sampah (boleh lebih dari satu)</p>
+                            <Label className="text-green-700">Jenis & Berat Sampah</Label>
+                            <p className="-mt-1 text-xs text-gray-500">Isi berat pada minimal 1 jenis sampah (boleh lebih dari satu)</p>
 
                             <div className="divide-y divide-green-100 rounded-lg border border-green-200 overflow-hidden">
                                 {data.items.map((item, i) => (
-                                    <div key={item.subjenis_sampah} className="flex items-center gap-3 px-4 py-2 bg-white even:bg-green-50/30">
-                                        <span className="min-w-0 flex-1 text-sm font-medium text-gray-700">{item.subjenis_sampah}</span>
+                                    <div key={item.jenis_sampah} className="flex items-center gap-3 px-4 py-2 bg-white even:bg-green-50/30">
+                                        <span className="min-w-0 flex-1 text-sm font-medium text-gray-700">{item.jenis_sampah}</span>
                                         <div className="relative w-32 shrink-0">
                                             <Input
                                                 type="number"

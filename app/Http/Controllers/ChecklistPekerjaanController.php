@@ -8,11 +8,72 @@ use App\Models\MasterPekerjaan;
 use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
 use Inertia\Inertia;
 use Inertia\Response;
 
 class ChecklistPekerjaanController extends Controller
 {
+    private function calculateProgress(string $nip, string $referenceDate): array
+    {
+        $ref = Carbon::parse($referenceDate)->startOfDay();
+        $startOfWeek = $ref->copy()->startOfWeek();
+        $endOfWeek = $ref->copy()->endOfWeek();
+        $startOfMonth = $ref->copy()->startOfMonth();
+        $endOfMonth = $ref->copy()->endOfMonth();
+
+        $harianTotal = MasterPekerjaan::active()->where('jenis_pekerjaan', 'harian')->count();
+        $mingguanTotal = MasterPekerjaan::active()->where('jenis_pekerjaan', 'mingguan')->count();
+        $bulananTotal = MasterPekerjaan::active()->where('jenis_pekerjaan', 'bulanan')->count();
+
+        $harianSelesai = ChecklistPekerjaan::where('nip', $nip)
+            ->where('tanggal', $ref->toDateString())
+            ->where('status', 'sudah')
+            ->where('jenis_pekerjaan', 'harian')
+            ->groupBy('master_pekerjaan_id')
+            ->pluck('master_pekerjaan_id')
+            ->count();
+
+        $mingguanSelesai = ChecklistPekerjaan::where('nip', $nip)
+            ->whereBetween('tanggal', [$startOfWeek->toDateString(), $endOfWeek->toDateString()])
+            ->where('status', 'sudah')
+            ->where('jenis_pekerjaan', 'mingguan')
+            ->groupBy('master_pekerjaan_id')
+            ->pluck('master_pekerjaan_id')
+            ->count();
+
+        $bulananSelesai = ChecklistPekerjaan::where('nip', $nip)
+            ->whereBetween('tanggal', [$startOfMonth->toDateString(), $endOfMonth->toDateString()])
+            ->where('status', 'sudah')
+            ->where('jenis_pekerjaan', 'bulanan')
+            ->groupBy('master_pekerjaan_id')
+            ->pluck('master_pekerjaan_id')
+            ->count();
+
+        Carbon::setLocale('id');
+
+        return [
+            'harian' => [
+                'total' => $harianTotal,
+                'selesai' => $harianSelesai,
+                'persentase' => $harianTotal > 0 ? (int) round(($harianSelesai / $harianTotal) * 100) : 0,
+                'periode' => $ref->translatedFormat('d F Y'),
+            ],
+            'mingguan' => [
+                'total' => $mingguanTotal,
+                'selesai' => $mingguanSelesai,
+                'persentase' => $mingguanTotal > 0 ? (int) round(($mingguanSelesai / $mingguanTotal) * 100) : 0,
+                'periode' => $startOfWeek->translatedFormat('d') . ' - ' . $endOfWeek->translatedFormat('d F Y'),
+            ],
+            'bulanan' => [
+                'total' => $bulananTotal,
+                'selesai' => $bulananSelesai,
+                'persentase' => $bulananTotal > 0 ? (int) round(($bulananSelesai / $bulananTotal) * 100) : 0,
+                'periode' => $startOfMonth->translatedFormat('d') . ' - ' . $endOfMonth->translatedFormat('d F Y'),
+            ],
+        ];
+    }
+
     public function index(): Response
     {
         $petugas = User::where('role', 'petugas')
@@ -50,6 +111,7 @@ class ChecklistPekerjaanController extends Controller
             : collect();
 
         $areas = OptionHelper::get('area');
+        $progress = $this->calculateProgress($nip, $tanggal);
 
         return Inertia::render('checklist-pekerjaan/show', [
             'petugas' => $petugas,
@@ -59,6 +121,7 @@ class ChecklistPekerjaanController extends Controller
             'filter' => $filter,
             'areaFilter' => $areaFilter,
             'areas' => $areas,
+            'progress' => $progress,
         ]);
     }
 
@@ -89,6 +152,7 @@ class ChecklistPekerjaanController extends Controller
             : collect();
 
         $areas = OptionHelper::get('area');
+        $progress = $this->calculateProgress($user->nip, $tanggal);
 
         return Inertia::render('checklist-pekerjaan/show', [
             'petugas' => [
@@ -103,6 +167,7 @@ class ChecklistPekerjaanController extends Controller
             'areaFilter' => $areaFilter,
             'areas' => $areas,
             'readOnly' => true,
+            'progress' => $progress,
         ]);
     }
 
@@ -125,6 +190,7 @@ class ChecklistPekerjaanController extends Controller
             : collect();
 
         $areas = OptionHelper::get('area');
+        $progress = $this->calculateProgress($nip, $tanggal);
 
         return Inertia::render('form/pekerjaan', [
             'tanggal' => $tanggal,
@@ -132,6 +198,7 @@ class ChecklistPekerjaanController extends Controller
             'checklist' => $checklist,
             'areaFilter' => $areaFilter,
             'areas' => $areas,
+            'progress' => $progress,
         ]);
     }
 

@@ -3,9 +3,11 @@ import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from 'recharts';
 import type { PieLabelRenderProps } from 'recharts';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Scale, Recycle, Truck, Users, CalendarIcon, Clock, Package, CheckCircle, ChevronLeft, ChevronRight, Send, Leaf, ClipboardCheck } from 'lucide-react';
+import { Scale, Recycle, Truck, Users, CalendarIcon, Clock, Package, CheckCircle, ChevronLeft, ChevronRight, Send, Leaf } from 'lucide-react';
 import { useState, useRef, useEffect } from 'react';
 import type { Auth } from '@/types';
+import ChecklistProgress from '@/components/checklist-progress';
+import NativeDatePicker from '@/components/native-date-picker';
 
 type ChartData = {
     name: string;
@@ -61,6 +63,19 @@ type RincianAreaDetail = {
     luas: number;
 };
 
+type ProgressItem = {
+    total: number;
+    selesai: number;
+    persentase: number;
+    periode: string;
+};
+
+type ProgressData = {
+    harian: ProgressItem;
+    mingguan: ProgressItem;
+    bulanan: ProgressItem;
+};
+
 type PageProps = {
     dataDasar: DataDasarType | null;
     rincianArea: RincianAreaDetail[];
@@ -74,18 +89,10 @@ type PageProps = {
         sudah_didistribusikan: number;
     };
     siapDidistribusikanByJenis: ChartData;
-    checklistStats: {
-        total: number;
-        selesai: number;
-        belum: number;
-        petugas: {
-            name: string;
-            nip: string;
-            total: number;
-            selesai: number;
-            belum: number;
-        }[];
-    } | null;
+    progress: ProgressData;
+    progressPetugasNip: string | null;
+    progressDate: string;
+    petugasList: { id: number; name: string; nip: string }[];
     filters: {
         start_date: string | null;
         end_date: string | null;
@@ -717,7 +724,9 @@ function DataDasarSummary({ dataDasar, rincianArea }: { dataDasar: DataDasarType
 }
 
 export default function Dashboard() {
-    const { dataDasar, rincianArea, penimbanganByArea, pilahByJenis, distribusiByTujuan, petugasStats, statusBerat, siapDidistribusikanByJenis, checklistStats, filters } = usePage<PageProps>().props;
+    const { auth, dataDasar, rincianArea, penimbanganByArea, pilahByJenis, distribusiByTujuan, petugasStats, statusBerat, siapDidistribusikanByJenis, progress, progressPetugasNip, progressDate, petugasList, filters } = usePage<PageProps & { auth: Auth }>().props;
+    const isAdmin = auth.user.role === 'admin';
+    const dashboardUrl = isAdmin ? '/admin/dashboard' : '/petugas/dashboard';
 
     const siapSortedData = siapDidistribusikanByJenis.slice().sort((a, b) => b.value - a.value);
     const siapTotal = siapDidistribusikanByJenis.reduce((s, d) => s + d.value, 0);
@@ -728,11 +737,43 @@ export default function Dashboard() {
     const [startDate, setStartDate] = useState(filters.start_date ?? '');
     const [endDate, setEndDate] = useState(filters.end_date ?? '');
 
-    function applyFilter(params: { start_date?: string | null; end_date?: string | null }) {
+    const [progressPetugas, setProgressPetugas] = useState(progressPetugasNip ?? 'all');
+    const [progressDateState, setProgressDateState] = useState(progressDate);
+
+    function applyFilter(params: { start_date?: string | null; end_date?: string | null; progress_petugas?: string | null; progress_date?: string | null }) {
         const query: Record<string, string> = {};
         if (params.start_date) query.start_date = params.start_date;
         if (params.end_date) query.end_date = params.end_date;
-        router.get('/admin/dashboard', query, { preserveState: true, preserveScroll: true, replace: true });
+        if (params.progress_petugas) query.progress_petugas = params.progress_petugas;
+        if (params.progress_date) query.progress_date = params.progress_date;
+        router.get(dashboardUrl, query, { preserveState: true, preserveScroll: true, replace: true });
+    }
+
+    function progressParams() {
+        const p: Record<string, string> = {};
+        if (progressPetugas !== 'all') p.progress_petugas = progressPetugas;
+        if (progressDateState) p.progress_date = progressDateState;
+        return p;
+    }
+
+    function handleProgressPetugasChange(value: string) {
+        setProgressPetugas(value);
+        const q: Record<string, string> = {};
+        if (startDate) q.start_date = startDate;
+        if (endDate) q.end_date = endDate;
+        if (value !== 'all') q.progress_petugas = value;
+        if (progressDateState) q.progress_date = progressDateState;
+        router.get(dashboardUrl, q, { preserveState: true, preserveScroll: true, replace: true });
+    }
+
+    function handleProgressDateChange(value: string) {
+        setProgressDateState(value);
+        const q: Record<string, string> = {};
+        if (startDate) q.start_date = startDate;
+        if (endDate) q.end_date = endDate;
+        if (progressPetugas !== 'all') q.progress_petugas = progressPetugas;
+        if (value) q.progress_date = value;
+        router.get(dashboardUrl, q, { preserveState: true, preserveScroll: true, replace: true });
     }
 
     function handlePreset(preset: typeof PRESETS[number]) {
@@ -740,18 +781,18 @@ export default function Dashboard() {
         if (preset.days === null) {
             setStartDate('');
             setEndDate('');
-            applyFilter({});
+            applyFilter({ ...progressParams() });
         } else if (preset.days === 0) {
             const today = formatDateInput(new Date());
             setStartDate(today);
             setEndDate(today);
-            applyFilter({ start_date: today, end_date: today });
+            applyFilter({ start_date: today, end_date: today, ...progressParams() });
         } else {
             const s = daysAgo(preset.days);
             const e = formatDateInput(new Date());
             setStartDate(s);
             setEndDate(e);
-            applyFilter({ start_date: s, end_date: e });
+            applyFilter({ start_date: s, end_date: e, ...progressParams() });
         }
     }
 
@@ -760,6 +801,7 @@ export default function Dashboard() {
         applyFilter({
             start_date: startDate || null,
             end_date: endDate || null,
+            ...progressParams(),
         });
     }
 
@@ -995,6 +1037,46 @@ export default function Dashboard() {
                 <Card className="border-green-200">
                     <CardHeader className="pb-2">
                         <CardTitle className="flex items-center gap-2 text-base text-green-900">
+                            <CheckCircle className="size-5 text-green-600" />
+                            Progres Checklist
+                        </CardTitle>
+                        <p className="text-xs text-green-700">
+                            Progres checklist harian, mingguan, dan bulanan
+                        </p>
+                    </CardHeader>
+                    <CardContent>
+                        <div className="mb-4 flex flex-wrap items-end gap-3">
+                            {isAdmin && (
+                                <div className="grid gap-1">
+                                    <label htmlFor="progress-petugas" className="text-xs font-medium text-green-700">Petugas</label>
+                                    <select
+                                        id="progress-petugas"
+                                        value={progressPetugasNip ?? 'all'}
+                                        onChange={(e) => handleProgressPetugasChange(e.target.value)}
+                                        className="h-9 rounded-md border border-green-200 bg-white px-3 text-sm shadow-sm focus-visible:border-green-500 focus-visible:ring-1 focus-visible:ring-green-500/20"
+                                    >
+                                        <option value="all">Semua Petugas</option>
+                                        {petugasList.map((p) => (
+                                        <option key={p.nip} value={p.nip}>{p.name}</option>
+                                    ))}
+                                </select>
+                            </div>
+                            )}
+                            <div className="grid gap-1">
+                                <label className="text-xs font-medium text-green-700">Tanggal</label>
+                                <NativeDatePicker
+                                    value={progressDate}
+                                    onChange={handleProgressDateChange}
+                                />
+                            </div>
+                        </div>
+                        <ChecklistProgress progress={progress} />
+                    </CardContent>
+                </Card>
+
+                <Card className="border-green-200">
+                    <CardHeader className="pb-2">
+                        <CardTitle className="flex items-center gap-2 text-base text-green-900">
                             <Users className="size-5 text-green-600" />
                             Rincian Aktivitas Petugas
                         </CardTitle>
@@ -1092,94 +1174,6 @@ export default function Dashboard() {
                         )}
                     </CardContent>
                 </Card>
-
-                {checklistStats && checklistStats.total > 0 && (
-                    <Card className="border-green-200">
-                        <CardHeader className="pb-2">
-                            <CardTitle className="flex items-center gap-2 text-base text-green-900">
-                                <ClipboardCheck className="size-5 text-green-600" />
-                                Checklist Pekerjaan
-                            </CardTitle>
-                            <p className="text-xs text-green-700">
-                                Rekap progres checklist pekerjaan petugas
-                            </p>
-                        </CardHeader>
-                        <CardContent>
-                            <div className="mb-4 flex items-center gap-6 rounded-lg border border-green-100 bg-green-50/40 p-4">
-                                <div className="text-center">
-                                    <p className="text-2xl font-bold text-green-900">{checklistStats.total}</p>
-                                    <p className="text-xs text-green-700">Total Tugas</p>
-                                </div>
-                                <div className="text-center">
-                                    <p className="text-2xl font-bold text-green-600">{checklistStats.selesai}</p>
-                                    <p className="text-xs text-green-700">Selesai</p>
-                                </div>
-                                <div className="text-center">
-                                    <p className="text-2xl font-bold text-red-500">{checklistStats.belum}</p>
-                                    <p className="text-xs text-green-700">Belum</p>
-                                </div>
-                                <div className="flex-1">
-                                    <div className="h-3 w-full overflow-hidden rounded-full bg-red-100">
-                                        {checklistStats.total > 0 && (
-                                            <div
-                                                className="h-full rounded-full bg-green-500 transition-all"
-                                                style={{ width: `${(checklistStats.selesai / checklistStats.total) * 100}%` }}
-                                            />
-                                        )}
-                                    </div>
-                                    <p className="mt-1 text-xs text-green-700">
-                                        {checklistStats.total > 0
-                                            ? `${((checklistStats.selesai / checklistStats.total) * 100).toFixed(1)}% selesai`
-                                            : 'Belum ada data'}
-                                    </p>
-                                </div>
-                            </div>
-
-                            {checklistStats.petugas.length > 0 && (
-                                <div className="overflow-x-auto">
-                                    <table className="w-full text-sm">
-                                        <thead>
-                                            <tr className="border-b border-green-100">
-                                                <th className="px-3 py-2 text-left text-xs font-semibold text-green-700">Petugas</th>
-                                                <th className="px-3 py-2 text-right text-xs font-semibold text-green-700">Total</th>
-                                                <th className="px-3 py-2 text-right text-xs font-semibold text-green-700">Selesai</th>
-                                                <th className="px-3 py-2 text-right text-xs font-semibold text-green-700">Belum</th>
-                                                <th className="px-3 py-2 text-right text-xs font-semibold text-green-700">Progres</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody className="divide-y divide-green-50">
-                                            {checklistStats.petugas
-                                                .slice()
-                                                .sort((a, b) => b.total - a.total)
-                                                .map((p) => {
-                                                    const pct = p.total > 0 ? (p.selesai / p.total) * 100 : 0;
-                                                    return (
-                                                        <tr key={p.nip} className="hover:bg-green-50/30">
-                                                            <td className="px-3 py-2 font-medium text-green-900">{p.name}</td>
-                                                            <td className="px-3 py-2 text-right tabular-nums text-green-800">{p.total}</td>
-                                                            <td className="px-3 py-2 text-right tabular-nums text-green-600">{p.selesai}</td>
-                                                            <td className="px-3 py-2 text-right tabular-nums text-red-500">{p.belum}</td>
-                                                            <td className="px-3 py-2 text-right">
-                                                                <div className="flex items-center justify-end gap-2">
-                                                                    <div className="h-2 w-24 overflow-hidden rounded-full bg-red-100">
-                                                                        <div
-                                                                            className="h-full rounded-full bg-green-500 transition-all"
-                                                                            style={{ width: `${pct}%` }}
-                                                                        />
-                                                                    </div>
-                                                                    <span className="text-xs tabular-nums text-green-700 w-10">{pct.toFixed(0)}%</span>
-                                                                </div>
-                                                            </td>
-                                                        </tr>
-                                                    );
-                                                })}
-                                        </tbody>
-                                    </table>
-                                </div>
-                            )}
-                        </CardContent>
-                    </Card>
-                )}
             </div>
         </>
     );

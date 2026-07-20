@@ -25,7 +25,7 @@ class PenimbanganRequest extends FormRequest
         } else {
             $rules['berat_sampah'] = ['required', 'numeric', 'min:0'];
             $rules['area'] = ['required', Rule::in($areaValues)];
-            $rules['jenis_sampah'] = ['nullable', Rule::in($subjenis)];
+            $rules['jenis_sampah'] = ['nullable', Rule::in($jenis)];
         }
 
         return $rules;

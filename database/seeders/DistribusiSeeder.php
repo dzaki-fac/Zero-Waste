@@ -16,12 +16,12 @@ class DistribusiSeeder extends Seeder
         $tujuan = ['TPS', 'Pupuk/kompos', 'PlasticPay', 'Tujuan lainnya'];
         $lokasi = ['Bandung', 'Jakarta', 'Surabaya', 'Semarang', 'Yogyakarta', 'Malang', 'Bogor', 'Depok'];
 
-        $pilahByJenis = PilahSampah::select('subjenis_sampah', DB::raw('SUM(berat) as total'))
-            ->groupBy('subjenis_sampah')
-            ->pluck('total', 'subjenis_sampah');
+        $pilahByJenis = PilahSampah::select('jenis_sampah', DB::raw('SUM(berat) as total'))
+            ->groupBy('jenis_sampah')
+            ->pluck('total', 'jenis_sampah');
 
-        foreach ($pilahByJenis as $subjenis => $totalPilah) {
-            if (!$subjenis) continue;
+        foreach ($pilahByJenis as $jenis => $totalPilah) {
+            if (!$jenis) continue;
             $ratio = fake()->randomFloat(2, 0.50, 0.70);
             $targetDistribusi = round($totalPilah * $ratio, 2);
 
@@ -42,7 +42,7 @@ class DistribusiSeeder extends Seeder
                     'user_id' => $petugasUser->id,
                     'tanggal' => fake()->dateTimeBetween('-3 months', 'now'),
                     'berat' => $weight,
-                    'jenis_sampah' => $subjenis,
+                    'jenis_sampah' => $jenis,
                     'tujuan_distribusi' => fake()->randomElement($tujuan),
                     'lokasi' => fake()->randomElement($lokasi),
                 ]);

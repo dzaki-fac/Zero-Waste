@@ -12,7 +12,7 @@ import { useEffect, useState } from 'react';
 
 type Options = {
     area: string[];
-    subjenis_sampah: string[];
+    jenis_detail: string[];
     tujuan_distribusi: string[];
 };
 
@@ -23,12 +23,12 @@ export default function FormPilahSampah() {
         options: Options;
     };
 
-    const subjenisOptions = options.subjenis_sampah;
+    const jenisDetailOptions = options.jenis_detail;
     const { data, setData, post, processing, errors } = useForm({
         _redirect: '/form',
         nama: auth.user.name,
         tanggal: new Date(Date.now() - new Date().getTimezoneOffset() * 60000).toISOString().slice(0, 16),
-        items: subjenisOptions.map((sub) => ({ subjenis_sampah: sub, berat: '' })),
+        items: jenisDetailOptions.map((sub) => ({ jenis_sampah: sub, berat: '' })),
     });
 
     const [showSuccess, setShowSuccess] = useState(false);
@@ -45,7 +45,7 @@ export default function FormPilahSampah() {
         e.preventDefault();
         const filledCount = data.items.filter((item) => parseFloat(item.berat) > 0).length;
         if (!filledCount) {
-            setSubmitError('Minimal isi berat pada 1 subjenis sampah');
+            setSubmitError('Minimal isi berat pada 1 jenis sampah');
             return;
         }
         setSubmitError('');
@@ -66,7 +66,7 @@ export default function FormPilahSampah() {
                 <div className="flex-1 px-4 pb-36 pt-6">
                     <Heading
                         title="Pencatatan Pilah Sampah"
-                        description="Isi berat pada subjenis sampah yang dipilah"
+                        description="Isi berat pada jenis sampah yang dipilah"
                     />
 
                     <form onSubmit={handleSubmit} className="mt-6 space-y-6" noValidate>
@@ -133,14 +133,14 @@ export default function FormPilahSampah() {
                         <div id="section-jenis-berat" className="rounded-2xl border border-green-100 bg-white p-5 shadow-sm">
                             <div className="mb-4 flex items-center gap-2 text-sm font-medium text-green-700">
                                 <Trash2 className="h-4 w-4" />
-                                Subjenis & Berat Sampah
+                                Jenis & Berat Sampah
                             </div>
-                            <p className="-mt-2 mb-3 text-xs text-gray-500">Isi berat pada minimal 1 subjenis sampah (boleh lebih dari satu)</p>
+                            <p className="-mt-2 mb-3 text-xs text-gray-500">Isi berat pada minimal 1 jenis sampah (boleh lebih dari satu)</p>
 
                             <div className="divide-y divide-green-100 rounded-xl border border-green-100 overflow-hidden">
                                 {data.items.map((item, i) => (
-                                    <div key={item.subjenis_sampah} className="flex items-center gap-3 px-4 py-2.5 bg-white even:bg-green-50/30">
-                                        <span className="min-w-0 flex-1 text-sm font-medium text-gray-700">{item.subjenis_sampah}</span>
+                                    <div key={item.jenis_sampah} className="flex items-center gap-3 px-4 py-2.5 bg-white even:bg-green-50/30">
+                                        <span className="min-w-0 flex-1 text-sm font-medium text-gray-700">{item.jenis_sampah}</span>
                                         <div className="relative w-32 shrink-0">
                                             <Input
                                                 type="number"
@@ -231,7 +231,7 @@ export default function FormPilahSampah() {
 
                         {submittedItems?.map((item, i) => (
                             <div key={i} className="flex items-center justify-between px-4 py-2 text-sm">
-                                <span className="text-gray-500">{item.subjenis_sampah as string}</span>
+                                <span className="text-gray-500">{item.jenis_sampah as string}</span>
                                 <span className="font-medium text-gray-800">{Number(item.berat).toFixed(2)} kg</span>
                             </div>
                         ))}

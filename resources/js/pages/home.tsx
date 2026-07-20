@@ -111,8 +111,8 @@ const HERO_SLIDES = [
 
 const HERO_STATS = [
   { label: "Lantai dipantau", value: 4, suffix: "" },
-  { label: "Sub-area aktif", value: 12, suffix: "+" },
-  { label: "Titik pemilahan", value: 20, suffix: "+" },
+  { label: "Area aktif", value: 15, suffix: "+" },
+  { label: "Titik pemilahan", value: 10, suffix: "+" },
 ];
 
 const MENU_DECK = [
@@ -289,19 +289,9 @@ function SectionLabel({ children }: { children: ReactNode; hideLine?: boolean })
 }
 
 function SafeImage({ src, alt, icon: Icon, gradient, className, style }: { src: string; alt: string; icon?: LucideIcon; gradient: string; className?: string; style?: CSSProperties }) {
-  const [state, setState] = useState<'loading' | 'loaded' | 'failed'>('loading');
+  const [failed, setFailed] = useState(false);
 
-  useEffect(() => {
-    let cancelled = false;
-    setState('loading');
-    const img = new Image();
-    img.onload = () => { if (!cancelled) setState('loaded'); };
-    img.onerror = () => { if (!cancelled) setState('failed'); };
-    img.src = src;
-    return () => { cancelled = true; img.onload = null; img.onerror = null; };
-  }, [src]);
-
-  if (state === 'failed' || state === 'loading') {
+  if (failed) {
     return (
       <div
         className={className}
@@ -318,6 +308,7 @@ function SafeImage({ src, alt, icon: Icon, gradient, className, style }: { src: 
       alt={alt}
       className={className}
       style={style}
+      onError={() => setFailed(true)}
     />
   );
 }
@@ -872,7 +863,21 @@ export default function Dashboard() {
               }}
             >
               <SectionLabel hideLine>
-                <span style={{ color: C.gold500, fontSize: "0.65rem" }}>Sistem Informasi Pengelolaan Sampah</span>
+                {/* text-shadow dua layar: layar pertama (0 1px 3px, lebih
+                    pekat/rapat) bikin outline tipis di sekeliling huruf
+                    supaya tetap kebaca walau background-nya terang; layar
+                    kedua (0 1px 8px, lebih blur/menyebar) bikin semacam
+                    "glow" gelap di sekitarnya buat nambah kontras tanpa
+                    keliatan kayak ada kotak hitam kaku di belakang teks. */}
+                <span
+                  style={{
+                    color: C.gold500,
+                    fontSize: "0.65rem",
+                    textShadow: "0 1px 3px rgba(0,0,0,0.9), 0 1px 8px rgba(0,0,0,0.6)",
+                  }}
+                >
+                  Sistem Informasi Pengelolaan Sampah
+                </span>
               </SectionLabel>
               <h1 key={activeHero.title} className="text-xl sm:text-3xl lg:text-4xl font-semibold max-w-4xl leading-tight text-white mb-2 sm:mb-3 hero-fade whitespace-normal" style={display}>
                 {activeHero.title}

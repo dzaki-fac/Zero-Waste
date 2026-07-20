@@ -21,7 +21,7 @@ class PenimbanganFactory extends Factory
     {
         $area = fake()->randomElement([
             'Lantai 1', 'Lantai 2', 'Lantai 3', 'Lantai 4',
-            'Area Teras', 'Area Halaman', 'Area Parkir',
+            'Area Teras', 'Area Halaman & Parkir',
         ]);
 
         return [

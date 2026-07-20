@@ -11,7 +11,7 @@ class PenimbanganSeeder extends Seeder
     public function run(): void
     {
         $petugas = User::where('role', 'petugas')->get()->keyBy('name');
-        $areas = ['Lantai 1', 'Lantai 2', 'Lantai 3', 'Lantai 4', 'Area Teras', 'Area Halaman', 'Area Parkir'];
+        $areas = ['Lantai 1', 'Lantai 2', 'Lantai 3', 'Lantai 4', 'Area Teras', 'Area Halaman & Parkir'];
         $jenisSampah = [
             'Plastik Kresek & Bungkus', 'Sampah Tisu', 'Kaleng & Botol Kaca',
             'Sisa Makanan', 'Plastik Botol & Wadah', 'Styrofoam', 'Daun', 'Ranting',

@@ -6,10 +6,12 @@ use App\Helpers\OptionHelper;
 use App\Models\ChecklistPekerjaan;
 use App\Models\DataDasar;
 use App\Models\Distribusi;
+use App\Models\MasterPekerjaan;
 use App\Models\Penimbangan;
 use App\Models\PilahSampah;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -22,6 +24,9 @@ class DashboardController extends Controller
         $endDate = $request->input('end_date');
 
         $user = $request->user();
+
+        $progressPetugasNip = $request->input('progress_petugas');
+        $progressDate = $request->input('progress_date');
 
         $penimbanganQuery = Penimbangan::visibleTo($user);
         $pilahQuery = PilahSampah::visibleTo($user);
@@ -56,9 +61,9 @@ class DashboardController extends Controller
         $pilahByJenis = PilahSampah::visibleTo($user)
             ->when($startDate, fn ($q) => $q->where('tanggal', '>=', $startDate))
             ->when($endDate, fn ($q) => $q->where('tanggal', '<=', $endDate))
-            ->select('subjenis_sampah', DB::raw('SUM(berat) as total'))
-            ->groupBy('subjenis_sampah')
-            ->pluck('total', 'subjenis_sampah')
+            ->select('jenis_sampah', DB::raw('SUM(berat) as total'))
+            ->groupBy('jenis_sampah')
+            ->pluck('total', 'jenis_sampah')
             ->map(fn ($total, $sub) => ['name' => $sub, 'value' => (float) $total])
             ->values()
             ->toArray();
@@ -143,6 +148,129 @@ class DashboardController extends Controller
 
         $dataDasar = DataDasar::where('user_id', auth()->id())->first();
 
+        $refDate = $progressDate ?: ($endDate ?: ($startDate ?: now()->toDateString()));
+        $ref = Carbon::parse($refDate)->startOfDay();
+        $startOfWeek = $ref->copy()->startOfWeek();
+        $endOfWeek = $ref->copy()->endOfWeek();
+        $startOfMonth = $ref->copy()->startOfMonth();
+        $endOfMonth = $ref->copy()->endOfMonth();
+
+        $harianTotal = MasterPekerjaan::active()->where('jenis_pekerjaan', 'harian')->count();
+        $mingguanTotal = MasterPekerjaan::active()->where('jenis_pekerjaan', 'mingguan')->count();
+        $bulananTotal = MasterPekerjaan::active()->where('jenis_pekerjaan', 'bulanan')->count();
+
+        if ($user->role === 'admin') {
+            if ($progressPetugasNip && $progressPetugasNip !== 'all') {
+                $petugas = User::where('role', 'petugas')->where('nip', $progressPetugasNip)->first();
+                $nipProg = $petugas ? $petugas->nip : null;
+                $progressPetugasName = $petugas ? $petugas->name : null;
+            } else {
+                $nipProg = null;
+                $progressPetugasName = null;
+            }
+
+            if ($nipProg) {
+                $harianSelesai = ChecklistPekerjaan::where('nip', $nipProg)
+                    ->where('tanggal', $ref->toDateString())
+                    ->where('status', 'sudah')
+                    ->where('jenis_pekerjaan', 'harian')
+                    ->groupBy('master_pekerjaan_id')
+                    ->pluck('master_pekerjaan_id')
+                    ->count();
+
+                $mingguanSelesai = ChecklistPekerjaan::where('nip', $nipProg)
+                    ->whereBetween('tanggal', [$startOfWeek->toDateString(), $endOfWeek->toDateString()])
+                    ->where('status', 'sudah')
+                    ->where('jenis_pekerjaan', 'mingguan')
+                    ->groupBy('master_pekerjaan_id')
+                    ->pluck('master_pekerjaan_id')
+                    ->count();
+
+                $bulananSelesai = ChecklistPekerjaan::where('nip', $nipProg)
+                    ->whereBetween('tanggal', [$startOfMonth->toDateString(), $endOfMonth->toDateString()])
+                    ->where('status', 'sudah')
+                    ->where('jenis_pekerjaan', 'bulanan')
+                    ->groupBy('master_pekerjaan_id')
+                    ->pluck('master_pekerjaan_id')
+                    ->count();
+            } else {
+                $petugasNips = User::where('role', 'petugas')->whereNotNull('nip')->where('nip', '!=', '')->pluck('nip');
+
+                $harianSelesai = ChecklistPekerjaan::whereIn('nip', $petugasNips)
+                    ->where('tanggal', $ref->toDateString())
+                    ->where('status', 'sudah')
+                    ->where('jenis_pekerjaan', 'harian')
+                    ->groupBy('master_pekerjaan_id')
+                    ->pluck('master_pekerjaan_id')
+                    ->count();
+
+                $mingguanSelesai = ChecklistPekerjaan::whereIn('nip', $petugasNips)
+                    ->whereBetween('tanggal', [$startOfWeek->toDateString(), $endOfWeek->toDateString()])
+                    ->where('status', 'sudah')
+                    ->where('jenis_pekerjaan', 'mingguan')
+                    ->groupBy('master_pekerjaan_id')
+                    ->pluck('master_pekerjaan_id')
+                    ->count();
+
+                $bulananSelesai = ChecklistPekerjaan::whereIn('nip', $petugasNips)
+                    ->whereBetween('tanggal', [$startOfMonth->toDateString(), $endOfMonth->toDateString()])
+                    ->where('status', 'sudah')
+                    ->where('jenis_pekerjaan', 'bulanan')
+                    ->groupBy('master_pekerjaan_id')
+                    ->pluck('master_pekerjaan_id')
+                    ->count();
+            }
+        } else {
+            $nip = $user->nip;
+
+            $harianSelesai = ChecklistPekerjaan::where('nip', $nip)
+                ->where('tanggal', $ref->toDateString())
+                ->where('status', 'sudah')
+                ->where('jenis_pekerjaan', 'harian')
+                ->groupBy('master_pekerjaan_id')
+                ->pluck('master_pekerjaan_id')
+                ->count();
+
+            $mingguanSelesai = ChecklistPekerjaan::where('nip', $nip)
+                ->whereBetween('tanggal', [$startOfWeek->toDateString(), $endOfWeek->toDateString()])
+                ->where('status', 'sudah')
+                ->where('jenis_pekerjaan', 'mingguan')
+                ->groupBy('master_pekerjaan_id')
+                ->pluck('master_pekerjaan_id')
+                ->count();
+
+            $bulananSelesai = ChecklistPekerjaan::where('nip', $nip)
+                ->whereBetween('tanggal', [$startOfMonth->toDateString(), $endOfMonth->toDateString()])
+                ->where('status', 'sudah')
+                ->where('jenis_pekerjaan', 'bulanan')
+                ->groupBy('master_pekerjaan_id')
+                ->pluck('master_pekerjaan_id')
+                ->count();
+        }
+
+        Carbon::setLocale('id');
+
+        $progress = [
+            'harian' => [
+                'total' => $harianTotal,
+                'selesai' => $harianSelesai,
+                'persentase' => $harianTotal > 0 ? (int) round(($harianSelesai / $harianTotal) * 100) : 0,
+                'periode' => $ref->translatedFormat('d F Y'),
+            ],
+            'mingguan' => [
+                'total' => $mingguanTotal,
+                'selesai' => $mingguanSelesai,
+                'persentase' => $mingguanTotal > 0 ? (int) round(($mingguanSelesai / $mingguanTotal) * 100) : 0,
+                'periode' => $startOfWeek->translatedFormat('d') . ' - ' . $endOfWeek->translatedFormat('d F Y'),
+            ],
+            'bulanan' => [
+                'total' => $bulananTotal,
+                'selesai' => $bulananSelesai,
+                'persentase' => $bulananTotal > 0 ? (int) round(($bulananSelesai / $bulananTotal) * 100) : 0,
+                'periode' => $startOfMonth->translatedFormat('d') . ' - ' . $endOfMonth->translatedFormat('d F Y'),
+            ],
+        ];
+
         $checklistStats = null;
 
         if ($user->role === 'admin') {
@@ -187,6 +315,11 @@ class DashboardController extends Controller
             ];
         }
 
+        $petugasList = User::where('role', 'petugas')
+            ->whereNotNull('nip')
+            ->where('nip', '!=', '')
+            ->get(['id', 'name', 'nip']);
+
         return Inertia::render('admin/dashboard', [
             'dataDasar' => $dataDasar,
             'rincianArea' => OptionHelper::get('rincian_area', []),
@@ -197,6 +330,10 @@ class DashboardController extends Controller
             'statusBerat' => $statusBerat,
             'siapDidistribusikanByJenis' => $siapDidistribusikanByJenis,
             'checklistStats' => $checklistStats,
+            'progress' => $progress,
+            'progressPetugasNip' => $progressPetugasNip,
+            'progressDate' => $progressDate ?: $ref->toDateString(),
+            'petugasList' => $petugasList,
             'filters' => [
                 'start_date' => $startDate,
                 'end_date' => $endDate,

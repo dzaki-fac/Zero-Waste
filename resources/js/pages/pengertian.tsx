@@ -40,23 +40,54 @@ const PENGERTIAN_ITEMS = [
   },
 ];
 
+// Detects devices that have a real hover-capable pointer (mouse/trackpad).
+// On touch-only devices this is false, so cards open on tap instead of hover.
+function useHasHover() {
+  const [hasHover, setHasHover] = useState(false);
+
+  useEffect(() => {
+    const mql = window.matchMedia("(hover: hover) and (pointer: fine)");
+    setHasHover(mql.matches);
+    const handleChange = (e: MediaQueryListEvent) => setHasHover(e.matches);
+    mql.addEventListener("change", handleChange);
+    return () => mql.removeEventListener("change", handleChange);
+  }, []);
+
+  return hasHover;
+}
+
 function PengertianContent() {
   const [activeKey, setActiveKey] = useState<string | null>(null);
+  const hasHover = useHasHover();
 
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
       {PENGERTIAN_ITEMS.map((it) => {
         const Icon = it.icon;
         const isOpen = activeKey === it.key;
+
+        const hoverHandlers = hasHover
+          ? {
+              onMouseEnter: () => setActiveKey(it.key),
+              onMouseLeave: () => setActiveKey((prev) => (prev === it.key ? null : prev)),
+            }
+          : {};
+
+        const tapHandlers = !hasHover
+          ? {
+              onClick: () => setActiveKey((prev) => (prev === it.key ? null : it.key)),
+            }
+          : {};
+
         return (
           <button
             key={it.key}
-            onMouseEnter={() => setActiveKey(it.key)}
-            onMouseLeave={() => setActiveKey((prev) => (prev === it.key ? null : prev))}
-            onClick={() => setActiveKey((prev) => (prev === it.key ? null : it.key))}
+            {...hoverHandlers}
+            {...tapHandlers}
             className="relative rounded-2xl overflow-hidden text-left w-full"
             style={{ aspectRatio: "4 / 5" }}
             aria-expanded={isOpen}
+            aria-label={it.title}
           >
             <SafeImage
               src={it.image}

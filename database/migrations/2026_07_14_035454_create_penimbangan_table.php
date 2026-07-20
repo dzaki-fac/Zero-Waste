@@ -13,7 +13,6 @@ return new class extends Migration
             $table->string('nama');
             $table->dateTime('tanggal');
             $table->decimal('berat_sampah', 10, 2);
-            $table->string('subjenis_sampah')->nullable();
             $table->string('jenis_sampah')->nullable();
             $table->string('area')->nullable();
             $table->foreignId('user_id')->nullable()->constrained('users')->nullOnDelete();
