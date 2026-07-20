@@ -33,10 +33,18 @@ export default function Navbar({ activeSection, onNavItemClick }: NavbarProps) {
       {/* Header sekarang pakai latar putih (bukan navy) supaya logo UNDIP &
           ZeroLib — yang teksnya gelap/hitam — tetap kebaca jelas. */}
       <header className="sticky top-0 z-40 border-b" style={{ backgroundColor: "#fff", borderColor: C.line }}>
-        <div className="w-full pl-5 sm:pl-8 pr-5 sm:pr-8 h-16 flex items-center justify-between">
-          {/* 3 logo disamain tingginya (h-9) & di-align tengah, apa pun
-              markup internal tiap komponen logonya (img/svg) — [&>*] maksa
-              elemen di dalamnya ikut tinggi wrapper & jaga rasio aslinya. */}
+        <div className="w-full pl-3 sm:pl-8 pr-3 sm:pr-8 h-14 sm:h-16 flex items-center justify-between gap-2 overflow-hidden">
+          {/* 3 logo disamain tingginya & di-align tengah, apa pun markup
+              internal tiap komponen logonya (img/svg). Dipakai `!` (important)
+              di [&>*] supaya class ini menang walau elemen svg/img di dalam
+              komponen logo punya width/height inline sendiri — inline style
+              biasanya lebih kuat dari class biasa, jadi tanpa `!` ukurannya
+              bisa "kalah" dan logo tetap tampil di ukuran aslinya yang besar.
+              `overflow-hidden` di wrapper tiap logo juga jadi jaring pengaman
+              kalau ternyata masih ada bagian yang meluber.
+              Tinggi logo jauh lebih kecil di mobile (h-5) supaya ketiga logo
+              muat berdampingan tanpa mendesak, lalu kembali normal (h-9) di
+              layar sm ke atas. */}
           <button
             type="button"
             onClick={() => {
@@ -46,20 +54,20 @@ export default function Navbar({ activeSection, onNavItemClick }: NavbarProps) {
                 navigate("/");
               }
             }}
-            className="flex items-center gap-4 cursor-pointer"
+            className="flex items-center gap-1.5 sm:gap-4 cursor-pointer min-w-0 overflow-hidden"
           >
-            <div className="h-9 flex items-center [&>*]:h-full [&>*]:w-auto">
+            <div className="h-5 sm:h-9 flex items-center shrink-0 overflow-hidden [&>*]:!h-full [&>*]:!w-auto [&>*]:!max-w-none">
               <UndipLogoIcon />
             </div>
-            <div className="h-9 flex items-center [&>*]:h-full [&>*]:w-auto">
+            <div className="h-5 sm:h-9 flex items-center shrink-0 overflow-hidden [&>*]:!h-full [&>*]:!w-auto [&>*]:!max-w-none">
               <UptLogoIcon />
             </div>
-            <div className="h-9 flex items-center [&>*]:h-full [&>*]:w-auto">
+            <div className="h-5 sm:h-9 flex items-center shrink-0 overflow-hidden [&>*]:!h-full [&>*]:!w-auto [&>*]:!max-w-none">
               <ZeroLibLogoIcon />
             </div>
           </button>
 
-          <nav className="hidden md:flex items-center gap-6 lg:gap-8">
+          <nav className="hidden md:flex items-center gap-6 lg:gap-8 shrink-0">
             {NAV_ITEMS.map((n) => {
               const active = activeSection === n.id;
               return (
@@ -86,7 +94,7 @@ export default function Navbar({ activeSection, onNavItemClick }: NavbarProps) {
           </nav>
 
           <button
-            className="md:hidden"
+            className="md:hidden shrink-0"
             style={{ color: C.leaf500 }}
             onClick={() => setMobileNavOpen((v) => !v)}
             aria-label="Buka menu"
