@@ -10,7 +10,7 @@ class PilahSampahRequest extends FormRequest
 {
     public function rules(): array
     {
-        $subjenis = OptionHelper::get('subjenis_sampah');
+        $jenisDetail = OptionHelper::get('jenis_detail');
         $area = OptionHelper::get('area');
 
         $rules = [
@@ -21,11 +21,11 @@ class PilahSampahRequest extends FormRequest
 
         if (in_array($this->input('_redirect'), ['/form', '/admin'])) {
             $rules['items'] = ['required', 'array', 'min:1'];
-            $rules['items.*.subjenis_sampah'] = ['required', Rule::in($subjenis)];
+            $rules['items.*.jenis_sampah'] = ['required', Rule::in($jenisDetail)];
             $rules['items.*.berat'] = ['nullable', 'numeric', 'min:0'];
         } else {
             $rules['berat'] = ['required', 'numeric', 'min:0'];
-            $rules['subjenis_sampah'] = ['required', Rule::in($subjenis)];
+            $rules['jenis_sampah'] = ['required', Rule::in($jenisDetail)];
         }
 
         return $rules;

@@ -21,7 +21,6 @@ class PilahSampah extends Model
         'area',
         'berat',
         'jenis_sampah',
-        'subjenis_sampah',
         'user_id',
     ];
 

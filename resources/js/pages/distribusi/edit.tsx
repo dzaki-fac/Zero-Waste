@@ -26,7 +26,7 @@ type Distribusi = {
 
 type Options = {
     area: string[];
-    subjenis_sampah: string[];
+    jenis_detail: string[];
     tujuan_distribusi: string[];
 };
 
@@ -114,13 +114,13 @@ export default function DistribusiEdit({ distribusi }: Props) {
                         </div>
 
                         <div className="grid gap-2">
-                            <Label htmlFor="jenis_sampah" className="text-green-700">Subjenis Sampah</Label>
+                            <Label htmlFor="jenis_sampah" className="text-green-700">Jenis Sampah</Label>
                             <Select name="jenis_sampah" value={data.jenis_sampah} onValueChange={(v) => setData('jenis_sampah', v)}>
                                 <SelectTrigger className="w-full border-green-200 focus-visible:border-green-500 focus-visible:ring-green-500/20">
-                                    <SelectValue placeholder="Pilih subjenis" />
+                                    <SelectValue placeholder="Pilih jenis" />
                                 </SelectTrigger>
                                 <SelectContent>
-                                    {options.subjenis_sampah.map((opt) => (
+                                    {options.jenis_detail.map((opt) => (
                                         <SelectItem key={opt} value={opt}>{opt}</SelectItem>
                                     ))}
                                 </SelectContent>

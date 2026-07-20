@@ -19,7 +19,6 @@ class Penimbangan extends Model
         'nama',
         'tanggal',
         'berat_sampah',
-        'subjenis_sampah',
         'jenis_sampah',
         'area',
         'user_id',

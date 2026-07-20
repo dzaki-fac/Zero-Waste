@@ -27,7 +27,6 @@ type PilahSampah = {
     tanggal: string;
     berat: string;
     jenis_sampah: string | null;
-    subjenis_sampah: string | null;
 };
 
 type Props = {
@@ -39,11 +38,11 @@ const currentYear = new Date().getFullYear();
 const years = Array.from({ length: 11 }, (_, i) => currentYear - i);
 
 export default function PilahSampahIndex({ pilahSampah }: Props) {
-    const { auth, options } = usePage().props as unknown as { auth: Auth; options: { jenis_sampah: string[]; subjenis_sampah: string[] } };
+    const { auth, options } = usePage().props as unknown as { auth: Auth; options: { jenis_sampah: string[]; jenis_detail: string[] } };
     const prefix = auth.user.role === 'admin' ? '/admin' : '/petugas';
     const [search, setSearch] = useState('');
     const [filterJenis, setFilterJenis] = useState('all');
-    const subjenisSampahOptions = options.subjenis_sampah;
+    const jenisDetailOptions = options.jenis_detail;
     const [filterPeriod, setFilterPeriod] = useState('all');
     const [customStartDate, setCustomStartDate] = useState('');
     const [customEndDate, setCustomEndDate] = useState('');
@@ -97,7 +96,7 @@ export default function PilahSampahIndex({ pilahSampah }: Props) {
     };
 
     const filtered = pilahSampah.filter((item) => {
-        const type = item.subjenis_sampah ?? item.jenis_sampah ?? '';
+        const type = item.jenis_sampah ?? '';
         const matchSearch = item.nama.toLowerCase().includes(search.toLowerCase());
         const matchJenis = filterJenis === 'all' || type === filterJenis;
         const matchDate = matchesDate(item.tanggal);
@@ -181,11 +180,11 @@ export default function PilahSampahIndex({ pilahSampah }: Props) {
                             </div>
                             <Select value={filterJenis} onValueChange={setFilterJenis}>
                                 <SelectTrigger className="w-full sm:w-[200px] border-green-200 focus-visible:border-green-500 focus-visible:ring-green-500/20">
-                                    <SelectValue placeholder="Semua Subjenis" />
+                                    <SelectValue placeholder="Semua Jenis" />
                                 </SelectTrigger>
                                 <SelectContent>
-                                    <SelectItem value="all">Semua Subjenis</SelectItem>
-                                    {subjenisSampahOptions.map((j) => (
+                                    <SelectItem value="all">Semua Jenis</SelectItem>
+                                    {jenisDetailOptions.map((j) => (
                                         <SelectItem key={j} value={j}>{j}</SelectItem>
                                     ))}
                                 </SelectContent>
@@ -307,7 +306,7 @@ export default function PilahSampahIndex({ pilahSampah }: Props) {
                                         <TableHead className="text-green-700">Nama</TableHead>
                                         <TableHead className="text-green-700">Tanggal</TableHead>
                                         <TableHead className="text-green-700">Berat (kg)</TableHead>
-                                        <TableHead className="text-green-700">Subjenis</TableHead>
+                                        <TableHead className="text-green-700">Jenis</TableHead>
                                         <TableHead className="text-right text-green-700">Aksi</TableHead>
                                     </TableRow>
                                 </TableHeader>
@@ -320,7 +319,7 @@ export default function PilahSampahIndex({ pilahSampah }: Props) {
                                         </TableRow>
                                     ) : (
                                         filtered.map((item, index) => {
-                                            const type = item.subjenis_sampah ?? item.jenis_sampah ?? '-';
+                                            const type = item.jenis_sampah ?? '-';
                                             return (
                                                 <TableRow key={item.id} className="border-green-100">
                                                     <TableCell>{index + 1}</TableCell>

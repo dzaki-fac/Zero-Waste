@@ -124,7 +124,7 @@ class PenimbanganController extends Controller
 
         $filename = 'penimbangan_' . now()->toDateString() . '.csv';
 
-        $headers = ['No', 'Nama', 'Tanggal', 'Berat (kg)', 'Jenis', 'Subjenis', 'Area'];
+        $headers = ['No', 'Nama', 'Tanggal', 'Berat (kg)', 'Jenis', 'Area'];
 
         $callback = function () use ($records, $headers) {
             $file = fopen('php://output', 'w');
@@ -139,7 +139,6 @@ class PenimbanganController extends Controller
                     $record->tanggal,
                     $record->berat_sampah,
                     $record->jenis_sampah ?? '-',
-                    $record->subjenis_sampah ?? '-',
                     $record->area ?? '-',
                 ]);
             }
