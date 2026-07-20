@@ -1,22 +1,15 @@
+import { useState } from 'react';
+import { Head, Link, useForm, usePage } from '@inertiajs/react';
+import { ArrowLeft, Save, Ship, MapPin } from 'lucide-react';
 import Heading from '@/components/heading';
 import InputError from '@/components/input-error';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from '@/components/ui/select';
-import { Head, Link, useForm, usePage } from '@inertiajs/react';
-import { ArrowLeft, Save } from 'lucide-react';
 
 type Options = {
     area: string[];
-    sub_area: Record<string, string[]>;
-    jenis_sampah: string[];
+    subjenis_sampah: string[];
     tujuan_distribusi: string[];
 };
 
@@ -25,21 +18,55 @@ export default function DistribusiCreate() {
         auth: { user: { name: string } };
         options: Options;
     };
+
+    const subjenisOptions = options.subjenis_sampah;
+    const tujuanOptions = options.tujuan_distribusi;
     const { data, setData, post, processing, errors } = useForm({
+        _redirect: '/admin',
         nama: auth.user.name,
         tanggal: new Date(Date.now() - new Date().getTimezoneOffset() * 60000).toISOString().slice(0, 16),
-        berat: '',
-        jenis_sampah: '',
+        items: subjenisOptions.map((sub) => ({ subjenis_sampah: sub, berat: '' })),
         tujuan_distribusi: '',
+        tujuan_lainnya: '',
         lokasi: '',
     });
 
+    const [tujuanError, setTujuanError] = useState('');
+    const [lokasiError, setLokasiError] = useState('');
+    const [submitError, setSubmitError] = useState('');
+
     const prefix = auth.user.role === 'admin' ? '/admin' : '/petugas';
+    const totalBerat = data.items.reduce((sum, item) => sum + (parseFloat(item.berat) || 0), 0);
+    const filledCount = data.items.filter((item) => parseFloat(item.berat) > 0).length;
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        post(`${prefix}/distribusi`);
+        if (!data.tujuan_distribusi) {
+            setTujuanError('Pilih tujuan distribusi');
+            return;
+        }
+        if (data.tujuan_distribusi === 'Tujuan lainnya' && !data.tujuan_lainnya) {
+            setTujuanError('Isi tujuan distribusi lainnya');
+            return;
+        }
+        if (!data.lokasi) {
+            setLokasiError('Masukkan lokasi');
+            return;
+        }
+        const hasBerat = data.items.some((item) => parseFloat(item.berat) > 0);
+        if (!hasBerat) {
+            setSubmitError('Minimal isi berat pada 1 subjenis sampah');
+            return;
+        }
+        post(`${prefix}/distribusi`, {
+            ...data,
+            tujuan_distribusi: data.tujuan_distribusi === 'Tujuan lainnya' ? data.tujuan_lainnya : data.tujuan_distribusi,
+        });
     };
+
+    const now = new Date(Date.now() - new Date().getTimezoneOffset() * 60000).toISOString().slice(0, 16);
+    const todayDate = now.slice(0, 10);
+    const todayTime = now.slice(11, 16);
 
     return (
         <>
@@ -54,7 +81,7 @@ export default function DistribusiCreate() {
                 <div className="rounded-xl border border-green-200 bg-white p-6 shadow-sm">
                     <form onSubmit={handleSubmit} className="space-y-5">
                         <div className="grid gap-2">
-                            <Label htmlFor="nama" className="text-green-700">Nama</Label>
+                            <Label htmlFor="nama" className="text-green-700">Nama Petugas</Label>
                             <Input
                                 id="nama"
                                 name="nama"
@@ -67,64 +94,70 @@ export default function DistribusiCreate() {
                         </div>
 
                         <div className="grid gap-2">
-                            <Label htmlFor="tanggal" className="text-green-700">Tanggal</Label>
-                            <Input
-                                id="tanggal"
-                                name="tanggal"
-                                type="datetime-local"
-                                value={data.tanggal}
-                                onChange={(e) => setData('tanggal', e.target.value)}
-                                required
-                                className="border-green-200 focus-visible:border-green-500 focus-visible:ring-green-500/20"
-                            />
+                            <Label htmlFor="tanggal" className="text-green-700">Tanggal & Waktu</Label>
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                <Input
+                                    id="tanggal_date"
+                                    type="date"
+                                    value={data.tanggal ? data.tanggal.slice(0, 10) : todayDate}
+                                    onChange={(e) => {
+                                        const time = data.tanggal ? data.tanggal.slice(11, 16) : todayTime;
+                                        setData('tanggal', `${e.target.value}T${time}`);
+                                    }}
+                                    required
+                                    className="border-green-200 focus-visible:border-green-500 focus-visible:ring-green-500/20"
+                                />
+                                <Input
+                                    id="tanggal_time"
+                                    type="time"
+                                    value={data.tanggal ? data.tanggal.slice(11, 16) : todayTime}
+                                    onChange={(e) => {
+                                        const date = data.tanggal ? data.tanggal.slice(0, 10) : todayDate;
+                                        setData('tanggal', `${date}T${e.target.value}`);
+                                    }}
+                                    required
+                                    className="border-green-200 focus-visible:border-green-500 focus-visible:ring-green-500/20"
+                                />
+                            </div>
                             <InputError message={errors.tanggal} />
                         </div>
 
                         <div className="grid gap-2">
-                            <Label htmlFor="berat" className="text-green-700">Berat (kg)</Label>
-                            <Input
-                                id="berat"
-                                name="berat"
-                                type="number"
-                                step="0.01"
-                                min="0"
-                                value={data.berat}
-                                onChange={(e) => setData('berat', e.target.value)}
-                                required
-                                placeholder="0.00"
-                                className="border-green-200 focus-visible:border-green-500 focus-visible:ring-green-500/20"
-                            />
-                            <InputError message={errors.berat} />
-                        </div>
+                            <Label className="text-green-700">Tujuan Distribusi</Label>
+                            <div className="flex flex-wrap gap-2">
+                                {tujuanOptions.map((opt) => {
+                                    const isSelected = data.tujuan_distribusi === opt;
+                                    return (
+                                        <button
+                                            key={opt}
+                                            type="button"
+                                            onClick={() => setData('tujuan_distribusi', opt)}
+                                            className={`rounded-xl border-2 px-4 py-2 text-sm font-medium transition-all ${
+                                                isSelected
+                                                    ? 'border-green-500 bg-green-50 text-green-700 shadow-sm'
+                                                    : 'border-gray-200 bg-gray-50 text-gray-600 hover:border-green-200 hover:bg-green-50'
+                                            }`}
+                                        >
+                                            {opt}
+                                        </button>
+                                    );
+                                })}
+                            </div>
+                            <InputError message={errors.tujuan_distribusi || tujuanError} />
 
-                        <div className="grid gap-2">
-                            <Label htmlFor="jenis_sampah" className="text-green-700">Jenis Sampah</Label>
-                            <Select name="jenis_sampah" value={data.jenis_sampah} onValueChange={(v) => setData('jenis_sampah', v)}>
-                                <SelectTrigger className="w-full border-green-200 focus-visible:border-green-500 focus-visible:ring-green-500/20">
-                                    <SelectValue placeholder="Pilih jenis sampah" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    {options.jenis_sampah.map((opt) => (
-                                        <SelectItem key={opt} value={opt}>{opt}</SelectItem>
-                                    ))}
-                                </SelectContent>
-                            </Select>
-                            <InputError message={errors.jenis_sampah} />
-                        </div>
-
-                        <div className="grid gap-2">
-                            <Label htmlFor="tujuan_distribusi" className="text-green-700">Tujuan Distribusi</Label>
-                            <Select name="tujuan_distribusi" value={data.tujuan_distribusi} onValueChange={(v) => setData('tujuan_distribusi', v)}>
-                                <SelectTrigger className="w-full border-green-200 focus-visible:border-green-500 focus-visible:ring-green-500/20">
-                                    <SelectValue placeholder="Pilih tujuan distribusi" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    {options.tujuan_distribusi.map((opt) => (
-                                        <SelectItem key={opt} value={opt}>{opt}</SelectItem>
-                                    ))}
-                                </SelectContent>
-                            </Select>
-                            <InputError message={errors.tujuan_distribusi} />
+                            {data.tujuan_distribusi === 'Tujuan lainnya' && (
+                                <div className="mt-2">
+                                    <Label htmlFor="tujuan_lainnya" className="text-xs font-medium text-gray-600">Sebutkan tujuan lainnya</Label>
+                                    <Input
+                                        id="tujuan_lainnya"
+                                        name="tujuan_lainnya"
+                                        value={data.tujuan_lainnya}
+                                        onChange={(e) => setData('tujuan_lainnya', e.target.value)}
+                                        placeholder="Masukkan tujuan distribusi"
+                                        className="mt-1 border-green-200 focus-visible:border-green-500 focus-visible:ring-green-500/20"
+                                    />
+                                </div>
+                            )}
                         </div>
 
                         <div className="grid gap-2">
@@ -138,13 +171,57 @@ export default function DistribusiCreate() {
                                 placeholder="Masukkan lokasi"
                                 className="border-green-200 focus-visible:border-green-500 focus-visible:ring-green-500/20"
                             />
-                            <InputError message={errors.lokasi} />
+                            <InputError message={errors.lokasi || lokasiError} />
+                        </div>
+
+                        <div className="grid gap-2">
+                            <Label className="text-green-700">Subjenis & Berat Sampah</Label>
+                            <p className="-mt-1 text-xs text-gray-500">Isi berat pada minimal 1 subjenis sampah (boleh lebih dari satu)</p>
+
+                            <div className="divide-y divide-green-100 rounded-lg border border-green-200 overflow-hidden">
+                                {data.items.map((item, i) => (
+                                    <div key={item.subjenis_sampah} className="flex items-center gap-3 px-4 py-2 bg-white even:bg-green-50/30">
+                                        <span className="min-w-0 flex-1 text-sm font-medium text-gray-700">{item.subjenis_sampah}</span>
+                                        <div className="relative w-32 shrink-0">
+                                            <Input
+                                                type="number"
+                                                step="0.01"
+                                                min="0"
+                                                value={item.berat}
+                                                onChange={(e) => {
+                                                    const items = data.items.map((it, idx) =>
+                                                        idx === i ? { ...it, berat: e.target.value } : it
+                                                    );
+                                                    setData('items', items);
+                                                    setSubmitError('');
+                                                }}
+                                                placeholder="0.00"
+                                                inputMode="decimal"
+                                                onWheel={(e) => e.currentTarget.blur()}
+                                                className="h-9 border-green-200 pe-8 text-sm [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
+                                            />
+                                            <span className="pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 text-xs text-green-600">kg</span>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+
+                            {submitError && (
+                                <p className="text-sm text-red-500">{submitError}</p>
+                            )}
+
+                            <div className="flex items-center justify-between rounded-lg bg-green-100 px-4 py-2">
+                                <span className="text-sm font-medium text-green-700">
+                                    Total{filledCount > 0 ? ` (${filledCount} subjenis)` : ''}
+                                </span>
+                                <span className="text-sm font-bold text-green-800">{totalBerat.toFixed(2)} kg</span>
+                            </div>
                         </div>
 
                         <div className="flex items-center gap-3 pt-2">
                             <Button disabled={processing} type="submit" className="bg-green-600 hover:bg-green-700">
                                 <Save className="h-4 w-4" />
-                                Simpan
+                                {processing ? 'Menyimpan...' : 'Simpan'}
                             </Button>
                             <Button variant="outline" asChild className="border-green-200 text-green-700 hover:bg-green-50">
                                 <Link href={`${prefix}/distribusi`} className="flex items-center gap-1">

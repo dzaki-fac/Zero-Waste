@@ -15,7 +15,8 @@ class ChecklistPekerjaanController extends Controller
 {
     public function index(): Response
     {
-        $petugas = User::where('role', 'petugas')->get(['id', 'name', 'nip']);
+        $petugas = User::where('role', 'petugas')
+            ->get(['id', 'name', 'nip']);
 
         return Inertia::render('checklist-pekerjaan/index', [
             'petugas' => $petugas,
@@ -24,6 +25,10 @@ class ChecklistPekerjaanController extends Controller
 
     public function show(string $nip, Request $request): Response
     {
+        if (blank($nip) || $nip === 'null' || $nip === 'undefined') {
+            abort(404, 'NIP tidak valid.');
+        }
+
         $petugas = User::where('role', 'petugas')->where('nip', $nip)->firstOrFail();
         $tanggal = $request->query('tanggal', now()->toDateString());
 
@@ -57,8 +62,85 @@ class ChecklistPekerjaanController extends Controller
         ]);
     }
 
+    public function showForAuthPetugas(Request $request): Response
+    {
+        $user = $request->user();
+
+        abort_unless($user !== null, 401);
+        abort_unless($user->role === 'petugas', 403);
+
+        $tanggal = $request->query('tanggal', now()->toDateString());
+
+        $filter = $request->query('jenis');
+        if ($filter && !in_array($filter, ['harian', 'mingguan', 'bulanan'])) {
+            $filter = null;
+        }
+
+        $areaFilter = $request->query('area');
+
+        $masterTasks = MasterPekerjaan::active()->ordered()->get();
+
+        $checklist = $areaFilter
+            ? ChecklistPekerjaan::where('nip', $user->nip)
+                ->where('tanggal', $tanggal)
+                ->where('area', $areaFilter)
+                ->get()
+                ->keyBy('master_pekerjaan_id')
+            : collect();
+
+        $areas = OptionHelper::get('area');
+
+        return Inertia::render('checklist-pekerjaan/show', [
+            'petugas' => [
+                'id' => $user->id,
+                'name' => $user->name,
+                'nip' => $user->nip,
+            ],
+            'tanggal' => $tanggal,
+            'masterTasks' => $masterTasks,
+            'checklist' => $checklist,
+            'filter' => $filter,
+            'areaFilter' => $areaFilter,
+            'areas' => $areas,
+            'readOnly' => true,
+        ]);
+    }
+
+    public function formPage(Request $request): Response
+    {
+        $user = $request->user();
+
+        $nip = $user->nip;
+        $tanggal = $request->query('tanggal', now()->toDateString());
+        $areaFilter = $request->query('area');
+
+        $masterTasks = MasterPekerjaan::active()->ordered()->get();
+
+        $checklist = $areaFilter
+            ? ChecklistPekerjaan::where('nip', $nip)
+                ->where('tanggal', $tanggal)
+                ->where('area', $areaFilter)
+                ->get()
+                ->keyBy('master_pekerjaan_id')
+            : collect();
+
+        $areas = OptionHelper::get('area');
+
+        return Inertia::render('form/pekerjaan', [
+            'tanggal' => $tanggal,
+            'masterTasks' => $masterTasks,
+            'checklist' => $checklist,
+            'areaFilter' => $areaFilter,
+            'areas' => $areas,
+        ]);
+    }
+
     public function history(string $nip, Request $request): Response
     {
+        if (blank($nip) || $nip === 'null' || $nip === 'undefined') {
+            abort(404, 'NIP tidak valid.');
+        }
+
         $petugas = User::where('role', 'petugas')->where('nip', $nip)->firstOrFail();
 
         $query = ChecklistPekerjaan::where('nip', $nip);
@@ -105,6 +187,11 @@ class ChecklistPekerjaanController extends Controller
     public function export(Request $request): \Symfony\Component\HttpFoundation\StreamedResponse
     {
         $nip = $request->query('nip');
+
+        if (blank($nip) || $nip === 'null' || $nip === 'undefined') {
+            abort(404, 'NIP tidak valid.');
+        }
+
         $startDate = $request->query('start_date');
         $endDate = $request->query('end_date');
         $status = $request->query('status');
@@ -244,7 +331,7 @@ class ChecklistPekerjaanController extends Controller
     public function store(Request $request): RedirectResponse
     {
         $validated = $request->validate([
-            'nip' => ['required', 'exists:users,nip'],
+            'nip' => ['required', 'string'],
             'tanggal' => ['required', 'date'],
             'area' => ['required', 'string', 'max:255'],
             'items' => ['required', 'array'],
@@ -252,7 +339,11 @@ class ChecklistPekerjaanController extends Controller
             'items.*.status' => ['required', 'in:sudah,belum'],
         ]);
 
-        $petugas = User::where('role', 'petugas')->where('nip', $validated['nip'])->firstOrFail();
+        $petugas = User::where('role', 'petugas')->where('nip', $validated['nip'])->first();
+
+        if (! $petugas) {
+            return back()->withErrors(['nip' => 'Petugas tidak ditemukan.']);
+        }
 
         $masterIds = collect($validated['items'])->pluck('master_pekerjaan_id')->unique();
         $masterTasks = MasterPekerjaan::whereIn('id', $masterIds)->get()->keyBy('id');
@@ -285,6 +376,20 @@ class ChecklistPekerjaanController extends Controller
 
         ChecklistPekerjaan::insert($rows);
 
-        return to_route('admin.checklist-pekerjaan.index');
+        if ($request->input('_redirect') === '/form') {
+            $total = count($rows);
+            $done = count(array_filter($rows, fn ($r) => $r['status'] === 'sudah'));
+
+            return redirect('/form/pekerjaan?' . http_build_query(['tanggal' => $validated['tanggal'], 'area' => $area]))->with('submitted', [
+                'area' => $area,
+                'tanggal' => $validated['tanggal'],
+                'total' => $total,
+                'sudah' => $done,
+                'belum' => $total - $done,
+                'nama' => $petugas->name,
+            ]);
+        }
+
+        return redirect("/admin/checklist-pekerjaan/{$petugas->nip}?" . http_build_query(['tanggal' => $validated['tanggal'], 'area' => $area]));
     }
 }

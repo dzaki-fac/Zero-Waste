@@ -26,8 +26,9 @@ type Penimbangan = {
     nama: string;
     tanggal: string;
     berat_sampah: string;
+    jenis_sampah: string | null;
+    subjenis_sampah: string | null;
     area: string;
-    sub_area: string;
 };
 
 type Props = {
@@ -41,11 +42,13 @@ const years = Array.from({ length: 11 }, (_, i) => currentYear - i);
 export default function PenimbanganIndex({ penimbangan }: Props) {
     const { auth } = usePage().props as { auth: Auth };
     const prefix = auth.user.role === 'admin' ? '/admin' : '/petugas';
-    const { options: pageOptions } = usePage().props as { options?: { area: string[] } };
+    const { options: pageOptions } = usePage().props as { options?: { area: string[]; jenis_sampah: string[] } };
     const areaOptions = pageOptions?.area ?? [];
+    const jenisSampahOptions = pageOptions?.jenis_sampah ?? [];
 
     const [search, setSearch] = useState('');
     const [filterArea, setFilterArea] = useState('all');
+    const [filterJenis, setFilterJenis] = useState('all');
     const [filterPeriod, setFilterPeriod] = useState('all');
     const [customStartDate, setCustomStartDate] = useState('');
     const [customEndDate, setCustomEndDate] = useState('');
@@ -101,8 +104,9 @@ export default function PenimbanganIndex({ penimbangan }: Props) {
     const filtered = penimbangan.filter((item) => {
         const matchSearch = item.nama.toLowerCase().includes(search.toLowerCase());
         const matchArea = filterArea === 'all' || item.area === filterArea;
+        const matchJenis = filterJenis === 'all' || item.jenis_sampah === filterJenis;
         const matchDate = matchesDate(item.tanggal);
-        return matchSearch && matchArea && matchDate;
+        return matchSearch && matchArea && matchJenis && matchDate;
     });
 
     const totalWeight = filtered.reduce((sum, item) => sum + Number(item.berat_sampah), 0);
@@ -188,6 +192,17 @@ export default function PenimbanganIndex({ penimbangan }: Props) {
                                     <SelectItem value="all">Semua Area</SelectItem>
                                     {areaOptions.map((a) => (
                                         <SelectItem key={a} value={a}>{a}</SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
+                            <Select value={filterJenis} onValueChange={setFilterJenis}>
+                                <SelectTrigger className="w-full sm:w-[200px] border-green-200 focus-visible:border-green-500 focus-visible:ring-green-500/20">
+                                    <SelectValue placeholder="Semua Jenis Sampah" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="all">Semua Jenis Sampah</SelectItem>
+                                    {jenisSampahOptions.map((j) => (
+                                        <SelectItem key={j} value={j}>{j}</SelectItem>
                                     ))}
                                 </SelectContent>
                             </Select>
@@ -308,15 +323,15 @@ export default function PenimbanganIndex({ penimbangan }: Props) {
                                         <TableHead className="text-green-700">Nama</TableHead>
                                         <TableHead className="text-green-700">Tanggal</TableHead>
                                         <TableHead className="text-green-700">Berat (kg)</TableHead>
+                                        <TableHead className="text-green-700">Jenis</TableHead>
                                         <TableHead className="text-green-700">Area</TableHead>
-                                        <TableHead className="text-green-700">Sub Area</TableHead>
                                         <TableHead className="text-right text-green-700">Aksi</TableHead>
                                     </TableRow>
                                 </TableHeader>
                                 <TableBody>
                                     {filtered.length === 0 ? (
                                         <TableRow>
-                                            <TableCell colSpan={7} className="text-center text-green-600/70">
+                                                <TableCell colSpan={7} className="text-center text-green-600/70">
                                                 Tidak ada data yang cocok.
                                             </TableCell>
                                         </TableRow>
@@ -325,16 +340,20 @@ export default function PenimbanganIndex({ penimbangan }: Props) {
                                             <TableRow key={item.id} className="border-green-100">
                                                 <TableCell>{index + 1}</TableCell>
                                                 <TableCell className="font-medium">{item.nama}</TableCell>
-                                                <TableCell>{new Date(item.tanggal).toLocaleString('id-ID', { day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' })}</TableCell>
+                                                <TableCell>{new Date(item.tanggal).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })} {new Date(item.tanggal).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })}</TableCell>
                                                 <TableCell className="font-medium">
                                                     {Number(item.berat_sampah).toLocaleString('id-ID', { minimumFractionDigits: 2 })} kg
+                                                </TableCell>
+                                                <TableCell>
+                                                    <span className="inline-flex items-center rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-medium text-green-700">
+                                                        {item.jenis_sampah ?? item.subjenis_sampah ?? '-'}
+                                                    </span>
                                                 </TableCell>
                                                 <TableCell>
                                                     <span className="inline-flex items-center rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-medium text-green-700">
                                                         {item.area}
                                                     </span>
                                                 </TableCell>
-                                                <TableCell>{item.sub_area}</TableCell>
                                                 <TableCell className="text-right">
                                                     <div className="flex justify-end gap-2">
                                                         <Button variant="outline" size="sm" asChild className="border-green-200 text-green-700 hover:bg-green-50 hover:text-green-800">

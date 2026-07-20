@@ -1,6 +1,3 @@
-import { Link } from '@inertiajs/react';
-import AppLogoIcon from '@/components/Undiplogoicon';
-import { login } from '@/routes';
 import type { AuthLayoutProps } from '@/types';
 
 export default function AuthSimpleLayout({
@@ -9,27 +6,24 @@ export default function AuthSimpleLayout({
     description,
 }: AuthLayoutProps) {
     return (
-        <div className="flex min-h-svh flex-col items-center justify-center gap-6 bg-background p-6 md:p-10">
+        <div className="flex min-h-screen flex-col items-center justify-center bg-linear-to-b from-green-50 to-white p-6 md:p-10">
             <div className="w-full max-w-sm">
-                <div className="flex flex-col gap-8">
-                    <div className="flex flex-col items-center gap-4">
-                        <Link
-                            href={login()}
-                            className="flex flex-col items-center gap-2 font-medium"
-                        >
-                            <div className="mb-1 flex h-9 w-9 items-center justify-center rounded-md">
-                                <AppLogoIcon className="size-9 fill-current text-[var(--foreground)]" />
-                            </div>
-                            <span className="sr-only">{title}</span>
-                        </Link>
+                    <div className="flex flex-col items-center">
+            <img
+                src="/logo-zerolib.png"
+                alt="ZeroLib Logo"
+                className="w-64 object-contain -mb-15"
+            />
 
-                        <div className="space-y-2 text-center">
-                            <h1 className="text-xl font-medium">{title}</h1>
-                            <p className="text-center text-sm text-muted-foreground">
-                                {description}
-                            </p>
-                        </div>
-                    </div>
+            <h1 className="text-xl font-medium text-center">
+                {title}
+            </h1>
+
+            <p className="mt-1 text-center text-sm text-muted-foreground">
+                {description}
+            </p>
+        </div>
+                <div className="mt-6">
                     {children}
                 </div>
             </div>

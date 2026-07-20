@@ -1,3 +1,4 @@
+import { Head } from '@inertiajs/react';
 import React, { useState, useRef, useEffect, useLayoutEffect, type ReactNode, type CSSProperties } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import type { LucideIcon } from "lucide-react";
@@ -15,20 +16,58 @@ import {
   Newspaper,
   Info,
   Users,
-  Instagram,
-  Youtube,
-  Globe,
   Phone,
   Mail,
+  Scale,
+  Truck,
+  Package,
+  Clock,
+  CheckCircle,
+  Send,
+  CalendarIcon,
 } from "lucide-react";
+import { usePage, router } from '@inertiajs/react';
+import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from 'recharts';
 import { C, display, body } from "../theme";
 import Navbar from "../components/Navbar";
+import { ChartTooltip, ChartLabel, getCategoryColor, PieLegend } from "../components/charts";
+import type { ChartData } from "../components/charts";
 
-// ---- Tiktok Icon --------------------------------------------------------
+// ---- Ikon media sosial ----
+function WebsiteIcon({ size = 16, color = "currentColor" }: { size?: number; color?: string }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+      <circle cx="12" cy="12" r="9" />
+      <path d="M3 12h18" />
+      <path d="M12 3c2.5 2.5 3.8 5.7 3.8 9s-1.3 6.5-3.8 9c-2.5-2.5-3.8-5.7-3.8-9s1.3-6.5 3.8-9Z" />
+    </svg>
+  );
+}
+
+function YoutubeIcon({ size = 16, color = "currentColor" }: { size?: number; color?: string }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M21.6 7.6c-.2-1-1-1.8-2-2C17.9 5.2 12 5.2 12 5.2s-5.9 0-7.6.4c-1 .2-1.8 1-2 2C2 9.3 2 12 2 12s0 2.7.4 4.4c.2 1 1 1.8 2 2 1.7.4 7.6.4 7.6.4s5.9 0 7.6-.4c1-.2 1.8-1 2-2 .4-1.7.4-4.4.4-4.4s0-2.7-.4-4.4Z" />
+      <path d="M10 9.6 15 12l-5 2.4V9.6Z" fill={color} stroke="none" />
+    </svg>
+  );
+}
+
+function InstagramIcon({ size = 16, color = "currentColor" }: { size?: number; color?: string }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+      <rect x="3" y="3" width="18" height="18" rx="5" />
+      <circle cx="12" cy="12" r="4" />
+      <circle cx="17.2" cy="6.8" r="1.1" fill={color} stroke="none" />
+    </svg>
+  );
+}
+
 function TiktokIcon({ size = 16, color = "currentColor" }: { size?: number; color?: string }) {
   return (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M9 12a4 4 0 1 0 4 4V4a5 5 0 0 0 5 5" />
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M14 4v9.5a3.5 3.5 0 1 1-3.5-3.5" />
+      <path d="M14 4c.3 2 1.8 3.5 4 3.8" />
     </svg>
   );
 }
@@ -116,103 +155,17 @@ const MENU_DECK = [
   },
 ];
 
-const NEWS = [
-  {
-    tag: "UNDIP",
-    date: "04 Apr 2026",
-    title: "K3L Sosialisasikan Pemilahan Sampah Residu di TPST Kampus UNDIP",
-    image:
-      "https://i.ytimg.com/vi/ne1zRy1AOOM/hq720.jpg?sqp=-oaymwEhCK4FEIIDSFryq4qpAxMIARUAAAAAGAElAADIQj0AgKJD&rs=AOn4CLDjk6kykjZwKXx6RaQdlDsDhyqU6g",
-    href: "https://kemdiktisaintek.go.id/news/article/implementasi-undip-zero-waste-k3l-sosialisasikan-pemilahan-sampah-residu",
-  },
-  {
-    tag: "UNDIP",
-    date: "Jun 2026",
-    title: "SV Zero Discharge: Langkah Strategis Sekolah Vokasi UNDIP",
-    image:
-      "https://undip.ac.id/wp-content/uploads/2026/06/1-ezgif.com-jpg-to-webp-converter-5.webp",
-    href: "https://undip.ac.id/post/57036/sv-zero-discharge-langkah-strategis-sekolah-vokasi-undip-menuju-kampus-berkelanjutan-berkelas-dunia.html",
-  },
-  {
-    tag: "Nasional",
-    date: "15 Jul 2026",
-    title: "UI Gandeng BRIN dan Industri Kembangkan Model Zero Waste",
-    image:
-      "https://apakabar.co.id/uploads/2026/07/post_6a50fe5d0bca19.37943188.jpg",
-    href: "https://www.kompas.com/edu/read/2026/07/15/101720771/gaet-brin-dan-industri-ui-kembangkan-pengolahan-sampah-model-zero-waste",
-  },
-  {
-    tag: "Nasional",
-    date: "08 Jun 2026",
-    title: "UMS Galakkan Zero Waste, Ikhtiar Kurangi Sampah Plastik",
-    image:
-      "https://www.ums.ac.id/__gambars__/uploads/LGWtScdV89eyA9wyzMSIiMvhQvXmDrUOe0ZY6B0Y.webp",
-    href: "https://jateng.antaranews.com/berita/634320/ums-galakkan-zero-waste-ikhtiar-kurangi-sampah-plastik",
-  },
-  {
-    tag: "Nasional",
-    date: "awal Jul 2026",
-    title: "UNJ Resmikan TPST dan Waste Management Center",
-    image:
-      "https://cdn2.timesmedia.co.id/cdn-times/uploads/assets/2026/07/01/unj-resmikan-tpst-dan-waste-management-center-untuk-perkuat-komitmen-menuju-kamp-x9mo7260.webp?v=7.0.0#",
-    href: "https://times.co.id/unj-resmikan-tpst-dan-waste-management-center-untuk-perkuat-komitmen-menuju-kampus-zero-waste",
-  },
-];
-
-const POSTERS = [
-  {
-    title: "Pilah dari Sumbernya",
-    tag: "Dasar",
-    note: "Kenapa pemilahan harus dimulai dari tiap sub-area, bukan di akhir.",
-    image:
-      "https://images.unsplash.com/photo-1532996122724-e3c354a0b15b?auto=format&fit=crop&w=1200&q=80",
-  },
-  {
-    title: "Ranting: Besar vs Kecil",
-    tag: "Organik",
-    note: "Ranting besar dicatat sebagai aset, ranting kecil dikembalikan ke tanah.",
-    image:
-      "https://images.unsplash.com/photo-1416879595882-3373a0480b5b?auto=format&fit=crop&w=1200&q=80",
-  },
-  {
-    title: "Sisa Makanan Jadi Kompos",
-    tag: "Organik",
-    note: "Jejak sisa makanan dari area baca sampai kantor, diolah jadi kompos.",
-    image:
-      "https://images.pexels.com/photos/5479034/pexels-photo-5479034.jpeg",
-  },
-  {
-    title: "Plastik & Styrofoam",
-    tag: "Anorganik",
-    note: "Pemisahan plastik berwarna dan bening, serta penanganan styrofoam.",
-    image:
-      "https://images.unsplash.com/photo-1611284446314-60a58ac0deb9?auto=format&fit=crop&w=1200&q=80",
-  },
-  {
-    title: "Kardus & Kertas",
-    tag: "Daur Ulang",
-    note: "Dirajang atau disalurkan jadi karya kreativitas, sebelum ke TPS.",
-    image:
-      "https://images.unsplash.com/photo-1595278069441-2cf29f8005a4?auto=format&fit=crop&w=1200&q=80",
-  },
-  {
-    title: "Distribusi Akhir",
-    tag: "Alur",
-    note: "Ke TPS, ditimbun jadi pupuk, atau disetor lewat Plasticpay.",
-    image:
-      "https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?auto=format&fit=crop&w=1200&q=80",
-  },
-];
-
 // Dua salinan berita digabung biar carousel-nya bisa looping mulus tanpa
 // "lompat" kelihatan — begitu geser sejauh satu set pertama, posisinya
 // digeser balik ke awal set (bukan direset ke 0), jadi mulus.
-const NEWS_LOOP = [...NEWS, ...NEWS];
+function makeNewsLoop(news: NewsItem[]): NewsItem[] {
+  return [...news, ...news];
+}
 
 const SOCIALS = [
-  { icon: Globe, label: "Website Resmi", href: "https://digilib.undip.ac.id/" },
-  { icon: Youtube, label: "YouTube", href: "https://youtube.com/@perpustakaanundip?si=RgDQgwp-UlPD7ryq" },
-  { icon: Instagram, label: "Instagram", href: "https://www.instagram.com/perpus.undip?igsh=MTh4bXFtd3AzbmRmdQ==" },
+  { icon: WebsiteIcon, label: "Website Resmi", href: "https://digilib.undip.ac.id/" },
+  { icon: YoutubeIcon, label: "YouTube", href: "https://youtube.com/@perpustakaanundip?si=RgDQgwp-UlPD7ryq" },
+  { icon: InstagramIcon, label: "Instagram", href: "https://www.instagram.com/perpus.undip?igsh=MTh4bXFtd3AzbmRmdQ==" },
   { icon: TiktokIcon, label: "TikTok", href: "https://www.tiktok.com/@perpus.undip.press?_r=1&_t=ZS-97okoKr4q4S" },
 ];
 
@@ -336,8 +289,19 @@ function SectionLabel({ children }: { children: ReactNode; hideLine?: boolean })
 }
 
 function SafeImage({ src, alt, icon: Icon, gradient, className, style }: { src: string; alt: string; icon?: LucideIcon; gradient: string; className?: string; style?: CSSProperties }) {
-  const [failed, setFailed] = useState(false);
-  if (failed) {
+  const [state, setState] = useState<'loading' | 'loaded' | 'failed'>('loading');
+
+  useEffect(() => {
+    let cancelled = false;
+    setState('loading');
+    const img = new Image();
+    img.onload = () => { if (!cancelled) setState('loaded'); };
+    img.onerror = () => { if (!cancelled) setState('failed'); };
+    img.src = src;
+    return () => { cancelled = true; img.onload = null; img.onerror = null; };
+  }, [src]);
+
+  if (state === 'failed' || state === 'loading') {
     return (
       <div
         className={className}
@@ -347,37 +311,287 @@ function SafeImage({ src, alt, icon: Icon, gradient, className, style }: { src: 
       </div>
     );
   }
+
   return (
     <img
       src={src}
       alt={alt}
       className={className}
       style={style}
-      onError={() => setFailed(true)}
     />
   );
 }
 
-function PlaceholderPanel({ item }: { item: (typeof MENU_DECK)[number] }) {
-  const Icon = item.icon;
-  return (
-    <div className="mt-4 rounded-2xl border border-dashed p-6 sm:p-8" style={{ borderColor: "#B9C0D6", backgroundColor: C.navy050 }}>
-      <div className="flex items-center gap-2 mb-2">
-        <Icon size={16} color={C.navy700} />
-        <span className="text-xs font-semibold uppercase tracking-wider" style={{ ...body, color: C.navy700 }}>
-          Ruang konten — {item.title}
-        </span>
-      </div>
-      <p className="text-sm leading-relaxed" style={{ ...body, color: C.ink500 }}>
-        {item.placeholder}
-      </p>
-    </div>
-  );
+// ---- Page props -------------------------------------------------------
+
+type PresetKey = 'all' | 'today' | '7d' | '30d' | '3m';
+
+const PRESETS: { key: PresetKey; label: string; days: number | null }[] = [
+    { key: 'all', label: 'Semua', days: null },
+    { key: 'today', label: 'Hari Ini', days: 0 },
+    { key: '7d', label: '7 Hari', days: 7 },
+    { key: '30d', label: '30 Hari', days: 30 },
+    { key: '3m', label: '3 Bulan', days: 90 },
+];
+
+function daysAgo(n: number): string {
+    const d = new Date();
+    d.setDate(d.getDate() - n);
+    return d.toISOString().split('T')[0];
 }
+
+function formatDateInput(d: Date): string {
+    return d.toISOString().split('T')[0];
+}
+
+type NewsItem = {
+    id: number;
+    tag: string;
+    date: string;
+    title: string;
+    image: string;
+    href: string;
+    is_published: boolean;
+    order: number;
+};
+
+type PosterItem = {
+    id: number;
+    title: string;
+    tag: string;
+    note: string | null;
+    image: string;
+    order: number;
+    is_published: boolean;
+};
+
+type PageProps = {
+    news: NewsItem[];
+    posters: PosterItem[];
+    penimbanganByArea: ChartData;
+    pilahByJenis: ChartData;
+    distribusiByTujuan: ChartData;
+    statusBerat: {
+        menunggu_pemilahan: number;
+        siap_didistribusikan: number;
+        sudah_didistribusikan: number;
+    };
+    siapDidistribusikanByJenis: ChartData;
+    filters?: {
+        start_date: string | null;
+        end_date: string | null;
+    };
+};
 
 // ---- Main component ---------------------------------------------------
 
+function LaporanCharts({ data }: { data: PageProps }) {
+    const { penimbanganByArea, pilahByJenis, distribusiByTujuan, statusBerat, siapDidistribusikanByJenis } = data;
+
+    const siapSorted = siapDidistribusikanByJenis.slice().sort((a, b) => b.value - a.value);
+    const siapTotal = siapDidistribusikanByJenis.reduce((s, d) => s + d.value, 0);
+
+    const STATUS_DATA = [
+        { key: 'menunggu_pemilahan', name: 'Menunggu Pemilahan', value: statusBerat.menunggu_pemilahan, color: '#ef4444', icon: Clock },
+        { key: 'siap_didistribusikan', name: 'Siap Didistribusikan', value: statusBerat.siap_didistribusikan, color: '#f59e0b', icon: Package },
+        { key: 'sudah_didistribusikan', name: 'Sudah Didistribusikan', value: statusBerat.sudah_didistribusikan, color: '#22c55e', icon: CheckCircle },
+    ];
+    const statusTotal = STATUS_DATA.reduce((s, d) => s + d.value, 0);
+
+    return (
+        <div className="flex flex-col gap-6">
+            <div className="grid gap-6 lg:grid-cols-2">
+                {/* Status Berat Sampah - Donut */}
+                <div className="rounded-2xl border bg-white p-5" style={{ borderColor: C.line }}>
+                    <div className="mb-1 flex items-center gap-2">
+                        <Package className="size-5" style={{ color: C.leaf500 }} />
+                        <h3 className="text-sm font-semibold" style={{ color: C.navy900 }}>Status Berat Sampah</h3>
+                    </div>
+                    <p className="mb-4 text-xs" style={{ color: C.ink500 }}>Alur berat sampah dari penimbangan hingga distribusi</p>
+                    <div className="flex flex-col items-center gap-6 lg:flex-row lg:items-center">
+                        <div className="relative h-[220px] w-[220px] shrink-0">
+                            <ResponsiveContainer width="100%" height="100%">
+                                <PieChart>
+                                    <Pie data={STATUS_DATA} cx="50%" cy="50%" innerRadius={58} outerRadius={95} paddingAngle={3} dataKey="value" stroke="none">
+                                        {STATUS_DATA.map((_, i) => <Cell key={i} fill={STATUS_DATA[i].color} />)}
+                                    </Pie>
+                                    <Tooltip content={<ChartTooltip />} />
+                                    <text x="50%" y="46%" textAnchor="middle" dominantBaseline="middle" className="fill-gray-900 text-xl font-bold tabular-nums">
+                                        {statusTotal.toLocaleString('id-ID', { minimumFractionDigits: 1, maximumFractionDigits: 1 })}
+                                    </text>
+                                    <text x="50%" y="58%" textAnchor="middle" dominantBaseline="middle" className="fill-gray-500 text-[10px]">
+                                        kg total
+                                    </text>
+                                </PieChart>
+                            </ResponsiveContainer>
+                        </div>
+                        <div className="flex w-full flex-col gap-2.5">
+                            {STATUS_DATA.map((item) => {
+                                const pct = statusTotal > 0 ? (item.value / statusTotal) * 100 : 0;
+                                const Icon = item.icon;
+                                return (
+                                    <div key={item.key} className="flex items-center gap-3 rounded-lg p-3" style={{ backgroundColor: `${item.color}0d` }}>
+                                        <div className="flex size-8 shrink-0 items-center justify-center rounded-lg" style={{ backgroundColor: `${item.color}1a` }}>
+                                            <Icon className="size-4" style={{ color: item.color }} />
+                                        </div>
+                                        <div className="min-w-0 flex-1">
+                                            <p className="text-xs font-medium" style={{ color: C.ink900 }}>{item.name}</p>
+                                            <div className="mt-1 h-1.5 w-full overflow-hidden rounded-full" style={{ backgroundColor: `${item.color}20` }}>
+                                                <div className="h-full rounded-full transition-all" style={{ width: `${pct}%`, backgroundColor: item.color }} />
+                                            </div>
+                                        </div>
+                                        <div className="shrink-0 text-right">
+                                            <p className="text-sm font-bold tabular-nums" style={{ color: C.ink900 }}>
+                                                {item.value.toLocaleString('id-ID', { minimumFractionDigits: 1, maximumFractionDigits: 1 })}
+                                            </p>
+                                            <p className="text-[10px]" style={{ color: C.ink500 }}>kg &middot; {pct.toFixed(1)}%</p>
+                                        </div>
+                                    </div>
+                                );
+                            })}
+                        </div>
+                    </div>
+                </div>
+
+                {/* Penimbangan per Area */}
+                {(() => {
+                    const data = penimbanganByArea;
+                    const total = data.reduce((s, d) => s + d.value, 0);
+                    const sorted = data.slice().sort((a, b) => b.value - a.value);
+                    return (
+                        <div className="rounded-2xl border bg-white p-5" style={{ borderColor: C.line }}>
+                            <div className="mb-1 flex items-center gap-2">
+                                <Scale className="size-5" style={{ color: C.leaf500 }} />
+                                <h3 className="text-sm font-semibold" style={{ color: C.navy900 }}>Penimbangan per Area</h3>
+                            </div>
+                            <p className="mb-4 text-xs" style={{ color: C.ink500 }}>
+                                Total berat ditimbang: {total.toLocaleString('id-ID', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} kg
+                            </p>
+                            {data.length > 0 ? (
+                                <div className="flex flex-col gap-4 lg:flex-row lg:items-center">
+                                    <div className="h-[240px] shrink-0 lg:w-1/2">
+                                        <ResponsiveContainer width="100%" height="100%">
+                                            <PieChart>
+                                                <defs>
+                                                    <filter id="homePieShadow1" x="-50%" y="-50%" width="200%" height="200%">
+                                                        <feDropShadow dx="0" dy="1" stdDeviation="1.2" floodColor="#000000" floodOpacity="0.65" />
+                                                    </filter>
+                                                </defs>
+                                                <Pie data={sorted} cx="50%" cy="50%" labelLine={false} label={ChartLabel} outerRadius={100} dataKey="value" stroke="none">
+                                                    {sorted.map((entry) => <Cell key={entry.name} fill={getCategoryColor(entry.name)} />)}
+                                                </Pie>
+                                                <Tooltip content={<ChartTooltip />} />
+                                            </PieChart>
+                                        </ResponsiveContainer>
+                                    </div>
+                                    <div className="w-full space-y-1.5 lg:pl-4">
+                                        <PieLegend data={sorted} total={total} />
+                                    </div>
+                                </div>
+                            ) : (
+                                <div className="flex h-48 items-center justify-center text-sm" style={{ color: C.ink500 }}>
+                                    Belum ada data
+                                </div>
+                            )}
+                        </div>
+                    );
+                })()}
+            </div>
+
+            {/* Tiga Pie Chart: Penimbangan, Pilah, Distribusi */}
+            <div className="grid gap-6 md:grid-cols-3">
+                {([
+                    { title: 'Pilah Sampah per Jenis', icon: Recycle, data: pilahByJenis, totalLabel: 'Total berat dipilah' },
+                    { title: 'Distribusi per Tujuan', icon: Truck, data: distribusiByTujuan, totalLabel: 'Total berat didistribusikan' },
+                    { title: 'Sisa & Siap Didistribusikan', icon: Send, data: siapDidistribusikanByJenis, totalLabel: 'Total sisa dan siap didistribusikan' },
+                ] as const).map((card) => {
+                    const total = card.data.reduce((s, d) => s + d.value, 0);
+                    const sorted = card.data.slice().sort((a, b) => b.value - a.value);
+                    return (
+                        <div key={card.title} className="rounded-2xl border bg-white p-5" style={{ borderColor: C.line }}>
+                            <div className="mb-1 flex items-center gap-2">
+                                <card.icon className="size-5" style={{ color: C.leaf500 }} />
+                                <h3 className="text-sm font-semibold" style={{ color: C.navy900 }}>{card.title}</h3>
+                            </div>
+                            <p className="mb-4 text-xs" style={{ color: C.ink500 }}>
+                                {card.totalLabel}: {total.toLocaleString('id-ID', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} kg
+                            </p>
+                            {card.data.length > 0 ? (
+                                <>
+                                    <div className="h-64">
+                                        <ResponsiveContainer width="100%" height="100%">
+                                            <PieChart>
+                                                <defs>
+                                                    <filter id="homePieShadowSm" x="-50%" y="-50%" width="200%" height="200%">
+                                                        <feDropShadow dx="0" dy="1" stdDeviation="1.2" floodColor="#000000" floodOpacity="0.65" />
+                                                    </filter>
+                                                </defs>
+                                                <Pie data={sorted} cx="50%" cy="50%" labelLine={false} label={ChartLabel} outerRadius={100} dataKey="value" stroke="none">
+                                                    {sorted.map((entry) => <Cell key={entry.name} fill={getCategoryColor(entry.name)} />)}
+                                                </Pie>
+                                                <Tooltip content={<ChartTooltip />} />
+                                            </PieChart>
+                                        </ResponsiveContainer>
+                                    </div>
+                                    <PieLegend data={sorted} total={total} />
+                                </>
+                            ) : (
+                                <div className="flex h-48 items-center justify-center text-sm" style={{ color: C.ink500 }}>
+                                    Belum ada data
+                                </div>
+                            )}
+                        </div>
+                    );
+                })}
+            </div>
+        </div>
+    );
+}
+
 export default function Dashboard() {
+    const rawProps = usePage().props as unknown as Record<string, unknown>;
+    const rawNews = (rawProps.news as Array<Record<string, unknown>>) || [];
+    const rawPosters = (rawProps.posters as Array<Record<string, unknown>>) || [];
+    const news: NewsItem[] = rawNews.map((n) => ({ id: n.id as number, tag: n.tag as string, date: n.date as string, title: n.title as string, image: n.image_url as string, href: n.href as string, is_published: n.is_published as boolean, order: n.order as number }));
+    const posters: PosterItem[] = rawPosters.map((p) => ({ id: p.id as number, title: p.title as string, tag: p.tag as string, note: p.note as string | null, image: p.image_url as string, order: p.order as number, is_published: p.is_published as boolean }));
+    const pageProps = rawProps as unknown as PageProps;
+    const NEWS_LOOP = makeNewsLoop(news);
+    const POSTERS = posters;
+    const [activePreset, setActivePreset] = useState<PresetKey>('all');
+    const [startDate, setStartDate] = useState(pageProps.filters?.start_date ?? '');
+    const [endDate, setEndDate] = useState(pageProps.filters?.end_date ?? '');
+
+    function applyFilter(params: { start_date?: string | null; end_date?: string | null }) {
+        const query: Record<string, string> = {};
+        if (params.start_date) query.start_date = params.start_date;
+        if (params.end_date) query.end_date = params.end_date;
+        router.get('/', query, { preserveState: true, preserveScroll: true, replace: true });
+    }
+
+    function handlePreset(preset: typeof PRESETS[number]) {
+        setActivePreset(preset.key);
+        if (preset.days === null) {
+            setStartDate('');
+            setEndDate('');
+            applyFilter({});
+        } else if (preset.days === 0) {
+            const today = formatDateInput(new Date());
+            setStartDate(today);
+            setEndDate(today);
+            applyFilter({ start_date: today, end_date: today });
+        } else {
+            const s = daysAgo(preset.days);
+            const e = formatDateInput(new Date());
+            setStartDate(s);
+            setEndDate(e);
+            applyFilter({ start_date: s, end_date: e });
+        }
+    }
+
+    function handleCustomDate() {
+        setActivePreset('all');
+        applyFilter({ start_date: startDate || null, end_date: endDate || null });
+    }
   const [heroIndex, setHeroIndex] = useState(0);
   const [posterIndex, setPosterIndex] = useState(0);
   const [posterPaused, setPosterPaused] = useState(false);
@@ -578,7 +792,9 @@ export default function Dashboard() {
   const heroParallax = Math.min(scrollY * 0.18, 120);
 
   return (
-    <div style={{ ...body, backgroundColor: C.paper50, color: C.ink900 }} className="min-h-screen">
+    <>
+      <Head title="Beranda" />
+      <div style={{ ...body, backgroundColor: C.paper50, color: C.ink900 }} className="min-h-screen">
       <style>{`
         html { scroll-behavior: smooth; }
         * { overflow-anchor: none; }
@@ -597,7 +813,7 @@ export default function Dashboard() {
 
       {/* ---- Hero ---- */}
       <section id="beranda" ref={setSectionRef("beranda")}>
-        <div className="relative w-full overflow-hidden" style={{ height: "33dvh", minHeight: 320 }}>
+        <div className="relative w-full overflow-hidden" style={{ height: "33dvh", minHeight: 280 }}>
           {HERO_SLIDES.map((s, i) => (
             <div
               key={i}
@@ -629,21 +845,25 @@ export default function Dashboard() {
           <button
             onClick={prevHero}
             aria-label="Slide sebelumnya"
-            className="absolute left-4 top-1/2 -translate-y-1/2 z-50 w-8 h-8 rounded-full flex items-center justify-center"
-            style={{ backgroundColor: "rgba(10,20,64,0.45)", border: "1px solid rgba(255,255,255,0.25)" }}
+            className="absolute left-2 sm:left-4 top-1/2 -translate-y-1/2 z-50 size-7 sm:size-8 rounded-full flex items-center justify-center transition-all duration-150 active:scale-90"
+            style={{ backgroundColor: "rgba(10,20,64,0.6)", border: "1px solid rgba(255,255,255,0.25)" }}
+            onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = "rgba(10,20,64,0.8)"; }}
+            onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = "rgba(10,20,64,0.6)"; }}
           >
-            <ChevronLeft size={14} color="#fff" />
+            <ChevronLeft size={12} color="#fff" />
           </button>
           <button
             onClick={nextHero}
             aria-label="Slide berikutnya"
-            className="absolute right-4 top-1/2 -translate-y-1/2 z-50 w-8 h-8 rounded-full flex items-center justify-center"
-            style={{ backgroundColor: "rgba(10,20,64,0.45)", border: "1px solid rgba(255,255,255,0.25)" }}
+            className="absolute right-2 sm:right-4 top-1/2 -translate-y-1/2 z-50 size-7 sm:size-8 rounded-full flex items-center justify-center transition-all duration-150 active:scale-90"
+            style={{ backgroundColor: "rgba(10,20,64,0.6)", border: "1px solid rgba(255,255,255,0.25)" }}
+            onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = "rgba(10,20,64,0.8)"; }}
+            onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = "rgba(10,20,64,0.6)"; }}
           >
-            <ChevronRight size={14} color="#fff" />
+            <ChevronRight size={12} color="#fff" />
           </button>
 
-          <div className="relative h-full max-w-6xl mx-auto px-5 sm:px-8 flex flex-col justify-between pt-8 sm:pt-10 pb-6 sm:pb-8">
+          <div className="relative h-full max-w-6xl mx-auto px-4 sm:px-8 flex flex-col justify-between pt-6 sm:pt-10 pb-4 sm:pb-8">
             <div
               style={{
                 opacity: heroMounted ? 1 : 0,
@@ -652,18 +872,18 @@ export default function Dashboard() {
               }}
             >
               <SectionLabel hideLine>
-                <span style={{ color: C.gold500, fontSize: "0.7rem" }}>Sistem Informasi Pengelolaan Sampah</span>
+                <span style={{ color: C.gold500, fontSize: "0.65rem" }}>Sistem Informasi Pengelolaan Sampah</span>
               </SectionLabel>
-              <h1 key={activeHero.title} className="text-2xl sm:text-3xl lg:text-4xl font-semibold max-w-4xl leading-tight text-white mb-3 hero-fade whitespace-normal sm:whitespace-nowrap" style={display}>
+              <h1 key={activeHero.title} className="text-xl sm:text-3xl lg:text-4xl font-semibold max-w-4xl leading-tight text-white mb-2 sm:mb-3 hero-fade whitespace-normal" style={display}>
                 {activeHero.title}
               </h1>
-              <p className="max-w-xl text-sm sm:text-base" style={{ color: "#C3C6DE" }}>
+              <p className="max-w-xl text-xs sm:text-base leading-relaxed" style={{ color: "#C3C6DE" }}>
                 {activeHero.desc}
               </p>
             </div>
 
             <div
-              className="flex flex-wrap gap-4 sm:gap-8"
+              className="flex flex-wrap gap-3 sm:gap-8"
               style={{
                 opacity: heroMounted ? 1 : 0,
                 transform: heroMounted ? "translateY(0)" : "translateY(16px)",
@@ -682,12 +902,11 @@ export default function Dashboard() {
                 key={i}
                 onClick={() => setHeroIndex(i)}
                 aria-label={`Ke slide ${i + 1}`}
-                className="rounded-full"
+                className="rounded-full transition-all duration-200 active:scale-75 hover:opacity-80"
                 style={{
                   width: i === heroIndex ? 22 : 7,
                   height: 7,
                   backgroundColor: i === heroIndex ? C.leaf400 : "rgba(255,255,255,0.4)",
-                  transition: "width 200ms ease, background-color 200ms ease",
                 }}
               />
             ))}
@@ -698,17 +917,62 @@ export default function Dashboard() {
       {/* ---- Laporan ---- */}
       <section id="laporan" ref={setSectionRef("laporan")} className="max-w-6xl mx-auto px-5 sm:px-8 pt-6 sm:pt-8 pb-8 sm:pb-10" style={{ scrollMarginTop: 72 }}>
         <Reveal>
-          <h2 className="text-2xl sm:text-3xl font-semibold mb-2" style={{ ...display, color: C.navy900 }}>
-            Laporan
-          </h2>
+          <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+            <div>
+              <h2 className="text-2xl sm:text-3xl font-semibold mb-1" style={{ ...display, color: C.navy900 }}>
+                Laporan
+              </h2>
+              <p className="text-sm" style={{ color: C.ink500 }}>Rekap data pengelolaan sampah</p>
+            </div>
+            <div className="flex flex-wrap items-center gap-2 shrink-0">
+              <div className="flex items-center rounded-lg border bg-white p-0.5" style={{ borderColor: C.line }}>
+                {PRESETS.map((preset) => (
+                  <button
+                    key={preset.key}
+                    onClick={() => handlePreset(preset)}
+                    className={`rounded-md px-3 py-1.5 text-xs font-medium transition-colors ${
+                      activePreset === preset.key
+                        ? 'bg-green-600 text-white shadow-sm'
+                        : 'text-gray-600 hover:text-gray-900'
+                    }`}
+                  >
+                    {preset.label}
+                  </button>
+                ))}
+              </div>
+              <div className="flex items-center gap-1.5 rounded-lg border bg-white px-2 py-1" style={{ borderColor: C.line }}>
+                <CalendarIcon className="size-3.5 text-gray-400" />
+                <input
+                  type="date"
+                  value={startDate}
+                  onChange={(e) => setStartDate(e.target.value)}
+                  className="w-28 border-0 bg-transparent text-xs text-gray-700 outline-none hover:text-gray-900 [color-scheme:light]"
+                />
+                <span className="text-xs text-gray-400">&ndash;</span>
+                <input
+                  type="date"
+                  value={endDate}
+                  onChange={(e) => setEndDate(e.target.value)}
+                  className="w-28 border-0 bg-transparent text-xs text-gray-700 outline-none hover:text-gray-900 [color-scheme:light]"
+                />
+                <button
+                  onClick={handleCustomDate}
+                  className="h-6 rounded-md px-2 text-xs font-medium text-green-700 hover:bg-green-50 hover:text-green-800 transition-colors"
+                >
+                  Terapkan
+                </button>
+              </div>
+            </div>
+          </div>
         </Reveal>
         <Reveal delay={80}>
-          <PlaceholderPanel item={MENU_DECK.find((item) => item.id === "laporan")!} />
+          <LaporanCharts data={pageProps} />
         </Reveal>
       </section>
 
       {/* ---- Berita ---- */}
       <section id="berita" ref={setSectionRef("berita")} className="pt-6 sm:pt-8" style={{ backgroundColor: C.navy900, scrollMarginTop: 64 }}>
+        {news.length > 0 ? (
         <div className="max-w-6xl mx-auto px-5 sm:px-8 pb-12">
           <Reveal>
             <div className="flex items-end justify-between flex-wrap gap-3 mb-8">
@@ -719,10 +983,10 @@ export default function Dashboard() {
                 </h2>
               </div>
               <div className="flex items-center gap-3">
-                <button onClick={() => scrollNews(-1)} className="w-9 h-9 rounded-full flex items-center justify-center border" style={{ borderColor: "rgba(255,255,255,0.25)" }} aria-label="Sebelumnya">
+                <button onClick={() => scrollNews(-1)} className="w-9 h-9 rounded-full flex items-center justify-center border transition-all duration-200 hover:scale-105 active:scale-90" style={{ borderColor: "rgba(255,255,255,0.25)" }} aria-label="Sebelumnya">
                   <ChevronLeft size={16} color="#fff" />
                 </button>
-                <button onClick={() => scrollNews(1)} className="w-9 h-9 rounded-full flex items-center justify-center border" style={{ borderColor: "rgba(255,255,255,0.25)" }} aria-label="Berikutnya">
+                <button onClick={() => scrollNews(1)} className="w-9 h-9 rounded-full flex items-center justify-center border transition-all duration-200 hover:scale-105 active:scale-90" style={{ borderColor: "rgba(255,255,255,0.25)" }} aria-label="Berikutnya">
                   <ChevronRight size={16} color="#fff" />
                 </button>
               </div>
@@ -738,17 +1002,17 @@ export default function Dashboard() {
           >
             <div ref={newsTrackRef} className="flex gap-5 pb-2" style={{ willChange: "transform" }}>
               {NEWS_LOOP.map((n, i) => (
-                <Reveal key={i} delay={(i % NEWS.length) * 80} className="shrink-0 w-64 sm:w-72">
+                <Reveal key={i} delay={(i % news.length) * 80} className="shrink-0 w-60 sm:w-64 lg:w-72">
                   <a
                     href={n.href}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="rounded-2xl overflow-hidden block"
-                    style={{ backgroundColor: C.navy800, transition: "transform 220ms ease" }}
-                    onMouseEnter={(e) => (e.currentTarget.style.transform = "translateY(-4px)")}
-                    onMouseLeave={(e) => (e.currentTarget.style.transform = "translateY(0)")}
+                    className="rounded-2xl overflow-hidden block flex flex-col h-full"
+                    style={{ backgroundColor: C.navy800, transition: "transform 220ms ease, box-shadow 220ms ease" }}
+                    onMouseEnter={(e) => { e.currentTarget.style.transform = "translateY(-4px)"; e.currentTarget.style.boxShadow = "0 8px 24px rgba(0,0,0,0.3)"; }}
+                    onMouseLeave={(e) => { e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.boxShadow = "none"; }}
                   >
-                    <div className="h-36 relative overflow-hidden">
+                    <div className="h-36 relative overflow-hidden shrink-0">
                       <SafeImage
                         src={n.image}
                         alt={n.title}
@@ -760,10 +1024,10 @@ export default function Dashboard() {
                         {n.tag}
                       </span>
                     </div>
-                    <div className="p-4">
+                    <div className="p-4 flex flex-col flex-1">
                       <div className="text-[11px] mb-1.5" style={{ color: "#8A8FB3" }}>{n.date}</div>
-                      <div className="text-sm font-medium leading-snug text-white mb-3" style={display}>{n.title}</div>
-                      <span className="inline-flex items-center gap-1.5 text-xs font-semibold" style={{ color: C.leaf400 }}>
+                      <div className="text-sm font-medium leading-snug text-white mb-3 line-clamp-2" style={display}>{n.title}</div>
+                      <span className="inline-flex items-center gap-1.5 text-xs font-semibold mt-auto" style={{ color: C.leaf400 }}>
                         Baca selengkapnya <ArrowRight size={13} />
                       </span>
                     </div>
@@ -773,10 +1037,17 @@ export default function Dashboard() {
             </div>
           </div>
         </div>
+        ) : (
+          <div className="max-w-6xl mx-auto px-5 sm:px-8 py-12 text-center">
+            <p className="text-sm" style={{ color: "#8A8FB3" }}>Belum ada berita.</p>
+          </div>
+        )}
       </section>
 
       {/* ---- Edukasi: poster slideshow ---- */}
       <section id="edukasi" ref={setSectionRef("edukasi")} className="max-w-6xl mx-auto px-5 sm:px-8 pt-6 sm:pt-8 pb-20" style={{ scrollMarginTop: 64 }}>
+        {posters.length > 0 ? (
+        <>
         <Reveal>
           <h2 className="text-2xl sm:text-3xl font-semibold mb-2" style={{ ...display, color: C.navy900 }}>
             Poster Edukasi
@@ -799,10 +1070,13 @@ export default function Dashboard() {
               </span>
             </div>
 
-            {/* Frame poster — rasio A3 vertikal (297 x 420), gambar dipusatkan */}
+            {/* Frame poster — rasio A3 vertikal (297 x 420), gambar dipusatkan.
+                Sengaja tidak ada overlay teks di atas gambar (judul/catatan),
+                supaya posternya kelihatan bersih & jelas. Tag di atas frame
+                (di luar gambar) sudah cukup jadi label. */}
             <div
               className="mx-auto rounded-2xl overflow-hidden relative mb-3"
-              style={{ aspectRatio: "297 / 420", width: "min(100%, 420px)", backgroundColor: C.navy050 }}
+              style={{ aspectRatio: "297 / 420", width: "min(100%, min(420px, 85vw))", backgroundColor: C.navy050 }}
             >
               <SafeImage
                 src={activePoster.image}
@@ -812,20 +1086,11 @@ export default function Dashboard() {
                 className="w-full h-full object-cover"
                 style={{ objectPosition: "center 65%" }}
               />
-              <div
-                className="absolute inset-0 flex flex-col items-center justify-end text-center px-6 py-8"
-                style={{ background: "linear-gradient(0deg, rgba(10,20,64,0.88) 15%, rgba(10,20,64,0.05) 65%)" }}
-              >
-                <h3 className="text-white text-xl sm:text-2xl font-semibold mb-2" style={display}>
-                  {activePoster.title}
-                </h3>
-                <p className="text-sm max-w-md" style={{ color: "#D6D9EC" }}>{activePoster.note}</p>
-              </div>
             </div>
 
             <div className="flex items-center justify-between mb-4">
-              <button onClick={prevPoster} className="w-10 h-10 rounded-full flex items-center justify-center border" style={{ borderColor: C.line }} aria-label="Poster sebelumnya">
-                <ChevronLeft size={18} color={C.navy900} />
+              <button onClick={prevPoster} className="w-9 sm:w-10 h-9 sm:h-10 rounded-full flex items-center justify-center border transition-all duration-200 hover:scale-105 active:scale-90" style={{ borderColor: C.line }} aria-label="Poster sebelumnya">
+                <ChevronLeft size={16} color={C.navy900} />
               </button>
               <div className="flex gap-1.5">
                 {POSTERS.map((_, i) => (
@@ -833,13 +1098,13 @@ export default function Dashboard() {
                     key={i}
                     onClick={() => setPosterIndex(i)}
                     aria-label={`Ke poster ${i + 1}`}
-                    className="rounded-full"
-                    style={{ width: i === posterIndex ? 20 : 6, height: 6, backgroundColor: i === posterIndex ? C.leaf500 : C.line, transition: "width 200ms ease, background-color 200ms ease" }}
+                    className="rounded-full transition-all duration-200 active:scale-75 hover:opacity-80"
+                    style={{ width: i === posterIndex ? 20 : 6, height: 6, backgroundColor: i === posterIndex ? C.leaf500 : C.line }}
                   />
                 ))}
               </div>
-              <button onClick={nextPoster} className="w-10 h-10 rounded-full flex items-center justify-center border" style={{ borderColor: C.line }} aria-label="Poster berikutnya">
-                <ChevronRight size={18} color={C.navy900} />
+              <button onClick={nextPoster} className="w-9 sm:w-10 h-9 sm:h-10 rounded-full flex items-center justify-center border transition-all duration-200 hover:scale-105 active:scale-90" style={{ borderColor: C.line }} aria-label="Poster berikutnya">
+                <ChevronRight size={16} color={C.navy900} />
               </button>
             </div>
 
@@ -852,11 +1117,10 @@ export default function Dashboard() {
                   <button
                     key={i}
                     onClick={() => setPosterIndex(i)}
-                    className="shrink-0 w-20 h-16 rounded-lg overflow-hidden relative snap-start"
+                    className="shrink-0 w-20 h-16 rounded-lg overflow-hidden relative snap-start transition-all duration-150 active:scale-95"
                     style={{
                       outline: isActive ? `2px solid ${C.leaf500}` : "none",
                       outlineOffset: "2px",
-                      transition: "transform 180ms ease",
                     }}
                     onMouseEnter={(e) => (e.currentTarget.style.transform = "scale(1.06)")}
                     onMouseLeave={(e) => (e.currentTarget.style.transform = "scale(1)")}
@@ -889,6 +1153,12 @@ export default function Dashboard() {
             </div>
           </div>
         </Reveal>
+        </>
+        ) : (
+          <div className="py-12 text-center">
+            <p className="text-sm" style={{ color: C.ink500 }}>Belum ada poster edukasi.</p>
+          </div>
+        )}
       </section>
 
       {/* ---- Footer ---- */}
@@ -943,12 +1213,28 @@ export default function Dashboard() {
                       target="_blank"
                       rel="noopener noreferrer"
                       aria-label={s.label}
-                      className="w-10 h-10 rounded-full flex items-center justify-center shrink-0 border transition-colors"
-                      style={{ backgroundColor: C.navy800, borderColor: C.navy700 }}
-                      onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = C.navy700; e.currentTarget.style.borderColor = C.leaf500; }}
-                      onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = C.navy800; e.currentTarget.style.borderColor = C.navy700; }}
+                      className="w-10 h-10 rounded-full flex items-center justify-center shrink-0 border transition-all duration-200"
+                      style={{
+                        backgroundColor: C.navy800,
+                        borderColor: C.navy700,
+                        boxShadow: "0 1px 3px rgba(0,0,0,0.12)",
+                      }}
+                      onMouseEnter={(e) => {
+                        const el = e.currentTarget;
+                        el.style.backgroundColor = C.navy700;
+                        el.style.borderColor = C.leaf500;
+                        el.style.transform = "scale(1.1)";
+                        el.style.boxShadow = `0 4px 12px ${C.leaf500}44`;
+                      }}
+                      onMouseLeave={(e) => {
+                        const el = e.currentTarget;
+                        el.style.backgroundColor = C.navy800;
+                        el.style.borderColor = C.navy700;
+                        el.style.transform = "scale(1)";
+                        el.style.boxShadow = "0 1px 3px rgba(0,0,0,0.12)";
+                      }}
                     >
-                      <SIcon size={16} color={C.leaf400} />
+                      <SIcon size={20} color={C.leaf400} />
                     </a>
                   );
                 })}
@@ -964,5 +1250,6 @@ export default function Dashboard() {
         </div>
       </footer>
     </div>
+    </>
   );
 }

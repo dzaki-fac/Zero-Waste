@@ -41,7 +41,7 @@ class FortifyServiceProvider extends ServiceProvider
                 }
 
                 if ($user->role === 'petugas') {
-                    return redirect()->route('petugas.form');
+                    return redirect()->route('form');
                 }
 
                 abort(403);

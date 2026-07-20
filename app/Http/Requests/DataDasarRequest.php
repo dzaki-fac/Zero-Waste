@@ -21,13 +21,17 @@ class DataDasarRequest extends FormRequest
             'jumlah_tenaga_pendukung' => ['required', 'integer', 'min:0'],
             'luas_area_fakultas' => ['required', 'numeric', 'min:0'],
             'luas_area_objek_lomba' => ['nullable', 'numeric', 'min:0'],
-            'baseline_sampah' => ['required', 'numeric', 'min:0'],
-            'baseline_sampah_periode' => ['required', 'in:hari,minggu'],
+            'baseline_sampah' => ['nullable', 'numeric', 'min:0'],
+            'baseline_sampah_periode' => ['nullable', 'in:hari,minggu'],
             'jenis_sampah_dominan' => ['nullable', 'array'],
             'jenis_sampah_dominan.*.kategori' => ['required', 'string'],
             'jenis_sampah_dominan.*.berat' => ['required', 'numeric', 'min:0'],
             'jenis_sampah_dominan.*.periode' => ['required', 'in:hari,minggu'],
             'kondisi_fasilitas' => ['nullable', 'string'],
+            'sampah_residu_akhir' => ['nullable', 'numeric', 'min:0'],
+            'total_sampah_terkelola' => ['nullable', 'numeric', 'min:0'],
+            'jumlah_warga_terlibat_aktif' => ['nullable', 'integer', 'min:0'],
+            'luas_area_zero_waste' => ['nullable', 'numeric', 'min:0'],
         ];
     }
 }

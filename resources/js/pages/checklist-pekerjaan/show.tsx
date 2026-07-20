@@ -1,6 +1,6 @@
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState, useCallback } from 'react';
 import { Head, Link, router } from '@inertiajs/react';
-import { ArrowLeft, CalendarDays, Circle, Save } from 'lucide-react';
+import { ArrowLeft, CalendarDays, CheckCircle2, Circle } from 'lucide-react';
 import Heading from '@/components/heading';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
@@ -45,6 +45,7 @@ type Props = {
     filter: string | null;
     areaFilter: string | null;
     areas: string[];
+    readOnly?: boolean;
 };
 
 const GROUP_ORDER = ['harian', 'mingguan', 'bulanan'] as const;
@@ -99,15 +100,32 @@ const COLGROUP = (
         <col />
         <col className="w-[140px]" />
         <col className="w-[150px]" />
-        <col className="w-[170px]" />
+        <col className="w-[80px]" />
     </colgroup>
 );
 
-export default function ChecklistPekerjaanShow({ petugas, tanggal, masterTasks, checklist, filter, areaFilter, areas }: Props) {
+export default function ChecklistPekerjaanShow({ petugas, tanggal, masterTasks, checklist, filter, areaFilter, areas, readOnly = false }: Props) {
     const dateInputRef = useRef<HTMLInputElement>(null);
     const [selectedDate, setSelectedDate] = useState(tanggal);
     const [activeFilter, setActiveFilter] = useState<string | null>(filter);
     const [activeArea, setActiveArea] = useState<string>(areaFilter ?? '');
+    const [areaAlert, setAreaAlert] = useState(false);
+    const debounceRef = useRef<NodeJS.Timeout | null>(null);
+
+    const activeAreaRef = useRef(activeArea);
+    const selectedDateRef = useRef(selectedDate);
+    const petugasNipRef = useRef(petugas.nip);
+
+    const baseUrl = readOnly ? '/petugas/checklist-pekerjaan' : `/admin/checklist-pekerjaan/${petugas.nip}`;
+    const backUrl = readOnly ? '/petugas/dashboard' : '/admin/checklist-pekerjaan';
+
+    useEffect(() => {
+        activeAreaRef.current = activeArea;
+    }, [activeArea]);
+
+    useEffect(() => {
+        selectedDateRef.current = selectedDate;
+    }, [selectedDate]);
 
     const [items, setItems] = useState<ChecklistItem[]>(() =>
         masterTasks.map((task) => ({
@@ -118,42 +136,77 @@ export default function ChecklistPekerjaanShow({ petugas, tanggal, masterTasks, 
         })),
     );
 
-    const [saving, setSaving] = useState(false);
+    useEffect(() => {
+        setItems(
+            masterTasks.map((task) => ({
+                master_pekerjaan_id: task.id,
+                tugas: task.nama_pekerjaan,
+                status: checklist[task.id]?.status ?? 'belum',
+                jenis_pekerjaan: task.jenis_pekerjaan,
+            })),
+        );
+    }, [masterTasks, checklist]);
+
     const areaSelected = activeArea !== '';
 
-    const toggleStatus = (masterId: number) => {
-        if (!areaSelected) return;
-        setItems((prev) =>
-            prev.map((item) =>
-                item.master_pekerjaan_id === masterId
-                    ? { ...item, status: item.status === 'sudah' ? 'belum' as const : 'sudah' as const }
-                    : item,
-            ),
-        );
-    };
+    const doSave = useCallback((updated: ChecklistItem[]) => {
+        const area = activeAreaRef.current;
+        const date = selectedDateRef.current;
+        const nip = petugasNipRef.current;
 
-    const handleSave = () => {
-        setSaving(true);
+        if (!area || !nip) return;
+
         router.post(
             '/admin/checklist-pekerjaan',
             {
-                nip: petugas.nip,
-                tanggal: selectedDate,
-                area: activeArea || undefined,
-                items: items.map((item) => ({
+                nip,
+                tanggal: date,
+                area,
+                items: updated.map((item) => ({
                     master_pekerjaan_id: item.master_pekerjaan_id,
                     status: item.status,
                 })),
             },
-            {
-                onFinish: () => setSaving(false),
-            },
+            { preserveScroll: true, preserveState: true },
         );
+    }, []);
+
+    const scheduleSave = useCallback((updated: ChecklistItem[]) => {
+        if (debounceRef.current) clearTimeout(debounceRef.current);
+        debounceRef.current = setTimeout(() => {
+            doSave(updated);
+        }, 200);
+    }, [doSave]);
+
+    const toggleStatus = (masterId: number) => {
+        if (!areaSelected) {
+            setAreaAlert(true);
+            return;
+        }
+
+        setItems((prev) => {
+            const updated = prev.map((item) =>
+                item.master_pekerjaan_id === masterId
+                    ? { ...item, status: item.status === 'sudah' ? 'belum' as const : 'sudah' as const }
+                    : item,
+            );
+            scheduleSave(updated);
+            return updated;
+        });
     };
 
     const handleDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const newDate = e.target.value;
         setSelectedDate(newDate);
+        if (readOnly) {
+            router.get(
+                baseUrl,
+                { tanggal: newDate, jenis: activeFilter ?? undefined, area: activeArea || undefined },
+                { preserveState: false, preserveScroll: true },
+            );
+            return;
+        }
+        if (!petugas.nip) return;
         router.get(
             `/admin/checklist-pekerjaan/${petugas.nip}`,
             { tanggal: newDate, jenis: activeFilter ?? undefined, area: activeArea || undefined },
@@ -166,6 +219,15 @@ export default function ChecklistPekerjaanShow({ petugas, tanggal, masterTasks, 
 
     const handleFilterChange = (value: string | null) => {
         setActiveFilter(value);
+        if (readOnly) {
+            router.get(
+                baseUrl,
+                { tanggal: selectedDate, jenis: value ?? undefined, area: activeArea || undefined },
+                { preserveState: true, preserveScroll: true },
+            );
+            return;
+        }
+        if (!petugas.nip) return;
         router.get(
             `/admin/checklist-pekerjaan/${petugas.nip}`,
             { tanggal: selectedDate, jenis: value ?? undefined, area: activeArea || undefined },
@@ -175,6 +237,16 @@ export default function ChecklistPekerjaanShow({ petugas, tanggal, masterTasks, 
 
     const handleAreaChange = (value: string) => {
         setActiveArea(value);
+        setAreaAlert(false);
+        if (readOnly) {
+            router.get(
+                baseUrl,
+                { tanggal: selectedDate, jenis: activeFilter ?? undefined, area: value || undefined },
+                { preserveState: false, preserveScroll: true },
+            );
+            return;
+        }
+        if (!petugas.nip) return;
         router.get(
             `/admin/checklist-pekerjaan/${petugas.nip}`,
             { tanggal: selectedDate, jenis: activeFilter ?? undefined, area: value || undefined },
@@ -225,7 +297,7 @@ export default function ChecklistPekerjaanShow({ petugas, tanggal, masterTasks, 
                         description={`NIP: ${petugas.nip ?? '-'}`}
                     />
                     <Button variant="outline" asChild className="border-green-200 text-green-700 hover:bg-green-50">
-                        <Link href="/admin/checklist-pekerjaan" className="flex items-center gap-1">
+                        <Link href={backUrl} className="flex items-center gap-1">
                             <ArrowLeft className="h-4 w-4" />
                             Kembali
                         </Link>
@@ -289,6 +361,12 @@ export default function ChecklistPekerjaanShow({ petugas, tanggal, masterTasks, 
                                 <option key={area} value={area}>{area}</option>
                             ))}
                         </select>
+                        {areaAlert && (
+                            <p className="flex items-center gap-1.5 text-xs font-medium text-red-600">
+                                <span className="inline-block h-1.5 w-1.5 rounded-full bg-red-500" />
+                                Pilih area terlebih dahulu sebelum mengisi tugas
+                            </p>
+                        )}
                     </div>
 
                     <div className={`rounded-lg border px-4 py-2 text-sm ${areaSelected ? 'border-green-200 bg-green-50' : 'border-gray-200 bg-gray-100'}`}>
@@ -364,20 +442,38 @@ export default function ChecklistPekerjaanShow({ petugas, tanggal, masterTasks, 
                                                     </span>
                                                 </TableCell>
                                                 <TableCell className="align-top pt-3 text-center">
-                                                    <button
-                                                        type="button"
-                                                        disabled={!areaSelected}
-                                                        onClick={() => toggleStatus(item.master_pekerjaan_id)}
-                                                        className={`rounded-full px-4 py-1.5 text-xs font-medium transition-colors inline-block min-w-[140px] ${
-                                                            !areaSelected
-                                                                ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
-                                                                : item.status === 'sudah'
-                                                                    ? 'bg-green-600 text-white hover:bg-green-700'
-                                                                    : 'bg-gray-100 text-gray-500 hover:bg-gray-200'
-                                                        }`}
-                                                    >
-                                                        {!areaSelected ? 'Pilih Area' : item.status === 'sudah' ? 'Sudah Dikerjakan' : 'Belum Dikerjakan'}
-                                                    </button>
+                                                    {readOnly ? (
+                                                        <div
+                                                            role="checkbox"
+                                                            aria-checked={item.status === 'sudah'}
+                                                            aria-readonly="true"
+                                                            className={`mx-auto flex h-7 w-7 items-center justify-center rounded-md border ${
+                                                                item.status === 'sudah'
+                                                                    ? 'border-green-600 bg-green-600'
+                                                                    : 'border-gray-300 bg-gray-100'
+                                                            }`}
+                                                        >
+                                                            {item.status === 'sudah' && <CheckCircle2 className="h-5 w-5 text-white" />}
+                                                        </div>
+                                                    ) : (
+                                                        <label className="inline-flex cursor-pointer items-center justify-center">
+                                                            <span className={`relative flex h-5 w-5 items-center justify-center rounded border-2 transition-colors ${
+                                                                !areaSelected
+                                                                    ? 'border-gray-200 bg-gray-100'
+                                                                    : item.status === 'sudah'
+                                                                        ? 'border-green-500 bg-green-500 text-white'
+                                                                        : 'border-gray-300 bg-white hover:border-gray-400'
+                                                            }`}>
+                                                                {item.status === 'sudah' && <CheckCircle2 className="h-3.5 w-3.5" />}
+                                                            </span>
+                                                            <input
+                                                                type="checkbox"
+                                                                checked={item.status === 'sudah'}
+                                                                onChange={() => toggleStatus(item.master_pekerjaan_id)}
+                                                                className="sr-only"
+                                                            />
+                                                        </label>
+                                                    )}
                                                 </TableCell>
                                             </TableRow>
                                         );
@@ -387,23 +483,6 @@ export default function ChecklistPekerjaanShow({ petugas, tanggal, masterTasks, 
                         </div>
                     );
                 })}
-
-                <div className="flex items-center gap-3 pt-2">
-                    <Button
-                        disabled={saving || !areaSelected}
-                        onClick={handleSave}
-                        className="bg-green-600 hover:bg-green-700 disabled:opacity-50"
-                    >
-                        <Save className="h-4 w-4" />
-                        Simpan Checklist
-                    </Button>
-                    <Button variant="outline" asChild className="border-green-200 text-green-700 hover:bg-green-50">
-                        <Link href="/admin/checklist-pekerjaan" className="flex items-center gap-1">
-                            <ArrowLeft className="h-4 w-4" />
-                            Batal
-                        </Link>
-                    </Button>
-                </div>
             </div>
         </>
     );

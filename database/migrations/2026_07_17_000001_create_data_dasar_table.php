@@ -28,6 +28,10 @@ return new class extends Migration
             $table->string('baseline_sampah_periode', 10)->default('hari');
             $table->json('jenis_sampah_dominan')->nullable();
             $table->text('kondisi_fasilitas')->nullable();
+            $table->decimal('sampah_residu_akhir', 12, 2)->default(0);
+            $table->decimal('total_sampah_terkelola', 12, 2)->default(0);
+            $table->integer('jumlah_warga_terlibat_aktif')->default(0);
+            $table->decimal('luas_area_zero_waste', 12, 2)->default(0);
             $table->timestamps();
         });
     }

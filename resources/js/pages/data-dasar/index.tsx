@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Head, useForm } from '@inertiajs/react';
-import { CheckCircle2, Edit3, Leaf, MapPin, Save, X } from 'lucide-react';
+import { CheckCircle2, Edit3, FileDown, Leaf, MapPin, Save, X } from 'lucide-react';
 import Heading from '@/components/heading';
 import InputError from '@/components/input-error';
 import { Button } from '@/components/ui/button';
@@ -40,33 +40,27 @@ type DataDasarType = {
     baseline_sampah_periode: 'hari' | 'minggu';
     jenis_sampah_dominan: JenisSampahItem[];
     kondisi_fasilitas: string | null;
+    sampah_residu_akhir: number;
+    total_sampah_terkelola: number;
+    jumlah_warga_terlibat_aktif: number;
+    luas_area_zero_waste: number;
+};
+
+type RincianAreaDetail = {
+    nama: string;
+    deskripsi: string;
+    luas: number;
 };
 
 type Props = {
     dataDasar: DataDasarType | null;
+    rincianArea?: RincianAreaDetail[];
+    computedBaseline?: { baseline_sampah: number; baseline_sampah_periode: string };
+    computedJenisSampah?: JenisSampahItem[];
+    computedSampahResidu?: number;
+    computedTotalSampahTerkelola?: number;
 };
 
-const kategoriSampah = [
-    'Daun',
-    'Ranting',
-    'Sisa Makanan',
-    'Plastik',
-    'Styrofoam',
-    'Botol',
-    'Kardus & Kertas',
-    'B3',
-    'Lainnya',
-];
-
-
-
-const defaultJenisSampah: JenisSampahItem[] = kategoriSampah.map((k) => ({
-    kategori: k,
-    berat: '',
-    periode: 'hari' as const,
-}));
-
-// Fields that count toward the "kelengkapan data" indicator in the header.
 const REQUIRED_FIELDS = [
     'nama_tim',
     'fakultas',
@@ -75,10 +69,9 @@ const REQUIRED_FIELDS = [
     'jumlah_mahasiswa',
     'jumlah_dosen',
     'luas_area_fakultas',
-    'baseline_sampah',
 ] as const;
 
-export default function DataDasarIndex({ dataDasar }: Props) {
+export default function DataDasarIndex({ dataDasar, rincianArea: rincianAreaProp, computedBaseline, computedJenisSampah, computedSampahResidu, computedTotalSampahTerkelola }: Props) {
     const [isEditing, setIsEditing] = useState(!dataDasar);
 
     const { data, setData, post, processing, errors, reset } = useForm({
@@ -98,12 +91,15 @@ export default function DataDasarIndex({ dataDasar }: Props) {
         luas_area_fakultas: dataDasar?.luas_area_fakultas?.toString() ?? '',
         luas_area_objek_lomba:
             dataDasar?.luas_area_objek_lomba?.toString() ?? '',
-        baseline_sampah: dataDasar?.baseline_sampah?.toString() ?? '',
-        baseline_sampah_periode: dataDasar?.baseline_sampah_periode ?? 'hari',
-        jenis_sampah_dominan:
-            dataDasar?.jenis_sampah_dominan ?? defaultJenisSampah,
         kondisi_fasilitas: dataDasar?.kondisi_fasilitas ?? '',
+        jumlah_warga_terlibat_aktif:
+            dataDasar?.jumlah_warga_terlibat_aktif?.toString() ?? '',
+        luas_area_zero_waste:
+            dataDasar?.luas_area_zero_waste?.toString() ?? '',
+        rincian_area: [] as RincianAreaDetail[],
     });
+
+    const [rincianArea, setRincianArea] = useState<RincianAreaDetail[]>([]);
 
     const jumlahMahasiswa = Number(data.jumlah_mahasiswa || 0);
     const jumlahDosen = Number(data.jumlah_dosen || 0);
@@ -111,6 +107,27 @@ export default function DataDasarIndex({ dataDasar }: Props) {
     const jumlahTenagaPendukung = Number(data.jumlah_tenaga_pendukung || 0);
     const totalWarga =
         jumlahMahasiswa + jumlahDosen + jumlahTendik + jumlahTenagaPendukung;
+
+    const baselineSampah = computedBaseline?.baseline_sampah ?? 0;
+    const sampahResidu = computedSampahResidu ?? 0;
+    const totalSampahTerkelola = computedTotalSampahTerkelola ?? 0;
+    const jumlahWargaTerlibat = Number(data.jumlah_warga_terlibat_aktif || 0);
+    const luasAreaZeroWaste = Number(data.luas_area_zero_waste || 0);
+    const luasAreaFakultas = Number(data.luas_area_fakultas || 0);
+
+    const hasilPenguranganSampah =
+        baselineSampah
+            ? ((baselineSampah - sampahResidu) / baselineSampah) * 100
+            : null;
+    const hasilSampahPerKapita = totalWarga
+        ? totalSampahTerkelola / totalWarga
+        : null;
+    const hasilPartisipasi = totalWarga
+        ? (jumlahWargaTerlibat / totalWarga) * 100
+        : null;
+    const hasilCakupanArea = luasAreaFakultas
+        ? (luasAreaZeroWaste / luasAreaFakultas) * 100
+        : null;
 
     const filledRequired = REQUIRED_FIELDS.filter(
         (f) => String(data[f] ?? '').trim() !== '',
@@ -126,6 +143,14 @@ export default function DataDasarIndex({ dataDasar }: Props) {
         });
     };
 
+    const updateRincianArea = (i: number, field: keyof RincianAreaDetail, value: string | number) => {
+        const copy = rincianArea.map((item, idx) =>
+            idx === i ? { ...item, [field]: value } : item,
+        );
+        setRincianArea(copy);
+        setData('rincian_area', copy);
+    };
+
     const handleFormSubmit = () => {
         const form = document.getElementById(
             'data-dasar-form',
@@ -133,25 +158,17 @@ export default function DataDasarIndex({ dataDasar }: Props) {
         form?.requestSubmit();
     };
 
+    const enterEditMode = () => {
+        if (rincianAreaProp) {
+            setRincianArea(rincianAreaProp);
+            setData('rincian_area', rincianAreaProp);
+        }
+        setIsEditing(true);
+    };
+
     const handleCancel = () => {
         reset();
         setIsEditing(false);
-    };
-
-    const setJenisSampah = <T extends keyof JenisSampahItem>(
-        index: number,
-        field: T,
-        value: JenisSampahItem[T],
-    ) => {
-        const updated = (data.jenis_sampah_dominan as JenisSampahItem[]).map(
-            (item: JenisSampahItem, i: number) => {
-                if (i === index) {
-                    return { ...item, [field]: value };
-                }
-                return item;
-            },
-        );
-        setData('jenis_sampah_dominan', updated);
     };
 
     return (
@@ -212,14 +229,24 @@ export default function DataDasarIndex({ dataDasar }: Props) {
                                 </Button>
                             </>
                         ) : (
-                            <Button
-                                type="button"
-                                onClick={() => setIsEditing(true)}
-                                className="bg-green-600 hover:bg-green-700"
-                            >
-                                <Edit3 className="h-4 w-4" />
-                                Edit Data
-                            </Button>
+                            <>
+                                {dataDasar && (
+                                    <Button asChild variant="outline" className="border-green-200 text-green-700 hover:bg-green-50">
+                                        <a href="/admin/data-dasar/export">
+                                            <FileDown className="h-4 w-4" />
+                                            Export CSV
+                                        </a>
+                                    </Button>
+                                )}
+                                <Button
+                                    type="button"
+                                    onClick={enterEditMode}
+                                    className="bg-green-600 hover:bg-green-700"
+                                >
+                                    <Edit3 className="h-4 w-4" />
+                                    Edit Data
+                                </Button>
+                            </>
                         )}
                     </div>
                 </div>
@@ -229,6 +256,184 @@ export default function DataDasarIndex({ dataDasar }: Props) {
                     onSubmit={handleSubmit}
                     className="flex flex-col gap-6"
                 >
+                    {/* Rumus Penilaian */}
+                    <SectionCard
+                        icon={Leaf}
+                        title="Rumus Penilaian"
+                        subtitle="Indikator dan rumus yang digunakan dalam penilaian program Zero Waste"
+                    >
+                        <div className="overflow-x-auto">
+                            <table className="w-full text-sm">
+                                <thead>
+                                    <tr className="border-b border-green-100 bg-green-50/60">
+                                        <th className="px-6 py-3 text-left text-xs font-semibold tracking-wider text-green-700 uppercase w-1/3">
+                                            Indikator
+                                        </th>
+                                        <th className="px-6 py-3 text-left text-xs font-semibold tracking-wider text-green-700 uppercase">
+                                            Rumus
+                                        </th>
+                                        <th className="px-6 py-3 text-center text-xs font-semibold tracking-wider text-green-700 uppercase w-28">
+                                            Hasil
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody className="divide-y divide-green-100">
+                                    <tr className="hover:bg-green-50/30 transition-colors">
+                                        <td className="px-6 py-3 text-sm font-medium text-green-900">
+                                            Persentase Pengurangan Sampah
+                                        </td>
+                                        <td className="px-6 py-3">
+                                            <div className="flex flex-col gap-1 text-xs">
+                                                <div className="leading-relaxed text-green-800">
+                                                    <span className="text-green-600">(</span>{' '}
+                                                    <span className="font-medium text-green-700">Baseline Sampah Awal: </span>
+                                                    <span className="tabular-nums font-semibold text-green-900">{baselineSampah.toLocaleString('id-ID')}</span>{' '}
+                                                    <span className="text-xs text-slate-500">kg</span>{' '}
+                                                    <span className="text-green-600">-</span>{' '}
+                                                    <span className="font-medium text-green-700">Sampah Residu Akhir: </span>
+                                                    <span className="tabular-nums font-semibold text-green-900">{sampahResidu.toLocaleString('id-ID')}</span>{' '}
+                                                    <span className="text-xs text-slate-500">kg</span>{' '}
+                                                    <span className="text-green-600">) / </span>{' '}
+                                                    <span className="font-medium text-green-700">Baseline Sampah Awal: </span>
+                                                    <span className="tabular-nums font-semibold text-green-900">{baselineSampah.toLocaleString('id-ID')}</span>{' '}
+                                                    <span className="text-xs text-slate-500">kg</span>{' '}
+                                                    <span className="text-green-600">× 100%</span>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td className="px-6 py-3 text-center">
+                                            <span className="text-sm tabular-nums font-medium text-green-900">
+                                                {hasilPenguranganSampah !== null ? `${hasilPenguranganSampah.toFixed(2)}%` : '-'}
+                                            </span>
+                                        </td>
+                                    </tr>
+                                    <tr className="hover:bg-green-50/30 transition-colors">
+                                        <td className="px-6 py-3 text-sm font-medium text-green-900">
+                                            Sampah Terkelola per Kapita
+                                        </td>
+                                        <td className="px-6 py-3">
+                                            <div className="flex flex-col gap-1 text-xs">
+                                                <div className="leading-relaxed text-green-800">
+                                                    <span className="font-medium text-green-700">Total Sampah Terkelola: </span>
+                                                    <span className="tabular-nums font-semibold text-green-900">{totalSampahTerkelola.toLocaleString('id-ID')}</span>{' '}
+                                                    <span className="text-xs text-slate-500">kg</span>{' '}
+                                                    <span className="text-green-600">/</span>{' '}
+                                                    <span className="font-medium text-green-700">Total Warga Fakultas atau Unit: </span>
+                                                    <span className="tabular-nums font-semibold text-green-900">{totalWarga.toLocaleString('id-ID')}</span>{' '}
+                                                    <span className="text-xs text-slate-500">orang</span>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td className="px-6 py-3 text-center">
+                                            <span className="text-sm tabular-nums font-medium text-green-900">
+                                                {hasilSampahPerKapita !== null ? hasilSampahPerKapita.toFixed(2) : '-'}
+                                                <span className="text-xs text-slate-500"> kg/orang</span>
+                                            </span>
+                                        </td>
+                                    </tr>
+                                    <tr className="hover:bg-green-50/30 transition-colors">
+                                        <td className="px-6 py-3 text-sm font-medium text-green-900">
+                                            Persentase Partisipasi
+                                        </td>
+                                        <td className="px-6 py-3">
+                                            {isEditing ? (
+                                                <div className="flex flex-col gap-1 text-xs">
+                                                    <div className="leading-relaxed text-green-800">
+                                                        <span className="font-medium text-green-700">Jumlah Warga yang Terlibat Aktif: </span>
+                                                        <Input
+                                                            type="number"
+                                                            min="0"
+                                                            step="1"
+                                                            value={data.jumlah_warga_terlibat_aktif}
+                                                            onChange={(e) =>
+                                                                setData('jumlah_warga_terlibat_aktif', e.target.value)
+                                                            }
+                                                            className="inline-flex w-20 border-green-200 text-xs text-center focus-visible:border-green-500 focus-visible:ring-green-500/20"
+                                                            placeholder="0"
+                                                        />{' '}
+                                                        <span className="text-xs text-slate-500">orang</span>{' '}
+                                                        <span className="text-green-600">/</span>{' '}
+                                                        <span className="font-medium text-green-700">Total Warga Fakultas atau Unit: </span>
+                                                        <span className="tabular-nums font-semibold text-green-900">{totalWarga.toLocaleString('id-ID')}</span>{' '}
+                                                        <span className="text-xs text-slate-500">orang</span>{' '}
+                                                        <span className="text-green-600">× 100%</span>
+                                                    </div>
+                                                </div>
+                                            ) : (
+                                                <div className="flex flex-col gap-1 text-xs">
+                                                    <div className="leading-relaxed text-green-800">
+                                                        <span className="font-medium text-green-700">Jumlah Warga yang Terlibat Aktif: </span>
+                                                        <span className="tabular-nums font-semibold text-green-900">{data.jumlah_warga_terlibat_aktif || '0'}</span>{' '}
+                                                        <span className="text-xs text-slate-500">orang</span>{' '}
+                                                        <span className="text-green-600">/</span>{' '}
+                                                        <span className="font-medium text-green-700">Total Warga Fakultas atau Unit: </span>
+                                                        <span className="tabular-nums font-semibold text-green-900">{totalWarga.toLocaleString('id-ID')}</span>{' '}
+                                                        <span className="text-xs text-slate-500">orang</span>{' '}
+                                                        <span className="text-green-600">× 100%</span>
+                                                    </div>
+                                                </div>
+                                            )}
+                                        </td>
+                                        <td className="px-6 py-3 text-center">
+                                            <span className="text-sm tabular-nums font-medium text-green-900">
+                                                {hasilPartisipasi !== null ? `${hasilPartisipasi.toFixed(2)}%` : '-'}
+                                            </span>
+                                        </td>
+                                    </tr>
+                                    <tr className="hover:bg-green-50/30 transition-colors">
+                                        <td className="px-6 py-3 text-sm font-medium text-green-900">
+                                            Cakupan Area Terkelola
+                                        </td>
+                                        <td className="px-6 py-3">
+                                            {isEditing ? (
+                                                <div className="flex flex-col gap-1 text-xs">
+                                                    <div className="leading-relaxed text-green-800">
+                                                        <span className="font-medium text-green-700">Luas Area yang Menerapkan Zero Waste: </span>
+                                                        <Input
+                                                            type="number"
+                                                            min="0"
+                                                            step="0.01"
+                                                            value={data.luas_area_zero_waste}
+                                                            onChange={(e) =>
+                                                                setData('luas_area_zero_waste', e.target.value)
+                                                            }
+                                                            className="inline-flex w-20 border-green-200 text-xs text-center focus-visible:border-green-500 focus-visible:ring-green-500/20"
+                                                            placeholder="0"
+                                                        />{' '}
+                                                        <span className="text-xs text-slate-500">m²</span>{' '}
+                                                        <span className="text-green-600">/</span>{' '}
+                                                        <span className="font-medium text-green-700">Total Luas Area Fakultas atau Unit: </span>
+                                                        <span className="tabular-nums font-semibold text-green-900">{data.luas_area_fakultas || '0'}</span>{' '}
+                                                        <span className="text-xs text-slate-500">m²</span>{' '}
+                                                        <span className="text-green-600">× 100%</span>
+                                                    </div>
+                                                </div>
+                                            ) : (
+                                                <div className="flex flex-col gap-1 text-xs">
+                                                    <div className="leading-relaxed text-green-800">
+                                                        <span className="font-medium text-green-700">Luas Area yang Menerapkan Zero Waste: </span>
+                                                        <span className="tabular-nums font-semibold text-green-900">{data.luas_area_zero_waste || '0'}</span>{' '}
+                                                        <span className="text-xs text-slate-500">m²</span>{' '}
+                                                        <span className="text-green-600">/</span>{' '}
+                                                        <span className="font-medium text-green-700">Total Luas Area Fakultas atau Unit: </span>
+                                                        <span className="tabular-nums font-semibold text-green-900">{data.luas_area_fakultas || '0'}</span>{' '}
+                                                        <span className="text-xs text-slate-500">m²</span>{' '}
+                                                        <span className="text-green-600">× 100%</span>
+                                                    </div>
+                                                </div>
+                                            )}
+                                        </td>
+                                        <td className="px-6 py-3 text-center">
+                                            <span className="text-sm tabular-nums font-medium text-green-900">
+                                                {hasilCakupanArea !== null ? `${hasilCakupanArea.toFixed(2)}%` : '-'}
+                                            </span>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </SectionCard>
+
                     {/* Identitas Peserta */}
                     <SectionCard
                         icon={MapPin}
@@ -555,122 +760,107 @@ export default function DataDasarIndex({ dataDasar }: Props) {
                             </div>
                         </DataRow>
 
-                        <DataRow
-                            label="Luas Area Fakultas / Unit"
-                            required
-                            keterangan="Total luas area dalam satuan meter persegi (m²)."
-                            errors={errors.luas_area_fakultas}
-                        >
-                            {isEditing ? (
-                                <NumberInput
-                                    value={data.luas_area_fakultas}
-                                    onChange={(v) =>
-                                        setData('luas_area_fakultas', v)
-                                    }
-                                    suffix="m²"
-                                />
-                            ) : (
-                                <DataValue
-                                    value={data.luas_area_fakultas}
-                                    suffix="m²"
-                                />
-                            )}
-                        </DataRow>
+                        <div className="col-span-3 bg-green-50/30 px-6 py-3">
+                            <h4 className="text-xs font-semibold tracking-wider text-green-700 uppercase">
+                                Rincian Luas Area per Klasifikasi
+                            </h4>
+                        </div>
 
-                        <DataRow
-                            label="Luas Area Objek Lomba"
-                            keterangan="Area yang benar-benar menjadi cakupan pelaksanaan program Zero Waste."
-                            errors={errors.luas_area_objek_lomba}
+                        {(isEditing ? rincianArea : (rincianAreaProp ?? [])).map((item, i) => (
+                            <div
+                                key={item.nama}
+                                className="grid grid-cols-1 gap-2 px-6 py-3 sm:grid-cols-3 sm:items-center sm:gap-4"
+                            >
+                                <dt className="text-sm font-medium text-green-800">
+                                    {item.nama}
+                                </dt>
+                                <dd className="text-xs leading-relaxed text-green-700">
+                                    {isEditing ? (
+                                        <Input
+                                            value={item.deskripsi}
+                                            onChange={(e) =>
+                                                updateRincianArea(i, 'deskripsi', e.target.value)
+                                            }
+                                            className="h-9 text-sm border-green-200 focus-visible:border-green-500 focus-visible:ring-green-500/20"
+                                            placeholder="Deskripsi area"
+                                        />
+                                    ) : (
+                                        item.deskripsi || (
+                                            <span className="italic text-slate-400">-</span>
+                                        )
+                                    )}
+                                </dd>
+                                <dd>
+                                    {isEditing ? (
+                                        <Input
+                                            type="number"
+                                            min={0}
+                                            value={item.luas}
+                                            onChange={(e) =>
+                                                updateRincianArea(i, 'luas', Number(e.target.value))
+                                            }
+                                            className="h-9 w-28 text-right text-sm border-green-200 focus-visible:border-green-500 focus-visible:ring-green-500/20"
+                                        />
+                                    ) : (
+                                        <DataValue
+                                            value={item.luas}
+                                            suffix="m²"
+                                        />
+                                    )}
+                                </dd>
+                            </div>
+                        ))}
+
+                        <div className="col-span-3 border-t border-green-100" />
+
+                        <div
+                            className="grid grid-cols-1 gap-2 bg-green-50/40 px-6 py-3 sm:grid-cols-3 sm:gap-4"
                         >
-                            {isEditing ? (
-                                <NumberInput
-                                    value={data.luas_area_objek_lomba}
-                                    onChange={(v) =>
-                                        setData('luas_area_objek_lomba', v)
-                                    }
-                                    suffix="m²"
-                                />
-                            ) : (
-                                <DataValue
-                                    value={data.luas_area_objek_lomba}
-                                    suffix="m²"
-                                />
-                            )}
-                        </DataRow>
+                            <dt className="pt-0.5 text-sm font-semibold text-green-900">
+                                Total Luas Area
+                            </dt>
+                            <dd className="text-xs leading-relaxed text-green-700">
+                                Jumlah luas keseluruhan
+                            </dd>
+                            <dd>
+                                <span className="text-sm font-semibold tabular-nums text-green-900">
+                                    {(isEditing ? rincianArea : (rincianAreaProp ?? [])).reduce(
+                                        (sum, item) =>
+                                            sum + (Number(item.luas) || 0),
+                                        0,
+                                    ).toLocaleString('id-ID')}{' '}
+                                    <span className="font-normal text-slate-600">
+                                        m²
+                                    </span>
+                                </span>
+                            </dd>
+                        </div>
+
+                        <div className="col-span-3 border-t border-green-100" />
 
                         <DataRow
                             label="Baseline Sampah Awal"
-                            required
                             keterangan="Jumlah timbulan sampah sebelum program Zero Waste dalam satuan kg per hari atau kg per minggu."
-                            errors={errors.baseline_sampah}
                         >
-                            {isEditing ? (
-                                <div className="flex flex-wrap items-center gap-2">
-                                    <div className="flex items-center gap-2">
-                                        <Input
-                                            type="number"
-                                            min="0"
-                                            step="0.01"
-                                            value={data.baseline_sampah}
-                                            onChange={(e) =>
-                                                setData(
-                                                    'baseline_sampah',
-                                                    e.target.value,
-                                                )
-                                            }
-                                            className="w-28 border-green-200 focus-visible:border-green-500 focus-visible:ring-green-500/20"
-                                            placeholder="0"
-                                        />
-                                        <span className="text-sm text-green-700">
-                                            kg
-                                        </span>
-                                    </div>
-                                    <span className="text-sm text-slate-500">
-                                        /
-                                    </span>
-                                    <Select
-                                        value={data.baseline_sampah_periode}
-                                        onValueChange={(v) =>
-                                            setData(
-                                                'baseline_sampah_periode',
-                                                v as 'hari' | 'minggu',
-                                            )
-                                        }
-                                    >
-                                        <SelectTrigger className="w-28 border-green-200 focus-visible:border-green-500 focus-visible:ring-green-500/20">
-                                            <SelectValue />
-                                        </SelectTrigger>
-                                        <SelectContent>
-                                            <SelectItem value="hari">
-                                                Per Hari
-                                            </SelectItem>
-                                            <SelectItem value="minggu">
-                                                Per Minggu
-                                            </SelectItem>
-                                        </SelectContent>
-                                    </Select>
-                                </div>
-                            ) : (
-                                <DataValue
-                                    value={data.baseline_sampah}
-                                    suffix={`kg/${
-                                        data.baseline_sampah_periode === 'hari'
-                                            ? 'hari'
-                                            : 'minggu'
-                                    }`}
-                                />
-                            )}
+                            <DataValue
+                                value={computedBaseline?.baseline_sampah ?? 0}
+                                suffix={`kg/${computedBaseline?.baseline_sampah_periode === 'minggu' ? 'minggu' : 'hari'}`}
+                            />
                         </DataRow>
 
                         <DataRow
                             label="Jenis Sampah Dominan"
                             keterangan="Timbulan tiap jenis sampah dalam kg per hari atau kg per minggu."
-                            errors={errors['jenis_sampah_dominan']}
                             stackOnMobile
                         >
                             <div className="divide-y divide-green-100 rounded-lg border border-green-100">
-                                {data.jenis_sampah_dominan?.map(
-                                    (item: JenisSampahItem, i: number) => (
+                                {(computedJenisSampah ?? []).length === 0 && (
+                                    <div className="px-3 py-2 text-xs text-slate-500 italic">
+                                        Belum ada data distribusi.
+                                    </div>
+                                )}
+                                {(computedJenisSampah ?? []).map(
+                                    (item: JenisSampahItem) => (
                                         <div
                                             key={item.kategori}
                                             className="flex items-center gap-3 px-3 py-2"
@@ -678,64 +868,17 @@ export default function DataDasarIndex({ dataDasar }: Props) {
                                             <span className="w-28 shrink-0 text-xs font-medium text-green-800">
                                                 {item.kategori}
                                             </span>
-                                            {isEditing ? (
-                                                <div className="flex items-center gap-1.5">
-                                                    <Input
-                                                        type="number"
-                                                        min="0"
-                                                        step="0.01"
-                                                        value={item.berat}
-                                                        onChange={(e) =>
-                                                            setJenisSampah(
-                                                                i,
-                                                                'berat',
-                                                                e.target.value,
-                                                            )
-                                                        }
-                                                        className="h-8 w-20 border-green-200 text-xs focus-visible:border-green-500 focus-visible:ring-green-500/20"
-                                                        placeholder="0"
-                                                    />
-                                                    <span className="shrink-0 text-xs text-slate-600">
-                                                        kg
-                                                    </span>
-                                                    <Select
-                                                        value={item.periode}
-                                                        onValueChange={(v) =>
-                                                            setJenisSampah(
-                                                                i,
-                                                                'periode',
-                                                                v as
-                                                                    | 'hari'
-                                                                    | 'minggu',
-                                                            )
-                                                        }
-                                                    >
-                                                        <SelectTrigger className="h-8 w-[5.5rem] shrink-0 border-green-200 text-xs focus-visible:border-green-500 focus-visible:ring-green-500/20">
-                                                            <SelectValue />
-                                                        </SelectTrigger>
-                                                        <SelectContent>
-                                                            <SelectItem value="hari">
-                                                                / Hari
-                                                            </SelectItem>
-                                                            <SelectItem value="minggu">
-                                                                / Minggu
-                                                            </SelectItem>
-                                                        </SelectContent>
-                                                    </Select>
-                                                </div>
-                                            ) : (
-                                                <span className="text-sm tabular-nums text-green-900">
-                                                    {Number(
-                                                        item.berat || 0,
-                                                    ).toLocaleString('id-ID')}{' '}
-                                                    kg
-                                                    <span className="text-slate-600">
-                                                        {item.periode === 'hari'
-                                                            ? '/hari'
-                                                            : '/minggu'}
-                                                    </span>
+                                            <span className="text-sm tabular-nums text-green-900">
+                                                {Number(
+                                                    item.berat || 0,
+                                                ).toLocaleString('id-ID')}{' '}
+                                                kg
+                                                <span className="text-slate-600">
+                                                    {item.periode === 'hari'
+                                                        ? '/hari'
+                                                        : '/minggu'}
                                                 </span>
-                                            )}
+                                            </span>
                                         </div>
                                     ),
                                 )}

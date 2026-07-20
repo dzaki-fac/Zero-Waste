@@ -12,8 +12,7 @@ import { useEffect, useState } from 'react';
 
 type Options = {
     area: Array<{ value: string; label: string; icon: string }>;
-    sub_area: Record<string, string[]>;
-    jenis_sampah: string[];
+    subjenis_sampah: string[];
     tujuan_distribusi: string[];
 };
 
@@ -24,13 +23,13 @@ export default function FormDistribusi() {
         options: Options;
     };
 
-    const jenisSampahOptions = options.jenis_sampah;
+    const subjenisOptions = options.subjenis_sampah;
     const tujuanOptions = options.tujuan_distribusi;
     const { data, setData, post, processing, errors } = useForm({
         _redirect: '/form',
         nama: auth.user.name,
         tanggal: new Date(Date.now() - new Date().getTimezoneOffset() * 60000).toISOString().slice(0, 16),
-        items: jenisSampahOptions.map((jenis) => ({ jenis_sampah: jenis, berat: '' })),
+        items: subjenisOptions.map((sub) => ({ subjenis_sampah: sub, berat: '' })),
         tujuan_distribusi: '',
         tujuan_lainnya: '',
         lokasi: '',
@@ -83,11 +82,11 @@ export default function FormDistribusi() {
         }
         const hasBerat = data.items.some((item) => parseFloat(item.berat) > 0);
         if (!hasBerat) {
-            setSubmitError('Minimal isi berat pada 1 jenis sampah');
+            setSubmitError('Minimal isi berat pada 1 subjenis sampah');
             scrollTo('section-jenis-berat');
             return;
         }
-        router.post('/petugas/distribusi', {
+        router.post('/form/distribusi', {
             ...data,
             tujuan_distribusi: data.tujuan_distribusi === 'Tujuan lainnya' ? data.tujuan_lainnya : data.tujuan_distribusi,
         });
@@ -137,7 +136,7 @@ export default function FormDistribusi() {
 
                             <div className="grid gap-2">
                                 <Label htmlFor="tanggal" className="text-xs font-medium text-gray-600">Tanggal & Waktu</Label>
-                                <div className="grid grid-cols-2 gap-3">
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                                     <div>
                                         <Input
                                             id="tanggal_date"
@@ -243,14 +242,14 @@ export default function FormDistribusi() {
                         <div id="section-jenis-berat" className="rounded-2xl border border-green-100 bg-white p-5 shadow-sm">
                             <div className="mb-4 flex items-center gap-2 text-sm font-medium text-green-700">
                                 <Trash2 className="h-4 w-4" />
-                                Jenis & Berat Sampah
+                                Subjenis & Berat Sampah
                             </div>
-                            <p className="-mt-2 mb-3 text-xs text-gray-500">Isi berat pada minimal 1 jenis sampah (boleh lebih dari satu)</p>
+                            <p className="-mt-2 mb-3 text-xs text-gray-500">Isi berat pada minimal 1 subjenis sampah (boleh lebih dari satu)</p>
 
                             <div className="divide-y divide-green-100 rounded-xl border border-green-100 overflow-hidden">
                                 {data.items.map((item, i) => (
-                                    <div key={item.jenis_sampah} className="flex items-center gap-3 px-4 py-2.5 bg-white even:bg-green-50/30">
-                                        <span className="min-w-0 flex-1 text-sm font-medium text-gray-700">{item.jenis_sampah}</span>
+                                    <div key={item.subjenis_sampah} className="flex items-center gap-3 px-4 py-2.5 bg-white even:bg-green-50/30">
+                                        <span className="min-w-0 flex-1 text-sm font-medium text-gray-700">{item.subjenis_sampah}</span>
                                         <div className="relative w-32 shrink-0">
                                             <Input
                                                 type="number"
@@ -281,7 +280,7 @@ export default function FormDistribusi() {
 
                             <div className="mt-3 flex items-center justify-between rounded-lg bg-green-100 px-4 py-2.5">
                                 <span className="text-sm font-medium text-green-700">
-                                    Total{filledCount > 0 ? ` (${filledCount} jenis)` : ''}
+                                    Total{filledCount > 0 ? ` (${filledCount} subjenis)` : ''}
                                 </span>
                                 <span className="text-sm font-bold text-green-800">{totalBerat.toFixed(2)} kg</span>
                             </div>

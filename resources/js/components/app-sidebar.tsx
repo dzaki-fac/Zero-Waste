@@ -1,5 +1,5 @@
 import { Link, usePage } from '@inertiajs/react';
-import { Database, LayoutDashboard, ListTodo, Recycle, Scale, Settings, Truck, Users } from 'lucide-react';
+import { ClipboardCheck, Database, Globe, LayoutDashboard, ListTodo, Recycle, Scale, Settings, Truck, Users } from 'lucide-react';
 import AppLogo from '@/components/app-logo';
 import { NavMain } from '@/components/nav-main';
 import { NavUser } from '@/components/nav-user';
@@ -8,9 +8,6 @@ import {
     SidebarContent,
     SidebarFooter,
     SidebarHeader,
-    SidebarMenu,
-    SidebarMenuButton,
-    SidebarMenuItem,
 } from '@/components/ui/sidebar';
 import type { Auth, NavItem } from '@/types';
 
@@ -28,28 +25,41 @@ export function AppSidebar() {
 
     const adminNavItems: NavItem[] = [
         { title: 'Checklist Pekerjaan', href: '/admin/checklist-pekerjaan', icon: LayoutDashboard },
-        { title: 'Data Dasar', href: '/admin/data-dasar', icon: Database },
         { title: 'Kelola Pekerjaan', href: '/admin/kelola-pekerjaan', icon: ListTodo },
+        {
+            title: 'Kelola Website',
+            icon: Globe,
+            items: [
+                { title: 'Peraturan', href: '/admin/dokumen' },
+                { title: 'Struktur', href: '/admin/dokumen' },
+                { title: 'SOP', href: '/admin/dokumen' },
+                { title: 'Berita', href: '/admin/berita' },
+                { title: 'Poster Edukasi', href: '/admin/poster' },
+            ],
+        },
+        { title: 'Data Dasar', href: '/admin/data-dasar', icon: Database },
         { title: 'Kelola Data', href: '/admin/kelola-data', icon: Settings },
         { title: 'Akun', href: '/admin/akun', icon: Users },
     ];
 
+    const petugasNavItems: NavItem[] = [
+        { title: 'Checklist Pekerjaan', href: '/petugas/checklist-pekerjaan', icon: ClipboardCheck },
+    ];
+
     const navItems: NavItem[] = auth.user.role === 'admin'
         ? [...sharedNavItems, ...adminNavItems]
-        : sharedNavItems;
+        : [...sharedNavItems, ...petugasNavItems];
 
     return (
         <Sidebar collapsible="icon">
             <SidebarHeader>
-                <SidebarMenu>
-                    <SidebarMenuItem>
-                        <SidebarMenuButton size="lg" asChild>
-                            <Link href={auth.user.role === 'petugas' ? '/form' : '/admin/dashboard'} prefetch>
-                                <AppLogo />
-                            </Link>
-                        </SidebarMenuButton>
-                    </SidebarMenuItem>
-                </SidebarMenu>
+                <Link
+                    href="/form"
+                    prefetch
+                    className="grid w-full grid-cols-[120px_minmax(0,1fr)] items-center gap-2 px-4 py-4 group-data-[collapsible=icon]:grid-cols-1 group-data-[collapsible=icon]:gap-0 group-data-[collapsible=icon]:px-2 group-data-[collapsible=icon]:py-2"
+                >
+                    <AppLogo />
+                </Link>
             </SidebarHeader>
 
             <SidebarContent>
@@ -61,4 +71,8 @@ export function AppSidebar() {
             </SidebarFooter>
         </Sidebar>
     );
+}
+
+function portalHref(path: string): string {
+    return `/${path}`;
 }

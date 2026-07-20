@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Head, Link, router, useForm, usePage } from '@inertiajs/react';
-import { ArrowLeft, Send, MapPin, Calendar, Weight, User, CheckCircle2 } from 'lucide-react';
+import { ArrowLeft, Send, Calendar, User, Trash2, CheckCircle2, MapPin } from 'lucide-react';
 import {
     Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle,
 } from '@/components/ui/dialog';
@@ -12,7 +12,6 @@ import { useEffect, useState } from 'react';
 
 type Options = {
     area: string[];
-    sub_area: Record<string, string[]>;
     jenis_sampah: string[];
     tujuan_distribusi: string[];
 };
@@ -20,32 +19,23 @@ type Options = {
 export default function FormPenimbangan() {
     const { auth, submitted, options } = usePage().props as unknown as {
         auth: { user: { name: string } };
-        submitted: Record<string, string | number | null> | null;
+        submitted: Record<string, unknown> | null;
         options: Options;
     };
 
     const areaOptions = options.area;
-    const subAreas = options.sub_area;
+    const jenisSampahOptions = options.jenis_sampah;
     const { data, setData, post, processing, errors } = useForm({
         _redirect: '/form',
         nama: auth.user.name,
         tanggal: new Date(Date.now() - new Date().getTimezoneOffset() * 60000).toISOString().slice(0, 16),
-        berat_sampah: '',
         area: '',
-        sub_area: '',
+        items: jenisSampahOptions.map((jenis) => ({ jenis_sampah: jenis, berat: '' })),
     });
 
-    const hasSubArea = data.area && (subAreas[data.area]?.length > 0);
-
-    const handleAreaChange = (value: string) => {
-        setData('area', value);
-        setData('sub_area', '');
-    };
-
     const [showSuccess, setShowSuccess] = useState(false);
+    const [submitError, setSubmitError] = useState('');
     const [areaError, setAreaError] = useState('');
-    const [subAreaError, setSubAreaError] = useState('');
-    const [beratError, setBeratError] = useState('');
 
     useEffect(() => {
         if (submitted) setShowSuccess(true);
@@ -55,13 +45,8 @@ export default function FormPenimbangan() {
         if (data.area) setAreaError('');
     }, [data.area]);
 
-    useEffect(() => {
-        if (data.sub_area) setSubAreaError('');
-    }, [data.sub_area]);
-
-    useEffect(() => {
-        if (data.berat_sampah) setBeratError('');
-    }, [data.berat_sampah]);
+    const totalBerat = data.items.reduce((sum, item) => sum + (parseFloat(item.berat) || 0), 0);
+    const filledCount = data.items.filter((item) => parseFloat(item.berat) > 0).length;
 
     const scrollTo = (id: string) => {
         document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'center' });
@@ -69,38 +54,36 @@ export default function FormPenimbangan() {
 
 const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        if (!data.berat_sampah) {
-            setBeratError('Masukkan berat sampah');
-            scrollTo('section-berat');
-            return;
-        }
         if (!data.area) {
             setAreaError('Pilih area terlebih dahulu');
-            scrollTo('section-lokasi');
+            scrollTo('section-area');
             return;
         }
-        if (hasSubArea && !data.sub_area) {
-            setSubAreaError('Silakan pilih sub area terlebih dahulu');
-            scrollTo('section-lokasi');
+        const filledCount = data.items.filter((item) => parseFloat(item.berat) > 0).length;
+        if (!filledCount) {
+            setSubmitError('Minimal isi berat pada 1 jenis sampah');
+            scrollTo('section-jenis-berat');
             return;
         }
+        setSubmitError('');
         post('/petugas/penimbangan');
     };
 
     const now = new Date(Date.now() - new Date().getTimezoneOffset() * 60000).toISOString().slice(0, 16);
-
     const todayDate = now.slice(0, 10);
     const todayTime = now.slice(11, 16);
+
+    const submittedItems = submitted?.items as Array<Record<string, string | number>> | undefined;
 
     return (
         <>
             <Head title="Tambah Penimbangan" />
 
             <div className="mx-auto flex min-h-dvh w-full max-w-lg flex-col bg-linear-to-b from-green-50/50 to-white">
-                <div className="flex-1 px-4 pb-32 pt-6">
+                <div className="flex-1 px-4 pb-36 pt-6">
                     <Heading
                         title="Tambah Penimbangan"
-                        description="Masukkan data penimbangan sampah baru"
+                        description="Isi berat pada jenis sampah yang akan ditimbang"
                     />
 
                     <form onSubmit={handleSubmit} className="mt-6 space-y-6" noValidate>
@@ -127,16 +110,15 @@ const handleSubmit = (e: React.FormEvent) => {
                         <div className="rounded-2xl border border-green-100 bg-white p-5 shadow-sm">
                             <div className="mb-4 flex items-center gap-2 text-sm font-medium text-green-700">
                                 <Calendar className="h-4 w-4" />
-                                Waktu Penimbangan
+                                Waktu
                             </div>
 
                             <div className="grid gap-2">
                                 <Label htmlFor="tanggal" className="text-xs font-medium text-gray-600">Tanggal & Waktu</Label>
-                                <div className="grid grid-cols-2 gap-3">
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                                     <div>
                                         <Input
                                             id="tanggal_date"
-                                            name="tanggal_date"
                                             type="date"
                                             value={data.tanggal ? data.tanggal.slice(0, 10) : todayDate}
                                             onChange={(e) => {
@@ -150,7 +132,6 @@ const handleSubmit = (e: React.FormEvent) => {
                                     <div>
                                         <Input
                                             id="tanggal_time"
-                                            name="tanggal_time"
                                             type="time"
                                             value={data.tanggal ? data.tanggal.slice(11, 16) : todayTime}
                                             onChange={(e) => {
@@ -166,36 +147,7 @@ const handleSubmit = (e: React.FormEvent) => {
                             </div>
                         </div>
 
-                        <div id="section-berat" className="rounded-2xl border border-green-100 bg-white p-5 shadow-sm">
-                            <div className="mb-4 flex items-center gap-2 text-sm font-medium text-green-700">
-                                <Weight className="h-4 w-4" />
-                                Berat Sampah
-                            </div>
-
-                            <div className="grid gap-2">
-                                <Label htmlFor="berat_sampah" className="text-xs font-medium text-gray-600">Berat (kg)</Label>
-                                <div className="relative">
-                                    <Input
-                                        id="berat_sampah"
-                                        name="berat_sampah"
-                                        type="number"
-                                        step="0.01"
-                                        min="0"
-                                        value={data.berat_sampah}
-                                        onChange={(e) => setData('berat_sampah', e.target.value)}
-                                        required
-                                        placeholder="0.00"
-                                        inputMode="decimal"
-                                        onWheel={(e) => e.currentTarget.blur()}
-                                        className="h-12 border-green-200 pe-8 text-lg [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
-                                    />
-                                    <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-sm font-medium text-green-600">kg</span>
-                                </div>
-                                <InputError message={errors.berat_sampah || beratError} />
-                            </div>
-                        </div>
-
-                        <div id="section-lokasi" className="rounded-2xl border border-green-100 bg-white p-5 shadow-sm">
+                        <div id="section-area" className="rounded-2xl border border-green-100 bg-white p-5 shadow-sm">
                             <div className="mb-4 flex items-center gap-2 text-sm font-medium text-green-700">
                                 <MapPin className="h-4 w-4" />
                                 Lokasi
@@ -211,7 +163,7 @@ const handleSubmit = (e: React.FormEvent) => {
                                                 <button
                                                     key={opt}
                                                     type="button"
-                                                    onClick={() => handleAreaChange(opt)}
+                                                    onClick={() => setData('area', opt)}
                                                     className={`rounded-xl border-2 px-4 py-3 text-sm font-medium transition-all active:scale-95 ${
                                                         isSelected
                                                             ? 'border-green-500 bg-green-50 text-green-700 shadow-sm'
@@ -225,32 +177,53 @@ const handleSubmit = (e: React.FormEvent) => {
                                     </div>
                                     <InputError message={errors.area || areaError} />
                                 </div>
+                            </div>
+                        </div>
 
-                                {hasSubArea && (
-                                    <div id="sub_area_section" className="grid gap-2">
-                                        <Label className="text-xs font-medium text-gray-600">Pilih Sub Area</Label>
-                                        <div className="grid grid-cols-2 gap-2">
-                                            {subAreas[data.area]?.map((opt) => {
-                                                const isSelected = data.sub_area === opt;
-                                                return (
-                                                    <button
-                                                        key={opt}
-                                                        type="button"
-                                                        onClick={() => setData('sub_area', opt)}
-                                                        className={`rounded-xl border-2 px-4 py-3 text-sm font-medium transition-all active:scale-95 ${
-                                                            isSelected
-                                                                ? 'border-green-500 bg-green-50 text-green-700 shadow-sm'
-                                                                : 'border-gray-100 bg-gray-50 text-gray-600 hover:border-green-200 hover:bg-green-50/50'
-                                                        }`}
-                                                    >
-                                                        {opt}
-                                                    </button>
-                                                );
-                                            })}
+                        <div id="section-jenis-berat" className="rounded-2xl border border-green-100 bg-white p-5 shadow-sm">
+                            <div className="mb-4 flex items-center gap-2 text-sm font-medium text-green-700">
+                                <Trash2 className="h-4 w-4" />
+                                Jenis & Berat Sampah
+                            </div>
+                            <p className="-mt-2 mb-3 text-xs text-gray-500">Isi berat pada minimal 1 jenis sampah (boleh lebih dari satu)</p>
+
+                            <div className="divide-y divide-green-100 rounded-xl border border-green-100 overflow-hidden">
+                                {data.items.map((item, i) => (
+                                    <div key={item.jenis_sampah} className="flex items-center gap-3 px-4 py-2.5 bg-white even:bg-green-50/30">
+                                        <span className="min-w-0 flex-1 text-sm font-medium text-gray-700">{item.jenis_sampah}</span>
+                                        <div className="relative w-32 shrink-0">
+                                            <Input
+                                                type="number"
+                                                step="0.01"
+                                                min="0"
+                                                value={item.berat}
+                                                onChange={(e) => {
+                                                    const items = data.items.map((it, idx) =>
+                                                        idx === i ? { ...it, berat: e.target.value } : it
+                                                    );
+                                                    setData('items', items);
+                                                    setSubmitError('');
+                                                }}
+                                                placeholder="0.00"
+                                                inputMode="decimal"
+                                                onWheel={(e) => e.currentTarget.blur()}
+                                                className="h-10 border-green-200 pe-8 text-sm [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
+                                            />
+                                            <span className="pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 text-xs text-green-600">kg</span>
                                         </div>
-                                        <InputError message={errors.sub_area || subAreaError} />
                                     </div>
-                                )}
+                                ))}
+                            </div>
+
+                            {submitError && (
+                                <p className="mt-2 text-sm text-red-500">{submitError}</p>
+                            )}
+
+                            <div className="mt-3 flex items-center justify-between rounded-lg bg-green-100 px-4 py-2.5">
+                                <span className="text-sm font-medium text-green-700">
+                                    Total{filledCount > 0 ? ` (${filledCount} jenis)` : ''}
+                                </span>
+                                <span className="text-sm font-bold text-green-800">{totalBerat.toFixed(2)} kg</span>
                             </div>
                         </div>
                     </form>
@@ -289,7 +262,7 @@ const handleSubmit = (e: React.FormEvent) => {
                         </div>
                         <DialogTitle className="text-center text-green-800">Data Berhasil Disimpan</DialogTitle>
                         <DialogDescription className="text-center">
-                            oleh <span className="font-medium text-green-700">{submitted?.nama}</span>
+                            oleh <span className="font-medium text-green-700">{submitted?.nama as string}</span>
                         </DialogDescription>
                     </DialogHeader>
 
@@ -306,16 +279,20 @@ const handleSubmit = (e: React.FormEvent) => {
                             </span>
                         </div>
                         <div className="flex items-center justify-between px-4 py-2.5 text-sm">
-                            <span className="text-gray-500">Berat Sampah</span>
-                            <span className="font-medium text-gray-800">{String(submitted?.berat_sampah ?? '-')} kg</span>
-                        </div>
-                        <div className="flex items-center justify-between px-4 py-2.5 text-sm">
                             <span className="text-gray-500">Area</span>
                             <span className="font-medium text-gray-800">{String(submitted?.area ?? '-')}</span>
                         </div>
-                        <div className="flex items-center justify-between px-4 py-2.5 text-sm">
-                            <span className="text-gray-500">Sub Area</span>
-                            <span className="font-medium text-gray-800">{String(submitted?.sub_area ?? '-')}</span>
+
+                        {submittedItems?.map((item, i) => (
+                            <div key={i} className="flex items-center justify-between px-4 py-2 text-sm">
+                                <span className="text-gray-500">{item.jenis_sampah as string}</span>
+                                <span className="font-medium text-gray-800">{Number(item.berat_sampah).toFixed(2)} kg</span>
+                            </div>
+                        ))}
+
+                        <div className="flex items-center justify-between bg-green-100/50 px-4 py-2.5 text-sm font-semibold">
+                            <span className="text-green-700">Total</span>
+                            <span className="text-green-800">{Number(submitted?.total_berat ?? 0).toFixed(2)} kg</span>
                         </div>
                     </div>
 

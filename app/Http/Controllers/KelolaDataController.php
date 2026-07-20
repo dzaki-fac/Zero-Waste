@@ -22,15 +22,20 @@ class KelolaDataController extends Controller
         $validated = $request->validate([
             'area' => ['required', 'array', 'min:1'],
             'area.*' => ['required', 'string', 'distinct'],
-            'sub_area' => ['nullable', 'array'],
             'jenis_sampah' => ['required', 'array', 'min:1'],
             'jenis_sampah.*' => ['required', 'string', 'distinct'],
+            'subjenis_sampah' => ['required', 'array', 'min:1'],
+            'subjenis_sampah.*' => ['required', 'string', 'distinct'],
             'tujuan_distribusi' => ['required', 'array', 'min:1'],
             'tujuan_distribusi.*' => ['required', 'string', 'distinct'],
+            'rincian_area' => ['required', 'array', 'min:1'],
+            'rincian_area.*.nama' => ['required', 'string', 'distinct'],
+            'rincian_area.*.deskripsi' => ['nullable', 'string', 'max:255'],
+            'rincian_area.*.luas' => ['required', 'numeric', 'min:0'],
         ]);
 
         OptionHelper::save($validated);
 
-        return redirect()->route('settings.index');
+        return redirect()->route('settings.index')->with('success', 'Data berhasil disimpan.');
     }
 }

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Info, Scale, MapPin } from "lucide-react";
 import { C, display, body } from "../theme";
 import Navbar from "../components/Navbar";
@@ -36,7 +36,7 @@ const PENGERTIAN_ITEMS = [
     title: "Ruang Lingkup",
     shortDesc:
       "Ruang lingkup program mencakup seluruh area Perpustakaan Universitas Diponegoro, meliputi lantai satu hingga empat, area baca, ruang kantor, ruang pertemuan, toilet, teras, halaman, area parkir, dan UNDIP Press sebagai bagian dari lingkungan operasional perpustakaan.",
-    image: "https://media.licdn.com/dms/image/v2/D5622AQFDBxnm7ErF1Q/feedshare-shrink_800/feedshare-shrink_800/0/1714140945258?e=2147483647&v=beta&t=JZo_Kp9tUI-MTiZd3Z4R_SAqrW9NBQgwgV-KYUCYlX4",
+    image: "/perpus.jpeg",
   },
 ];
 
@@ -93,6 +93,8 @@ function PengertianContent() {
 }
 
 export default function PengertianPage() {
+  const appName = import.meta.env.VITE_APP_NAME || 'ZeroLib';
+  useEffect(() => { document.title = `Tentang ZeroLib - ${appName}`; }, []);
   return (
     <div style={{ ...body, backgroundColor: C.paper50, color: C.ink900 }} className="min-h-screen">
       <Navbar activeSection="pengertian" />

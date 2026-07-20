@@ -37,7 +37,17 @@ export default function Navbar({ activeSection, onNavItemClick }: NavbarProps) {
           {/* 3 logo disamain tingginya (h-9) & di-align tengah, apa pun
               markup internal tiap komponen logonya (img/svg) — [&>*] maksa
               elemen di dalamnya ikut tinggi wrapper & jaga rasio aslinya. */}
-          <div className="flex items-center gap-4">
+          <button
+            type="button"
+            onClick={() => {
+              if (location.pathname === "/") {
+                window.scrollTo({ top: 0, behavior: "smooth" });
+              } else {
+                navigate("/");
+              }
+            }}
+            className="flex items-center gap-4 cursor-pointer"
+          >
             <div className="h-9 flex items-center [&>*]:h-full [&>*]:w-auto">
               <UndipLogoIcon />
             </div>
@@ -47,7 +57,7 @@ export default function Navbar({ activeSection, onNavItemClick }: NavbarProps) {
             <div className="h-9 flex items-center [&>*]:h-full [&>*]:w-auto">
               <ZeroLibLogoIcon />
             </div>
-          </div>
+          </button>
 
           <nav className="hidden md:flex items-center gap-6 lg:gap-8">
             {NAV_ITEMS.map((n) => {

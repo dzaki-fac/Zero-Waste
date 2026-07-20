@@ -6,26 +6,23 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
     public function up(): void
     {
         Schema::create('checklist_pekerjaan', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('petugas_id')->constrained('users')->cascadeOnDelete();
+            $table->string('nip', 30);
             $table->date('tanggal');
             $table->string('tugas');
+            $table->string('area')->nullable();
+            $table->string('jenis_pekerjaan', 20);
+            $table->foreignId('master_pekerjaan_id')->nullable()->constrained('master_pekerjaan')->nullOnDelete();
             $table->enum('status', ['sudah', 'belum'])->default('belum');
             $table->timestamps();
 
-            $table->unique(['petugas_id', 'tanggal', 'tugas']);
+            $table->unique(['nip', 'tanggal', 'master_pekerjaan_id', 'area'], 'checklist_pekerjaan_unique');
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
         Schema::dropIfExists('checklist_pekerjaan');
