@@ -18,7 +18,7 @@ class OptionHelper
                 'Plastik berwarna', 'Plastik putih', 'Styrofoam', 'Botol',
                 'Kardus dan Kertas', 'B3', 'Lainnya',
             ],
-            'subjenis_sampah' => [
+            'jenis_detail' => [
                 'Daun', 'Ranting besar', 'Ranting kecil', 'Sisa makanan',
                 'Plastik berwarna', 'Plastik putih', 'Styrofoam', 'Kardus',
                 'Kertas', 'B3', 'Wadah', 'Botol', 'Tisu',

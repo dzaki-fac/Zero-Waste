@@ -5,7 +5,6 @@ import { TooltipProvider } from '@/components/ui/tooltip';
 import { initializeTheme } from '@/hooks/use-appearance';
 import AppLayout from '@/layouts/app-layout';
 import AuthLayout from '@/layouts/auth-layout';
-import FormLayout from '@/layouts/form-layout';
 import ScrollToTop from "./components/ScrollToTop";
 import SOPPage from "./pages/SOPPage";
 import PengertianPage from "./pages/pengertian";
@@ -23,7 +22,7 @@ createInertiaApp({
             case name.startsWith('login/'):
                 return AuthLayout;
             case name.startsWith('form/'):
-                return FormLayout;
+                return null;
             default:
                 return AppLayout;
         }

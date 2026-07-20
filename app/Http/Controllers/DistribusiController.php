@@ -56,7 +56,7 @@ class DistribusiController extends Controller
                 $distribusi = Distribusi::create([
                     'nama' => $nama,
                     'tanggal' => $request->input('tanggal'),
-                    'jenis_sampah' => $item['subjenis_sampah'],
+                    'jenis_sampah' => $item['jenis_sampah'],
                     'berat' => $berat,
                     'tujuan_distribusi' => $request->input('tujuan_distribusi'),
                     'lokasi' => $request->input('lokasi'),
@@ -185,7 +185,7 @@ class DistribusiController extends Controller
                     $record->nama,
                     $record->tanggal,
                     $record->berat,
-                    $record->subjenis_sampah ?? $record->jenis_sampah,
+                    $record->jenis_sampah,
                     $record->tujuan_distribusi,
                     $record->lokasi,
                     $statusLabels[$record->review_status] ?? 'Menunggu Review',

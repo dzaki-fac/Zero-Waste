@@ -27,7 +27,6 @@ type Penimbangan = {
     tanggal: string;
     berat_sampah: string;
     jenis_sampah: string | null;
-    subjenis_sampah: string | null;
     area: string;
 };
 
@@ -346,7 +345,7 @@ export default function PenimbanganIndex({ penimbangan }: Props) {
                                                 </TableCell>
                                                 <TableCell>
                                                     <span className="inline-flex items-center rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-medium text-green-700">
-                                                        {item.jenis_sampah ?? item.subjenis_sampah ?? '-'}
+                                                        {item.jenis_sampah ?? '-'}
                                                     </span>
                                                 </TableCell>
                                                 <TableCell>

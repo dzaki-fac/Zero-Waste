@@ -18,17 +18,17 @@ type RincianArea = {
 type Options = {
     area: string[];
     jenis_sampah: string[];
-    subjenis_sampah: string[];
+    jenis_detail: string[];
     tujuan_distribusi: string[];
     rincian_area: RincianArea[];
 };
 
-type ListKey = 'area' | 'jenis_sampah' | 'tujuan_distribusi';
+type ListKey = 'area' | 'jenis_sampah' | 'jenis_detail' | 'tujuan_distribusi';
 
 const sections: { key: ListKey; label: string; title: string; placeholder: string }[] = [
     { key: 'area', label: 'Area', title: 'Tambah Area', placeholder: 'Masukkan nama area' },
     { key: 'jenis_sampah', label: 'Jenis Sampah', title: 'Tambah Jenis Sampah', placeholder: 'Masukkan nama jenis sampah' },
-    { key: 'subjenis_sampah', label: 'Sub Jenis Sampah', title: 'Tambah Sub Jenis Sampah', placeholder: 'Masukkan nama sub jenis sampah' },
+    { key: 'jenis_detail', label: 'Jenis Detail', title: 'Tambah Jenis Detail', placeholder: 'Masukkan nama jenis detail' },
     { key: 'tujuan_distribusi', label: 'Tujuan Distribusi', title: 'Tambah Tujuan Distribusi', placeholder: 'Masukkan nama tujuan distribusi' },
 ];
 
@@ -103,7 +103,7 @@ export default function Settings() {
 
     const openRemove = (key: ListKey, i: number) => {
         const name = options[key][i];
-        const labelMap: Record<ListKey, string> = { area: 'area', jenis_sampah: 'jenis sampah', subjenis_sampah: 'sub jenis sampah', tujuan_distribusi: 'tujuan distribusi' };
+        const labelMap: Record<ListKey, string> = { area: 'area', jenis_sampah: 'jenis sampah', jenis_detail: 'jenis detail', tujuan_distribusi: 'tujuan distribusi' };
         setConfirm({
             open: true,
             title: 'Hapus Data',
@@ -133,7 +133,7 @@ export default function Settings() {
             <Head title="Pengaturan Data" />
 
             <div className="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
-                <Heading title="Pengaturan Data" description="Kelola area, jenis sampah, sub jenis sampah, dan tujuan distribusi" />
+                <Heading title="Pengaturan Data" description="Kelola area, jenis sampah, jenis detail, dan tujuan distribusi" />
 
                 {showSuccess && success && (
                     <div className="flex items-center gap-3 rounded-lg border border-green-300 bg-green-50 px-4 py-3 text-sm text-green-800 shadow-sm transition-opacity duration-300">

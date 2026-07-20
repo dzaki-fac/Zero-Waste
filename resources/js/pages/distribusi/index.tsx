@@ -88,12 +88,12 @@ const currentYear = new Date().getFullYear();
 const years = Array.from({ length: 11 }, (_, i) => currentYear - i);
 
 export default function DistribusiIndex({ distribusi }: Props) {
-    const { auth, options } = usePage().props as unknown as { auth: Auth; options: { jenis_sampah: string[]; subjenis_sampah: string[]; tujuan_distribusi: string[] } };
+    const { auth, options } = usePage().props as unknown as { auth: Auth; options: { jenis_sampah: string[]; jenis_detail: string[]; tujuan_distribusi: string[] } };
     const prefix = auth.user.role === 'admin' ? '/admin' : '/petugas';
     const isAdmin = auth.user.role === 'admin';
 
     const jenisSampahOptions = options.jenis_sampah;
-    const subjenisSampahOptions = options.subjenis_sampah;
+    const jenisDetailOptions = options.jenis_detail;
     const tujuanOptions = options.tujuan_distribusi;
 
     const [search, setSearch] = useState('');
@@ -300,11 +300,11 @@ export default function DistribusiIndex({ distribusi }: Props) {
                             </div>
                             <Select value={filterJenis} onValueChange={setFilterJenis}>
                                 <SelectTrigger className="w-full sm:w-[200px] border-green-200 focus-visible:border-green-500 focus-visible:ring-green-500/20">
-                                    <SelectValue placeholder="Semua Subjenis" />
+                                    <SelectValue placeholder="Semua Jenis" />
                                 </SelectTrigger>
                                 <SelectContent>
-                                    <SelectItem value="all">Semua Subjenis</SelectItem>
-                                    {subjenisSampahOptions.map((j) => (
+                                    <SelectItem value="all">Semua Jenis</SelectItem>
+                                    {jenisDetailOptions.map((j) => (
                                         <SelectItem key={j} value={j}>{j}</SelectItem>
                                     ))}
                                 </SelectContent>
@@ -437,7 +437,7 @@ export default function DistribusiIndex({ distribusi }: Props) {
                                         <TableHead className="text-green-700">Nama</TableHead>
                                         <TableHead className="text-green-700">Tanggal</TableHead>
                                         <TableHead className="text-green-700">Berat (kg)</TableHead>
-                                        <TableHead className="text-green-700">Subjenis</TableHead>
+                                        <TableHead className="text-green-700">Jenis</TableHead>
                                         <TableHead className="text-green-700">Tujuan</TableHead>
                                         <TableHead className="text-green-700">Lokasi</TableHead>
                                         <TableHead className="text-green-700">Status</TableHead>

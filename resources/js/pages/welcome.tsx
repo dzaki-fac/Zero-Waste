@@ -91,7 +91,7 @@ export default function Welcome() {
                     <img
                 src="/logo-zerolib.png"
                 alt="ZeroLib"
-                className="h-auto w-[420px] max-w-none translate-y-4 scale-[1.35] object-contain object-center"
+                className="h-auto w-full max-w-[420px] object-contain object-center"
                 loading="eager"
                 draggable={false}
             />

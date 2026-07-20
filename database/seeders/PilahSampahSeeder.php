@@ -12,7 +12,7 @@ class PilahSampahSeeder extends Seeder
     public function run(): void
     {
         $petugas = User::where('role', 'petugas')->get()->keyBy('name');
-        $subjenisSampah = [
+        $jenisSampah = [
             'Daun', 'Ranting besar', 'Ranting kecil', 'Sisa makanan',
             'Plastik berwarna', 'Plastik putih', 'Styrofoam', 'Kardus',
             'Kertas', 'B3', 'Wadah', 'Botol', 'Tisu',
@@ -38,7 +38,7 @@ class PilahSampahSeeder extends Seeder
                 'user_id' => $petugasUser->id,
                 'tanggal' => fake()->dateTimeBetween('-3 months', 'now'),
                 'berat' => $weights[$i],
-                'subjenis_sampah' => fake()->randomElement($subjenisSampah),
+                'jenis_sampah' => fake()->randomElement($jenisSampah),
             ]);
         }
     }

@@ -19,7 +19,7 @@ class KelolaDataSeeder extends Seeder
                 'Plastik Kresek & Bungkus', 'Sampah Tisu', 'Kaleng & Botol Kaca',
                 'Sisa Makanan', 'Plastik Botol & Wadah', 'Styrofoam', 'Daun', 'Ranting',
             ],
-            'subjenis_sampah' => [
+            'jenis_detail' => [
                 'Daun', 'Ranting besar', 'Ranting kecil', 'Sisa makanan',
                 'Plastik berwarna', 'Plastik putih', 'Styrofoam', 'Kardus',
                 'Kertas', 'B3', 'Wadah', 'Botol', 'Tisu',
