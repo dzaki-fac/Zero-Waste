@@ -872,7 +872,21 @@ export default function Dashboard() {
               }}
             >
               <SectionLabel hideLine>
-                <span style={{ color: C.gold500, fontSize: "0.65rem" }}>Sistem Informasi Pengelolaan Sampah</span>
+                {/* text-shadow dua layar: layar pertama (0 1px 3px, lebih
+                    pekat/rapat) bikin outline tipis di sekeliling huruf
+                    supaya tetap kebaca walau background-nya terang; layar
+                    kedua (0 1px 8px, lebih blur/menyebar) bikin semacam
+                    "glow" gelap di sekitarnya buat nambah kontras tanpa
+                    keliatan kayak ada kotak hitam kaku di belakang teks. */}
+                <span
+                  style={{
+                    color: C.gold500,
+                    fontSize: "0.65rem",
+                    textShadow: "0 1px 3px rgba(0,0,0,0.9), 0 1px 8px rgba(0,0,0,0.6)",
+                  }}
+                >
+                  Sistem Informasi Pengelolaan Sampah
+                </span>
               </SectionLabel>
               <h1 key={activeHero.title} className="text-xl sm:text-3xl lg:text-4xl font-semibold max-w-4xl leading-tight text-white mb-2 sm:mb-3 hero-fade whitespace-normal" style={display}>
                 {activeHero.title}
