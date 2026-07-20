@@ -1,3 +1,4 @@
+import { Head } from '@inertiajs/react';
 import React, { useState, useRef, useEffect, useLayoutEffect, type ReactNode, type CSSProperties } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import type { LucideIcon } from "lucide-react";
@@ -791,7 +792,9 @@ export default function Dashboard() {
   const heroParallax = Math.min(scrollY * 0.18, 120);
 
   return (
-    <div style={{ ...body, backgroundColor: C.paper50, color: C.ink900 }} className="min-h-screen">
+    <>
+      <Head title="Beranda" />
+      <div style={{ ...body, backgroundColor: C.paper50, color: C.ink900 }} className="min-h-screen">
       <style>{`
         html { scroll-behavior: smooth; }
         * { overflow-anchor: none; }
@@ -1247,5 +1250,6 @@ export default function Dashboard() {
         </div>
       </footer>
     </div>
+    </>
   );
 }

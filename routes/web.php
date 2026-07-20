@@ -46,6 +46,7 @@ Route::middleware(['auth', CheckRole::class . ':admin'])
     ->prefix('admin')
     ->name('admin.')
     ->group(function () {
+        Route::get('/', [DashboardController::class, 'index']);
         Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
         Route::get('penimbangan/export', [PenimbanganController::class, 'export'])->name('penimbangan.export');

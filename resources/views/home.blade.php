@@ -31,7 +31,7 @@
 
         @viteReactRefresh
         @vite(['resources/css/app.css', 'resources/js/main.tsx'])
-        <title>{{ config('app.name', 'Laravel') }}</title>
+        <title>{{ config('app.name', 'ZeroLib') }}</title>
     </head>
     <body class="font-sans antialiased">
         <div id="app"></div>
