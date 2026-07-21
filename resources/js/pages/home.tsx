@@ -1,5 +1,6 @@
 import { Head } from '@inertiajs/react';
 import { usePage, router } from '@inertiajs/react';
+import { baseUrl } from '@/lib/path';
 import type { LucideIcon } from "lucide-react";
 import {
   Recycle,
@@ -586,7 +587,7 @@ query.start_date = params.start_date;
 query.end_date = params.end_date;
 }
 
-        router.get('/', query, { preserveState: true, preserveScroll: true, replace: true });
+        router.get(baseUrl('/'), query, { preserveState: true, preserveScroll: true, replace: true });
     }
 
     function handlePreset(preset: typeof PRESETS[number]) {

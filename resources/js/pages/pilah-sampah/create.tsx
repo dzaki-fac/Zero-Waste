@@ -4,6 +4,7 @@ import { useState } from 'react';
 import Heading from '@/components/heading';
 import InputError from '@/components/input-error';
 import { Button } from '@/components/ui/button';
+import { baseUrl } from '@/lib/path';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 
@@ -29,7 +30,7 @@ export default function PilahSampahCreate() {
 
     const [submitError, setSubmitError] = useState('');
 
-    const prefix = auth.user.role === 'admin' ? '/admin' : '/petugas';
+    const prefix = baseUrl(auth.user.role === 'admin' ? '/admin' : '/petugas');
     const totalBerat = data.items.reduce((sum, item) => sum + (parseFloat(item.berat) || 0), 0);
     const filledCount = data.items.filter((item) => parseFloat(item.berat) > 0).length;
 

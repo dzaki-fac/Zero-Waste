@@ -4,6 +4,7 @@ import { useState, useMemo } from 'react';
 import Heading from '@/components/heading';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { baseUrl } from '@/lib/path';
 import {
     Select,
     SelectContent,
@@ -39,7 +40,7 @@ const years = Array.from({ length: 11 }, (_, i) => currentYear - i);
 
 export default function PilahSampahIndex({ pilahSampah }: Props) {
     const { auth, options } = usePage().props as unknown as { auth: Auth; options: { jenis_sampah: string[]; jenis_detail: string[] } };
-    const prefix = auth.user.role === 'admin' ? '/admin' : '/petugas';
+    const prefix = baseUrl(auth.user.role === 'admin' ? '/admin' : '/petugas');
     const [search, setSearch] = useState('');
     const [filterJenis, setFilterJenis] = useState('all');
     const jenisDetailOptions = options.jenis_detail;
