@@ -1,10 +1,10 @@
-import { useEffect, useRef, useState, useCallback } from 'react';
 import { Head, Link, router } from '@inertiajs/react';
 import { ArrowLeft, CalendarDays, CheckCircle2, Circle } from 'lucide-react';
+import { useEffect, useRef, useState, useCallback } from 'react';
+import ChecklistProgress from '@/components/checklist-progress';
 import Heading from '@/components/heading';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
-import ChecklistProgress from '@/components/checklist-progress';
 import {
     Table,
     TableBody,
@@ -78,7 +78,11 @@ const jenisLabel = (val: string) => {
         case 'bulanan': return 'Bulanan';
         default: {
             const s = val.charAt(0).toUpperCase() + val.slice(1).toLowerCase();
-            if (s === 'Harian' || s === 'Mingguan' || s === 'Bulanan') return s;
+
+            if (s === 'Harian' || s === 'Mingguan' || s === 'Bulanan') {
+return s;
+}
+
             return 'Tidak Diketahui';
         }
     }
@@ -169,7 +173,9 @@ export default function ChecklistPekerjaanShow({ petugas, tanggal, masterTasks, 
         const date = selectedDateRef.current;
         const nip = petugasNipRef.current;
 
-        if (!area || !nip) return;
+        if (!area || !nip) {
+return;
+}
 
         router.post(
             '/admin/checklist-pekerjaan',
@@ -187,7 +193,10 @@ export default function ChecklistPekerjaanShow({ petugas, tanggal, masterTasks, 
     }, []);
 
     const scheduleSave = useCallback((updated: ChecklistItem[]) => {
-        if (debounceRef.current) clearTimeout(debounceRef.current);
+        if (debounceRef.current) {
+clearTimeout(debounceRef.current);
+}
+
         debounceRef.current = setTimeout(() => {
             doSave(updated);
         }, 200);
@@ -196,6 +205,7 @@ export default function ChecklistPekerjaanShow({ petugas, tanggal, masterTasks, 
     const toggleStatus = (masterId: number) => {
         if (!areaSelected) {
             setAreaAlert(true);
+
             return;
         }
 
@@ -206,6 +216,7 @@ export default function ChecklistPekerjaanShow({ petugas, tanggal, masterTasks, 
                     : item,
             );
             scheduleSave(updated);
+
             return updated;
         });
     };
@@ -213,15 +224,21 @@ export default function ChecklistPekerjaanShow({ petugas, tanggal, masterTasks, 
     const handleDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const newDate = e.target.value;
         setSelectedDate(newDate);
+
         if (readOnly) {
             router.get(
                 baseUrl,
                 { tanggal: newDate, jenis: activeFilter ?? undefined, area: activeArea || undefined },
                 { preserveState: false, preserveScroll: true },
             );
+
             return;
         }
-        if (!petugas.nip) return;
+
+        if (!petugas.nip) {
+return;
+}
+
         router.get(
             `/admin/checklist-pekerjaan/${petugas.nip}`,
             { tanggal: newDate, jenis: activeFilter ?? undefined, area: activeArea || undefined },
@@ -234,15 +251,21 @@ export default function ChecklistPekerjaanShow({ petugas, tanggal, masterTasks, 
 
     const handleFilterChange = (value: string | null) => {
         setActiveFilter(value);
+
         if (readOnly) {
             router.get(
                 baseUrl,
                 { tanggal: selectedDate, jenis: value ?? undefined, area: activeArea || undefined },
                 { preserveState: true, preserveScroll: true },
             );
+
             return;
         }
-        if (!petugas.nip) return;
+
+        if (!petugas.nip) {
+return;
+}
+
         router.get(
             `/admin/checklist-pekerjaan/${petugas.nip}`,
             { tanggal: selectedDate, jenis: value ?? undefined, area: activeArea || undefined },
@@ -253,15 +276,21 @@ export default function ChecklistPekerjaanShow({ petugas, tanggal, masterTasks, 
     const handleAreaChange = (value: string) => {
         setActiveArea(value);
         setAreaAlert(false);
+
         if (readOnly) {
             router.get(
                 baseUrl,
                 { tanggal: selectedDate, jenis: activeFilter ?? undefined, area: value || undefined },
                 { preserveState: false, preserveScroll: true },
             );
+
             return;
         }
-        if (!petugas.nip) return;
+
+        if (!petugas.nip) {
+return;
+}
+
         router.get(
             `/admin/checklist-pekerjaan/${petugas.nip}`,
             { tanggal: selectedDate, jenis: activeFilter ?? undefined, area: value || undefined },
@@ -281,6 +310,7 @@ export default function ChecklistPekerjaanShow({ petugas, tanggal, masterTasks, 
                 const tb = masterTasks.find((t) => t.id === b.master_pekerjaan_id);
                 const ua = ta?.urutan ?? 0;
                 const ub = tb?.urutan ?? 0;
+
                 return ua - ub || a.master_pekerjaan_id - b.master_pekerjaan_id;
             });
 
@@ -296,8 +326,12 @@ export default function ChecklistPekerjaanShow({ petugas, tanggal, masterTasks, 
     const allTotal = items.length;
 
     const counterText = () => {
-        if (!activeFilter) return `${doneFiltered} / ${totalFiltered}`;
+        if (!activeFilter) {
+return `${doneFiltered} / ${totalFiltered}`;
+}
+
         const label = jenisLabel(activeFilter);
+
         return `${doneFiltered} / ${totalFiltered} ${label}`;
     };
 
@@ -396,7 +430,10 @@ export default function ChecklistPekerjaanShow({ petugas, tanggal, masterTasks, 
 
                 {GROUP_ORDER.map((key) => {
                     const groupItems = grouped[key];
-                    if (groupItems.length === 0 && activeFilter !== null && activeFilter !== key) return null;
+
+                    if (groupItems.length === 0 && activeFilter !== null && activeFilter !== key) {
+return null;
+}
 
                     if (groupItems.length === 0) {
                         return (
@@ -439,6 +476,7 @@ export default function ChecklistPekerjaanShow({ petugas, tanggal, masterTasks, 
                                 <TableBody>
                                     {groupItems.map((item) => {
                                         const task = masterTasks.find((t) => t.id === item.master_pekerjaan_id);
+
                                         return (
                                             <TableRow key={item.master_pekerjaan_id} className="border-green-100">
                                                 <TableCell className="align-top pt-4">

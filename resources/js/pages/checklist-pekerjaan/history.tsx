@@ -1,6 +1,6 @@
-import { useState } from 'react';
 import { Head, Link, router } from '@inertiajs/react';
 import { ArrowLeft, CalendarDays, FileDown } from 'lucide-react';
+import { useState } from 'react';
 import Heading from '@/components/heading';
 import { Button } from '@/components/ui/button';
 import {
@@ -14,11 +14,16 @@ import {
 
 const formatDate = (dateStr: string) => {
     const [y, m, d] = dateStr.split('-');
-    if (!y || !m || !d) return dateStr;
+
+    if (!y || !m || !d) {
+return dateStr;
+}
+
     const months = [
         'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni',
         'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember',
     ];
+
     return `${parseInt(d)} ${months[parseInt(m) - 1]} ${y}`;
 };
 

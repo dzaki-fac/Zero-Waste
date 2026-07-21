@@ -1,9 +1,9 @@
-import { useState, useEffect } from "react";
 import { Info, Scale, MapPin } from "lucide-react";
-import { C, display, body } from "../theme";
-import Navbar from "../components/Navbar";
+import { useState, useEffect } from "react";
 import Footer from "../components/Footer";
+import Navbar from "../components/Navbar";
 import { Reveal, SafeImage } from "../components/shared";
+import { C, display, body } from "../theme";
 
 const PENGERTIAN_ITEMS = [
   {
@@ -50,6 +50,7 @@ function useHasHover() {
     setHasHover(mql.matches);
     const handleChange = (e: MediaQueryListEvent) => setHasHover(e.matches);
     mql.addEventListener("change", handleChange);
+
     return () => mql.removeEventListener("change", handleChange);
   }, []);
 
@@ -125,7 +126,10 @@ function PengertianContent() {
 
 export default function PengertianPage() {
   const appName = import.meta.env.VITE_APP_NAME || 'ZeroLib';
-  useEffect(() => { document.title = `Tentang ZeroLib - ${appName}`; }, []);
+  useEffect(() => {
+ document.title = `Tentang ZeroLib - ${appName}`; 
+}, []);
+
   return (
     <div style={{ ...body, backgroundColor: C.paper50, color: C.ink900 }} className="min-h-screen">
       <Navbar activeSection="pengertian" />

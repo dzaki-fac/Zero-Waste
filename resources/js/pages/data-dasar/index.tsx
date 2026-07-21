@@ -1,12 +1,11 @@
-import { useState } from 'react';
 import { Head, useForm } from '@inertiajs/react';
 import { CheckCircle2, Edit3, FileDown, Leaf, MapPin, Save, X } from 'lucide-react';
+import { useState } from 'react';
 import Heading from '@/components/heading';
 import InputError from '@/components/input-error';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
 import {
     Select,
     SelectContent,
@@ -14,6 +13,7 @@ import {
     SelectTrigger,
     SelectValue,
 } from '@/components/ui/select';
+import { Textarea } from '@/components/ui/textarea';
 
 type JenisSampahItem = {
     kategori: string;
@@ -163,6 +163,7 @@ export default function DataDasarIndex({ dataDasar, rincianArea: rincianAreaProp
             setRincianArea(rincianAreaProp);
             setData('rincian_area', rincianAreaProp);
         }
+
         setIsEditing(true);
     };
 
@@ -1052,6 +1053,7 @@ function DataValue({
     suffix: string;
 }) {
     const num = Number(value);
+
     return value !== '' && value !== null && value !== undefined ? (
         <span className="text-sm font-medium tabular-nums text-green-900">
             {isNaN(num) ? value : num.toLocaleString('id-ID')}{' '}
@@ -1080,6 +1082,7 @@ function NumberInput({
                 value={value}
                 onChange={(e) => {
                     const v = e.target.value;
+
                     if (v === '' || Number(v) >= 0) {
                         onChange(v);
                     }

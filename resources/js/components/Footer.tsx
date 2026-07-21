@@ -42,6 +42,7 @@ export default function Footer() {
             <div className="flex flex-col gap-3">
               {KONTAK.map((k, i) => {
                 const KIcon = k.icon;
+
                 return (
                   <div key={i} className="flex items-start gap-3">
                     <span className="w-8 h-8 rounded-full flex items-center justify-center shrink-0" style={{ backgroundColor: C.navy800 }}>
@@ -74,6 +75,7 @@ export default function Footer() {
             <div className="flex items-center gap-3">
               {SOCIALS.map((s, i) => {
                 const SIcon = s.icon;
+
                 return (
                   <a
                     key={i}
@@ -83,8 +85,12 @@ export default function Footer() {
                     aria-label={s.label}
                     className="w-10 h-10 rounded-full flex items-center justify-center shrink-0 border transition-colors"
                     style={{ backgroundColor: C.navy800, borderColor: C.navy700 }}
-                    onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = C.navy700; e.currentTarget.style.borderColor = C.leaf500; }}
-                    onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = C.navy800; e.currentTarget.style.borderColor = C.navy700; }}
+                    onMouseEnter={(e) => {
+ e.currentTarget.style.backgroundColor = C.navy700; e.currentTarget.style.borderColor = C.leaf500; 
+}}
+                    onMouseLeave={(e) => {
+ e.currentTarget.style.backgroundColor = C.navy800; e.currentTarget.style.borderColor = C.navy700; 
+}}
                   >
                     <SIcon size={16} color={C.leaf400} />
                   </a>

@@ -1,8 +1,8 @@
+import { Menu, X } from "lucide-react";
 import { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import { Menu, X } from "lucide-react";
-import { C, display } from "../theme";
 import { NAV_ITEMS, PAGE_ROUTES } from "../navData";
+import { C, display } from "../theme";
 import UndipLogoIcon from "./Undiplogoicon";
 import UptLogoIcon from "./Uptlogoicon";
 import ZeroLibLogoIcon from "./Zeroliblogoicon";
@@ -19,6 +19,7 @@ export default function Navbar({ activeSection, onNavItemClick }: NavbarProps) {
 
   const handleNavClick = (id: string) => {
     setMobileNavOpen(false);
+
     if (PAGE_ROUTES[id]) {
       navigate(PAGE_ROUTES[id]);
     } else if (location.pathname !== "/") {
@@ -64,14 +65,23 @@ export default function Navbar({ activeSection, onNavItemClick }: NavbarProps) {
           <nav className="hidden md:flex items-center gap-6 lg:gap-8 shrink-0">
             {NAV_ITEMS.map((n) => {
               const active = activeSection === n.id;
+
               return (
                 <button
                   key={n.id}
                   onClick={() => handleNavClick(n.id)}
                   className="relative py-2 text-sm font-semibold tracking-wide transition-colors"
                   style={{ ...display, color: active ? C.leaf500 : C.ink500 }}
-                  onMouseEnter={(e) => { if (!active) e.currentTarget.style.color = C.leaf500; }}
-                  onMouseLeave={(e) => { if (!active) e.currentTarget.style.color = C.ink500; }}
+                  onMouseEnter={(e) => {
+ if (!active) {
+e.currentTarget.style.color = C.leaf500;
+} 
+}}
+                  onMouseLeave={(e) => {
+ if (!active) {
+e.currentTarget.style.color = C.ink500;
+} 
+}}
                 >
                   {n.label}
                   <span
@@ -147,6 +157,7 @@ export default function Navbar({ activeSection, onNavItemClick }: NavbarProps) {
           <div className="px-5 pb-4 pt-1 flex flex-col gap-1">
             {NAV_ITEMS.map((n, i) => {
               const active = activeSection === n.id;
+
               return (
                 <button
                   key={n.id}

@@ -48,8 +48,10 @@ export default function Settings() {
     const initRincianArea = (): RincianArea[] => {
         const existing = options.rincian_area ?? [];
         const areaNames = options.area ?? [];
+
         return areaNames.map((nama) => {
             const found = existing.find((r) => r.nama === nama);
+
             return found ?? { nama, deskripsi: '', luas: 0 };
         });
     };
@@ -68,6 +70,7 @@ export default function Settings() {
         if (success) {
             setShowSuccess(true);
             const timer = setTimeout(() => setShowSuccess(false), 3500);
+
             return () => clearTimeout(timer);
         }
     }, [success]);
@@ -86,7 +89,10 @@ export default function Settings() {
 
     const addItem = () => {
         const name = newItem.trim();
-        if (!name || options[activeKey].includes(name)) return;
+
+        if (!name || options[activeKey].includes(name)) {
+return;
+}
 
         const next = { ...options, [activeKey]: [...options[activeKey], name] };
 
@@ -249,7 +255,9 @@ export default function Settings() {
                             placeholder={current.placeholder}
                             className="h-12 text-base"
                             onKeyDown={(e) => {
-                                if (e.key === 'Enter') addItem();
+                                if (e.key === 'Enter') {
+addItem();
+}
                             }}
                             autoFocus
                         />
@@ -275,7 +283,9 @@ export default function Settings() {
                         <Button type="button" variant="outline" onClick={() => setConfirm((c) => ({ ...c, open: false }))}>
                             Batal
                         </Button>
-                        <Button type="button" className="bg-red-600 text-white hover:bg-red-700" onClick={() => { confirm.onConfirm(); setConfirm((c) => ({ ...c, open: false })); }}>
+                        <Button type="button" className="bg-red-600 text-white hover:bg-red-700" onClick={() => {
+ confirm.onConfirm(); setConfirm((c) => ({ ...c, open: false })); 
+}}>
                             Hapus
                         </Button>
                     </DialogFooter>

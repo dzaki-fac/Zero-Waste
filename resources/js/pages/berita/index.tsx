@@ -3,6 +3,7 @@ import { Globe, Pencil, Plus, Trash2 } from 'lucide-react';
 import { useState } from 'react';
 import Heading from '@/components/heading';
 import { Button } from '@/components/ui/button';
+import { Checkbox } from '@/components/ui/checkbox';
 import {
     Dialog,
     DialogContent,
@@ -13,7 +14,6 @@ import {
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Checkbox } from '@/components/ui/checkbox';
 import {
     Table,
     TableBody,
@@ -76,7 +76,11 @@ export default function KelolaBerita({ news }: Props) {
             preserveScroll: true,
             onSuccess: () => {
                 setAddOpen(false);
-                if (imagePreview) URL.revokeObjectURL(imagePreview);
+
+                if (imagePreview) {
+URL.revokeObjectURL(imagePreview);
+}
+
                 setImagePreview(null);
                 addForm.reset();
             },
@@ -101,7 +105,11 @@ export default function KelolaBerita({ news }: Props) {
 
     function handleEdit(e: React.FormEvent) {
         e.preventDefault();
-        if (!editingItem) return;
+
+        if (!editingItem) {
+return;
+}
+
         editForm.patch(`/admin/berita/${editingItem.id}`, {
             preserveScroll: true,
             onSuccess: () => {
@@ -112,7 +120,10 @@ export default function KelolaBerita({ news }: Props) {
     }
 
     function handleDelete() {
-        if (!deletingItem) return;
+        if (!deletingItem) {
+return;
+}
+
         setDeleteError(null);
         setDeleteProcessing(true);
         router.delete(`/admin/berita/${deletingItem.id}`, {
@@ -144,7 +155,11 @@ export default function KelolaBerita({ news }: Props) {
                         onClick={() => {
                             addForm.reset();
                             addForm.clearErrors();
-                            if (imagePreview) URL.revokeObjectURL(imagePreview);
+
+                            if (imagePreview) {
+URL.revokeObjectURL(imagePreview);
+}
+
                             setImagePreview(null);
                             setAddOpen(true);
                         }}
@@ -196,7 +211,9 @@ export default function KelolaBerita({ news }: Props) {
                                                         src={item.image_url}
                                                         alt="preview"
                                                         className="size-10 rounded-md object-cover border border-green-100"
-                                                        onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = 'none'; }}
+                                                        onError={(e) => {
+ (e.currentTarget as HTMLImageElement).style.display = 'none'; 
+}}
                                                     />
                                                 ) : (
                                                     <span className="text-xs text-green-400">-</span>
@@ -317,13 +334,20 @@ export default function KelolaBerita({ news }: Props) {
                                 accept="image/jpeg,image/png,image/jpg,image/webp"
                                 onChange={(e) => {
                                     const file = e.target.files?.[0] ?? null;
+
                                     if (file && file.size > 2 * 1024 * 1024) {
                                         alert('Ukuran gambar terlalu besar. Maksimal 2 MB.');
                                         e.target.value = '';
+
                                         return;
                                     }
+
                                     addForm.setData('image', file);
-                                    if (imagePreview) URL.revokeObjectURL(imagePreview);
+
+                                    if (imagePreview) {
+URL.revokeObjectURL(imagePreview);
+}
+
                                     setImagePreview(file ? URL.createObjectURL(file) : null);
                                 }}
                                 required
@@ -465,7 +489,9 @@ export default function KelolaBerita({ news }: Props) {
                                     src={editForm.data.image_url}
                                     alt="preview"
                                     className="mt-1 h-20 rounded-md object-cover border border-green-100"
-                                    onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = 'none'; }}
+                                    onError={(e) => {
+ (e.currentTarget as HTMLImageElement).style.display = 'none'; 
+}}
                                 />
                             )}
                         </div>
@@ -525,7 +551,13 @@ export default function KelolaBerita({ news }: Props) {
                 </DialogContent>
             </Dialog>
 
-            <Dialog open={deleteOpen} onOpenChange={(open) => { if (!open) { setDeleteError(null); } setDeleteOpen(open); }}>
+            <Dialog open={deleteOpen} onOpenChange={(open) => {
+ if (!open) {
+ setDeleteError(null); 
+}
+
+ setDeleteOpen(open); 
+}}>
                 <DialogContent className="sm:max-w-sm">
                     <DialogHeader>
                         <DialogTitle>Hapus Berita</DialogTitle>
@@ -544,7 +576,9 @@ export default function KelolaBerita({ news }: Props) {
                     <DialogFooter>
                         <Button
                             variant="outline"
-                            onClick={() => { setDeleteError(null); setDeleteOpen(false); }}
+                            onClick={() => {
+ setDeleteError(null); setDeleteOpen(false); 
+}}
                             disabled={deleteProcessing}
                             className="border-green-200 text-green-700 hover:bg-green-50"
                         >

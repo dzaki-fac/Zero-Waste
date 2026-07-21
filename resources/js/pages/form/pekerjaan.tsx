@@ -1,6 +1,6 @@
-import { useEffect, useRef, useState } from 'react';
 import { Head, Link, router, usePage } from '@inertiajs/react';
 import { ArrowLeft, CalendarDays, CheckCircle2, Circle, MapPin } from 'lucide-react';
+import { useEffect, useRef, useState } from 'react';
 import Heading from '@/components/heading';
 import { Button } from '@/components/ui/button';
 
@@ -84,7 +84,10 @@ export default function FormPekerjaan() {
     }, [masterTasks, checklist]);
 
     const scheduleSave = (updated: ChecklistItem[]) => {
-        if (debounceRef.current) clearTimeout(debounceRef.current);
+        if (debounceRef.current) {
+clearTimeout(debounceRef.current);
+}
+
         debounceRef.current = setTimeout(() => {
             router.post(
                 '/form/checklist-pekerjaan',
@@ -106,8 +109,10 @@ export default function FormPekerjaan() {
     const toggleStatus = (masterId: number) => {
         if (!activeArea) {
             setAreaAlert(true);
+
             return;
         }
+
         setAreaAlert(false);
 
         setItems((prev) => {
@@ -117,6 +122,7 @@ export default function FormPekerjaan() {
                     : item,
             );
             scheduleSave(updated);
+
             return updated;
         });
     };
@@ -151,6 +157,7 @@ export default function FormPekerjaan() {
             .sort((a, b) => {
                 const ta = masterTasks.find((t) => t.id === a.master_pekerjaan_id);
                 const tb = masterTasks.find((t) => t.id === b.master_pekerjaan_id);
+
                 return (ta?.urutan ?? 0) - (tb?.urutan ?? 0);
             });
 
@@ -193,6 +200,7 @@ export default function FormPekerjaan() {
                             <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
                                 {areas.map((area) => {
                                     const isSelected = activeArea === area;
+
                                     return (
                                         <button
                                             key={area}
@@ -228,7 +236,10 @@ export default function FormPekerjaan() {
 
                         {GROUP_ORDER.map((key) => {
                             const groupItems = grouped[key];
-                            if (groupItems.length === 0) return null;
+
+                            if (groupItems.length === 0) {
+return null;
+}
 
                             return (
                                 <div key={key} className="rounded-2xl border border-green-100 bg-white shadow-sm overflow-hidden">
@@ -245,6 +256,7 @@ export default function FormPekerjaan() {
                                         {groupItems.map((item) => {
                                             const task = masterTasks.find((t) => t.id === item.master_pekerjaan_id);
                                             const checked = item.status === 'sudah';
+
                                             return (
                                                 <label
                                                     key={item.master_pekerjaan_id}

@@ -39,6 +39,7 @@ export default function PilahSampahEdit({ pilahSampah }: Props) {
 
     const initialTanggal = (() => {
         const d = new Date(pilahSampah.tanggal);
+
         return new Date(d.getTime() - d.getTimezoneOffset() * 60000).toISOString().slice(0, 16);
     })();
 

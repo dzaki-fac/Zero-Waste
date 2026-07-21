@@ -3,6 +3,7 @@ import { Globe, Pencil, Plus, Trash2 } from 'lucide-react';
 import { useState } from 'react';
 import Heading from '@/components/heading';
 import { Button } from '@/components/ui/button';
+import { Checkbox } from '@/components/ui/checkbox';
 import {
     Dialog,
     DialogContent,
@@ -13,7 +14,6 @@ import {
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Checkbox } from '@/components/ui/checkbox';
 import {
     Table,
     TableBody,
@@ -72,7 +72,11 @@ export default function KelolaPoster({ posters }: Props) {
             preserveScroll: true,
             onSuccess: () => {
                 setAddOpen(false);
-                if (imagePreview) URL.revokeObjectURL(imagePreview);
+
+                if (imagePreview) {
+URL.revokeObjectURL(imagePreview);
+}
+
                 setImagePreview(null);
                 addForm.reset();
             },
@@ -90,7 +94,11 @@ export default function KelolaPoster({ posters }: Props) {
             is_published: item.is_published,
         });
         editForm.clearErrors();
-        if (editPreview) URL.revokeObjectURL(editPreview);
+
+        if (editPreview) {
+URL.revokeObjectURL(editPreview);
+}
+
         setEditPreview(null);
         setEditKey((k) => k + 1);
         setEditOpen(true);
@@ -98,20 +106,31 @@ export default function KelolaPoster({ posters }: Props) {
 
     function handleEdit(e: React.FormEvent) {
         e.preventDefault();
-        if (!editingItem) return;
+
+        if (!editingItem) {
+return;
+}
+
         editForm.patch(`/admin/poster/${editingItem.id}`, {
             preserveScroll: true,
             onSuccess: () => {
                 setEditOpen(false);
                 setEditingItem(null);
-                if (editPreview) URL.revokeObjectURL(editPreview);
+
+                if (editPreview) {
+URL.revokeObjectURL(editPreview);
+}
+
                 setEditPreview(null);
             },
         });
     }
 
     function handleDelete() {
-        if (!deletingItem) return;
+        if (!deletingItem) {
+return;
+}
+
         setDeleteError(null);
         setDeleteProcessing(true);
         router.delete(`/admin/poster/${deletingItem.id}`, {
@@ -143,7 +162,11 @@ export default function KelolaPoster({ posters }: Props) {
                         onClick={() => {
                             addForm.reset();
                             addForm.clearErrors();
-                            if (imagePreview) URL.revokeObjectURL(imagePreview);
+
+                            if (imagePreview) {
+URL.revokeObjectURL(imagePreview);
+}
+
                             setImagePreview(null);
                             setAddOpen(true);
                         }}
@@ -188,7 +211,9 @@ export default function KelolaPoster({ posters }: Props) {
                                                         src={item.image_url}
                                                         alt="preview"
                                                         className="size-10 rounded-md object-cover border border-green-100"
-                                                        onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = 'none'; }}
+                                                        onError={(e) => {
+ (e.currentTarget as HTMLImageElement).style.display = 'none'; 
+}}
                                                     />
                                                 ) : (
                                                     <span className="text-xs text-green-400">-</span>
@@ -273,13 +298,20 @@ export default function KelolaPoster({ posters }: Props) {
                                 accept="image/jpeg,image/png,image/jpg,image/webp"
                                 onChange={(e) => {
                                     const file = e.target.files?.[0] ?? null;
+
                                     if (file && file.size > 2 * 1024 * 1024) {
                                         alert('Ukuran gambar terlalu besar. Maksimal 2 MB.');
                                         e.target.value = '';
+
                                         return;
                                     }
+
                                     addForm.setData('image', file);
-                                    if (imagePreview) URL.revokeObjectURL(imagePreview);
+
+                                    if (imagePreview) {
+URL.revokeObjectURL(imagePreview);
+}
+
                                     setImagePreview(file ? URL.createObjectURL(file) : null);
                                 }}
                                 required
@@ -340,9 +372,13 @@ export default function KelolaPoster({ posters }: Props) {
 
             <Dialog key={editKey} open={editOpen} onOpenChange={(open) => {
                 if (!open) {
-                    if (editPreview) URL.revokeObjectURL(editPreview);
+                    if (editPreview) {
+URL.revokeObjectURL(editPreview);
+}
+
                     setEditPreview(null);
                 }
+
                 setEditOpen(open);
             }}>
                 <DialogContent className="sm:max-w-lg">
@@ -388,13 +424,20 @@ export default function KelolaPoster({ posters }: Props) {
                                 accept="image/jpeg,image/png,image/jpg,image/webp"
                                 onChange={(e) => {
                                     const file = e.target.files?.[0] ?? null;
+
                                     if (file && file.size > 2 * 1024 * 1024) {
                                         alert('Ukuran gambar terlalu besar. Maksimal 2 MB.');
                                         e.target.value = '';
+
                                         return;
                                     }
+
                                     editForm.setData('image', file);
-                                    if (editPreview) URL.revokeObjectURL(editPreview);
+
+                                    if (editPreview) {
+URL.revokeObjectURL(editPreview);
+}
+
                                     setEditPreview(file ? URL.createObjectURL(file) : null);
                                 }}
                                 className="border-green-200 focus-visible:border-green-500 focus-visible:ring-green-500/20 file:mr-3 file:rounded-md file:border-0 file:bg-green-600 file:px-3 file:py-1 file:text-white file:hover:bg-green-700"
@@ -452,7 +495,13 @@ export default function KelolaPoster({ posters }: Props) {
                 </DialogContent>
             </Dialog>
 
-            <Dialog open={deleteOpen} onOpenChange={(open) => { if (!open) { setDeleteError(null); } setDeleteOpen(open); }}>
+            <Dialog open={deleteOpen} onOpenChange={(open) => {
+ if (!open) {
+ setDeleteError(null); 
+}
+
+ setDeleteOpen(open); 
+}}>
                 <DialogContent className="sm:max-w-sm">
                     <DialogHeader>
                         <DialogTitle>Hapus Poster</DialogTitle>
@@ -471,7 +520,9 @@ export default function KelolaPoster({ posters }: Props) {
                     <DialogFooter>
                         <Button
                             variant="outline"
-                            onClick={() => { setDeleteError(null); setDeleteOpen(false); }}
+                            onClick={() => {
+ setDeleteError(null); setDeleteOpen(false); 
+}}
                             disabled={deleteProcessing}
                             className="border-green-200 text-green-700 hover:bg-green-50"
                         >

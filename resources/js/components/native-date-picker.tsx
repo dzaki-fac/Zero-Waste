@@ -1,5 +1,5 @@
-import { useRef } from 'react';
 import { CalendarDays } from 'lucide-react';
+import { useRef } from 'react';
 
 type NativeDatePickerProps = {
     value: string;
@@ -12,7 +12,11 @@ export default function NativeDatePicker({ value, onChange, className = '' }: Na
 
     const openDatePicker = () => {
         const input = inputRef.current;
-        if (!input) return;
+
+        if (!input) {
+return;
+}
+
         try {
             input.showPicker?.();
         } catch {
@@ -42,6 +46,7 @@ export default function NativeDatePicker({ value, onChange, className = '' }: Na
                 onChange={(event) => onChange(event.target.value)}
                 onClick={(event) => {
                     event.stopPropagation();
+
                     try {
                         event.currentTarget.showPicker?.();
                     } catch {

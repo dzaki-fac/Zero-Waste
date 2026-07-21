@@ -1,6 +1,7 @@
-import React, { useState, type ReactNode } from "react";
 import { Link, usePage } from "@inertiajs/react";
 import { Menu, X, Instagram, Youtube, Globe } from "lucide-react";
+import React, { useState  } from "react";
+import type {ReactNode} from "react";
 
 export const C = {
   navy900: "#0A1440",
@@ -93,13 +94,25 @@ export default function Layout({
         key={item.id}
         onClick={() => {
           setMobileNavOpen(false);
-          if (onAnchorClick) onAnchorClick(item.id);
-          else window.location.href = `/#${item.id}`;
+
+          if (onAnchorClick) {
+onAnchorClick(item.id);
+} else {
+window.location.href = `/#${item.id}`;
+}
         }}
         className={cls}
         style={sharedStyle}
-        onMouseEnter={(e) => { if (!active && !mobile) e.currentTarget.style.backgroundColor = C.navy700; }}
-        onMouseLeave={(e) => { if (!active && !mobile) e.currentTarget.style.backgroundColor = "transparent"; }}
+        onMouseEnter={(e) => {
+ if (!active && !mobile) {
+e.currentTarget.style.backgroundColor = C.navy700;
+} 
+}}
+        onMouseLeave={(e) => {
+ if (!active && !mobile) {
+e.currentTarget.style.backgroundColor = "transparent";
+} 
+}}
       >
         {item.label}
         {!mobile && (
@@ -154,6 +167,7 @@ export default function Layout({
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
               {SOCIALS.map((s, i) => {
                 const SIcon = s.icon;
+
                 return (
                   <a key={i} href={s.href} target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 rounded-xl p-4 border" style={{ backgroundColor: C.navy800, borderColor: C.navy700 }}>
                     <span className="w-9 h-9 rounded-full flex items-center justify-center shrink-0" style={{ backgroundColor: C.navy700 }}>

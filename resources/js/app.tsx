@@ -6,10 +6,10 @@ import { initializeTheme } from '@/hooks/use-appearance';
 import AppLayout from '@/layouts/app-layout';
 import AuthLayout from '@/layouts/auth-layout';
 import ScrollToTop from "./components/ScrollToTop";
-import SOPPage from "./pages/SOPPage";
 import PengertianPage from "./pages/pengertian";
-import StrukturPage from "./pages/struktur";
 import PeraturanPage from "./pages/peraturan";
+import SOPPage from "./pages/SOPPage";
+import StrukturPage from "./pages/struktur";
 
 const appName = import.meta.env.VITE_APP_NAME || 'ZeroLib';
 

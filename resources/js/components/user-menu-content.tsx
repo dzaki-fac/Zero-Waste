@@ -1,3 +1,5 @@
+import { router } from '@inertiajs/react';
+import { LogOut } from 'lucide-react';
 import {
     DropdownMenuItem,
     DropdownMenuLabel,
@@ -7,8 +9,6 @@ import { UserInfo } from '@/components/user-info';
 import { useMobileNavigation } from '@/hooks/use-mobile-navigation';
 import { logout as logoutRoute } from '@/routes';
 import type { User } from '@/types';
-import { router } from '@inertiajs/react';
-import { LogOut } from 'lucide-react';
 
 type Props = {
     user: User;

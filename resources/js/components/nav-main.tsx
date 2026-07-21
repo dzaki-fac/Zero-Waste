@@ -1,5 +1,5 @@
-import { ChevronDown } from 'lucide-react';
 import { Link } from '@inertiajs/react';
+import { ChevronDown } from 'lucide-react';
 import { useState } from 'react';
 import {
     SidebarGroup,
@@ -12,20 +12,22 @@ import {
     SidebarMenuSubItem,
 } from '@/components/ui/sidebar';
 import { useCurrentUrl } from '@/hooks/use-current-url';
-import type { NavItem } from '@/types';
 import { cn } from '@/lib/utils';
+import type { NavItem } from '@/types';
 
 export function NavMain({ items = [] }: { items: NavItem[] }) {
     const { isCurrentUrl } = useCurrentUrl();
 
     const [openMenus, setOpenMenus] = useState<Record<string, boolean>>(() => {
         const initial: Record<string, boolean> = {};
+
         for (const item of items) {
             if (item.items) {
                 const isAnyActive = item.items.some((sub) => isCurrentUrl(sub.href));
                 initial[item.title] = isAnyActive;
             }
         }
+
         return initial;
     });
 
@@ -42,6 +44,7 @@ export function NavMain({ items = [] }: { items: NavItem[] }) {
                 {items.map((item) => {
                     if (item.items) {
                         const isOpen = openMenus[item.title] ?? false;
+
                         return (
                             <SidebarMenuItem key={item.title}>
                                 <SidebarMenuButton

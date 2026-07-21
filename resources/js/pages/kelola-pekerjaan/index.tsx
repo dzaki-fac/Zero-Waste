@@ -128,7 +128,11 @@ export default function KelolaPekerjaan({ pekerjaan, filter }: Props) {
 
     function handleEdit(e: React.FormEvent) {
         e.preventDefault();
-        if (!editingItem) return;
+
+        if (!editingItem) {
+return;
+}
+
         editForm.patch(`/admin/kelola-pekerjaan/${editingItem.id}`, {
             preserveScroll: true,
             onSuccess: () => {
@@ -139,7 +143,10 @@ export default function KelolaPekerjaan({ pekerjaan, filter }: Props) {
     }
 
     function handleDelete() {
-        if (!deletingItem) return;
+        if (!deletingItem) {
+return;
+}
+
         setDeleteError(null);
         setDeleteProcessing(true);
         router.delete(`/admin/kelola-pekerjaan/${deletingItem.id}`, {
@@ -167,10 +174,12 @@ export default function KelolaPekerjaan({ pekerjaan, filter }: Props) {
     }
 
     const grouped: Record<string, MasterPekerjaan[]> = {};
+
     for (const key of GROUP_ORDER) {
         const tasks = pekerjaan
             .filter((t) => t.jenis_pekerjaan === key)
             .sort((a, b) => a.urutan - b.urutan || a.id - b.id);
+
         if (activeFilter === null || activeFilter === key) {
             grouped[key] = tasks;
         } else {
@@ -231,9 +240,11 @@ export default function KelolaPekerjaan({ pekerjaan, filter }: Props) {
                     <>
                         {GROUP_ORDER.map((key) => {
                             const tasks = grouped[key];
+
                             if (tasks.length === 0 && activeFilter !== null && activeFilter !== key) {
                                 return null;
                             }
+
                             if (tasks.length === 0 && activeFilter === key) {
                                 return (
                                     <div key={key} className="rounded-xl border border-green-200 bg-white shadow-sm overflow-hidden">
@@ -250,7 +261,10 @@ export default function KelolaPekerjaan({ pekerjaan, filter }: Props) {
                                     </div>
                                 );
                             }
-                            if (tasks.length === 0) return null;
+
+                            if (tasks.length === 0) {
+return null;
+}
 
                             return (
                                 <div key={key} className="rounded-xl border border-green-200 bg-white shadow-sm overflow-hidden">
@@ -446,7 +460,13 @@ export default function KelolaPekerjaan({ pekerjaan, filter }: Props) {
                 </DialogContent>
             </Dialog>
 
-            <Dialog open={deleteOpen} onOpenChange={(open) => { if (!open) { setDeleteError(null); } setDeleteOpen(open); }}>
+            <Dialog open={deleteOpen} onOpenChange={(open) => {
+ if (!open) {
+ setDeleteError(null); 
+}
+
+ setDeleteOpen(open); 
+}}>
                 <DialogContent className="sm:max-w-sm">
                     <DialogHeader>
                         <DialogTitle>Hapus Pekerjaan</DialogTitle>
@@ -465,7 +485,9 @@ export default function KelolaPekerjaan({ pekerjaan, filter }: Props) {
                     <DialogFooter>
                         <Button
                             variant="outline"
-                            onClick={() => { setDeleteError(null); setDeleteOpen(false); }}
+                            onClick={() => {
+ setDeleteError(null); setDeleteOpen(false); 
+}}
                             disabled={deleteProcessing}
                             className="border-green-200 text-green-700 hover:bg-green-50"
                         >

@@ -1,6 +1,5 @@
 import { Head } from '@inertiajs/react';
-import React, { useState, useRef, useEffect, useLayoutEffect, type ReactNode, type CSSProperties } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { usePage, router } from '@inertiajs/react';
 import type { LucideIcon } from "lucide-react";
 import {
   Recycle,
@@ -26,12 +25,14 @@ import {
   Send,
   CalendarIcon,
 } from "lucide-react";
-import { usePage, router } from '@inertiajs/react';
+import React, { useState, useRef, useEffect, useLayoutEffect   } from "react";
+import type {ReactNode, CSSProperties} from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from 'recharts';
-import { C, display, body } from "../theme";
-import Navbar from "../components/Navbar";
 import { ChartTooltip, ChartLabel, getCategoryColor, PieLegend } from "../components/charts";
 import type { ChartData } from "../components/charts";
+import Navbar from "../components/Navbar";
+import { C, display, body } from "../theme";
 
 // ---- Ikon media sosial ----
 function WebsiteIcon({ size = 16, color = "currentColor" }: { size?: number; color?: string }) {
@@ -191,7 +192,11 @@ function useInView(threshold = 0.18) {
   const [inView, setInView] = useState(false);
   useEffect(() => {
     const el = ref.current;
-    if (!el) return;
+
+    if (!el) {
+return;
+}
+
     const obs = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
@@ -204,8 +209,10 @@ function useInView(threshold = 0.18) {
       { threshold, rootMargin: "0px 0px -8% 0px" }
     );
     obs.observe(el);
+
     return () => obs.disconnect();
   }, [threshold]);
+
   return [ref, inView] as const;
 }
 
@@ -221,6 +228,7 @@ function Reveal({
   style?: CSSProperties;
 }) {
   const [ref, inView] = useInView();
+
   return (
     <div
       ref={ref}
@@ -240,18 +248,26 @@ function Reveal({
 function useCountUp(target: number, active: boolean, duration = 1400) {
   const [value, setValue] = useState(0);
   useEffect(() => {
-    if (!active) return;
+    if (!active) {
+return;
+}
+
     let raf: number;
     const start = performance.now();
     const step = (t: number) => {
       const p = Math.min((t - start) / duration, 1);
       const eased = 1 - Math.pow(1 - p, 3);
       setValue(Math.round(eased * target));
-      if (p < 1) raf = requestAnimationFrame(step);
+
+      if (p < 1) {
+raf = requestAnimationFrame(step);
+}
     };
     raf = requestAnimationFrame(step);
+
     return () => cancelAnimationFrame(raf);
   }, [active, target, duration]);
+
   return value;
 }
 
@@ -259,9 +275,11 @@ function StatCounter({ stat, delay }: { stat: (typeof HERO_STATS)[number]; delay
   const [started, setStarted] = useState(false);
   useEffect(() => {
     const t = setTimeout(() => setStarted(true), delay);
+
     return () => clearTimeout(t);
   }, [delay]);
   const value = useCountUp(stat.value, started);
+
   return (
     <div>
       <div className="text-xl sm:text-2xl font-semibold text-white" style={display}>
@@ -328,6 +346,7 @@ const PRESETS: { key: PresetKey; label: string; days: number | null }[] = [
 function daysAgo(n: number): string {
     const d = new Date();
     d.setDate(d.getDate() - n);
+
     return d.toISOString().split('T')[0];
 }
 
@@ -420,6 +439,7 @@ function LaporanCharts({ data }: { data: PageProps }) {
                             {STATUS_DATA.map((item) => {
                                 const pct = statusTotal > 0 ? (item.value / statusTotal) * 100 : 0;
                                 const Icon = item.icon;
+
                                 return (
                                     <div key={item.key} className="flex items-center gap-3 rounded-lg p-3" style={{ backgroundColor: `${item.color}0d` }}>
                                         <div className="flex size-8 shrink-0 items-center justify-center rounded-lg" style={{ backgroundColor: `${item.color}1a` }}>
@@ -449,6 +469,7 @@ function LaporanCharts({ data }: { data: PageProps }) {
                     const data = penimbanganByArea;
                     const total = data.reduce((s, d) => s + d.value, 0);
                     const sorted = data.slice().sort((a, b) => b.value - a.value);
+
                     return (
                         <div className="rounded-2xl border bg-white p-5" style={{ borderColor: C.line }}>
                             <div className="mb-1 flex items-center gap-2">
@@ -498,6 +519,7 @@ function LaporanCharts({ data }: { data: PageProps }) {
                 ] as const).map((card) => {
                     const total = card.data.reduce((s, d) => s + d.value, 0);
                     const sorted = card.data.slice().sort((a, b) => b.value - a.value);
+
                     return (
                         <div key={card.title} className="rounded-2xl border bg-white p-5" style={{ borderColor: C.line }}>
                             <div className="mb-1 flex items-center gap-2">
@@ -554,13 +576,21 @@ export default function Dashboard() {
 
     function applyFilter(params: { start_date?: string | null; end_date?: string | null }) {
         const query: Record<string, string> = {};
-        if (params.start_date) query.start_date = params.start_date;
-        if (params.end_date) query.end_date = params.end_date;
+
+        if (params.start_date) {
+query.start_date = params.start_date;
+}
+
+        if (params.end_date) {
+query.end_date = params.end_date;
+}
+
         router.get('/', query, { preserveState: true, preserveScroll: true, replace: true });
     }
 
     function handlePreset(preset: typeof PRESETS[number]) {
         setActivePreset(preset.key);
+
         if (preset.days === null) {
             setStartDate('');
             setEndDate('');
@@ -612,6 +642,7 @@ export default function Dashboard() {
     const headerEl = document.querySelector("header");
     const navHeight = headerEl ? headerEl.getBoundingClientRect().height : 64;
     const EXTRA_BUFFER: Record<string, number> = { berita: 0, edukasi: 0, laporan: 0 };
+
     return navHeight + (EXTRA_BUFFER[id] ?? 8);
   };
 
@@ -622,11 +653,17 @@ export default function Dashboard() {
     if (typeof window !== "undefined" && "scrollRestoration" in window.history) {
       window.history.scrollRestoration = "manual";
     }
+
     const scrollToId = (location.state as { scrollTo?: string })?.scrollTo;
+
     if (scrollToId) {
       const align = () => {
         const el = sectionRefs.current[scrollToId];
-        if (!el) return;
+
+        if (!el) {
+return;
+}
+
         const offset = getNavOffset(scrollToId);
         const top = el.getBoundingClientRect().top + window.scrollY - offset;
         window.scrollTo({ top, behavior: "instant" });
@@ -642,6 +679,7 @@ export default function Dashboard() {
   // ulang saat user navigasi lain / refresh.
   useEffect(() => {
     const scrollToId = (location.state as { scrollTo?: string })?.scrollTo;
+
     if (scrollToId) {
       navigate(location.pathname, { replace: true, state: {} });
     }
@@ -651,6 +689,7 @@ export default function Dashboard() {
     const t = setInterval(() => {
       setHeroIndex((i) => (i + 1) % HERO_SLIDES.length);
     }, 8000);
+
     return () => clearInterval(t);
   }, []);
 
@@ -659,6 +698,7 @@ export default function Dashboard() {
     const raf1 = requestAnimationFrame(() => {
       raf2 = requestAnimationFrame(() => setHeroMounted(true));
     });
+
     return () => {
       cancelAnimationFrame(raf1);
       cancelAnimationFrame(raf2);
@@ -669,10 +709,14 @@ export default function Dashboard() {
   // posterIndex berubah (baik otomatis maupun diklik manual), jadi hitungan
   // mundurnya selalu mulai dari 0 lagi. Berhenti sementara saat kartu di-hover.
   useEffect(() => {
-    if (posterPaused) return;
+    if (posterPaused) {
+return;
+}
+
     const t = setTimeout(() => {
       setPosterIndex((i) => (i + 1) % POSTERS.length);
     }, POSTER_AUTOPLAY_MS);
+
     return () => clearTimeout(t);
   }, [posterIndex, posterPaused]);
 
@@ -687,49 +731,69 @@ export default function Dashboard() {
 
     const onScroll = () => {
       setScrollY(window.scrollY);
-      if (Date.now() < suppressObserverUntilRef.current) return;
+
+      if (Date.now() < suppressObserverUntilRef.current) {
+return;
+}
 
       const headerEl = document.querySelector("header");
       const headerHeight = headerEl ? headerEl.getBoundingClientRect().height : 64;
       const referenceLine = headerHeight + 4;
 
       let current = SECTION_ORDER[0];
+
       for (const id of SECTION_ORDER) {
         const el = sectionRefs.current[id];
-        if (!el) continue;
+
+        if (!el) {
+continue;
+}
+
         const top = el.getBoundingClientRect().top;
+
         if (top <= referenceLine) {
           current = id;
         }
       }
+
       setActiveSection(current);
     };
 
     window.addEventListener("scroll", onScroll, { passive: true });
     onScroll();
+
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
   useEffect(() => {
     const track = newsTrackRef.current;
-    if (!track) return;
+
+    if (!track) {
+return;
+}
+
     const SPEED_PX_PER_SEC = 32;
     let raf = 0;
     let last = performance.now();
     const step = (now: number) => {
       const dt = (now - last) / 1000;
       last = now;
+
       if (!newsPaused && track) {
         newsOffsetRef.current += SPEED_PX_PER_SEC * dt;
         const singleSetWidth = track.scrollWidth / 2;
+
         if (newsOffsetRef.current >= singleSetWidth) {
           newsOffsetRef.current -= singleSetWidth;
         }
+
         track.style.transform = `translateX(-${newsOffsetRef.current}px)`;
       }
+
       raf = requestAnimationFrame(step);
     };
     raf = requestAnimationFrame(step);
+
     return () => cancelAnimationFrame(raf);
   }, [newsPaused]);
 
@@ -737,11 +801,18 @@ export default function Dashboard() {
     setActiveSection(id);
     suppressObserverUntilRef.current = Date.now() + 1900;
     const el = sectionRefs.current[id];
-    if (!el) return;
+
+    if (!el) {
+return;
+}
 
     const align = (behavior: ScrollBehavior) => {
       const target = sectionRefs.current[id];
-      if (!target) return;
+
+      if (!target) {
+return;
+}
+
       const offset = getNavOffset(id);
       const top = target.getBoundingClientRect().top + window.scrollY - offset;
       window.scrollTo({ top, behavior });
@@ -768,11 +839,22 @@ export default function Dashboard() {
 
   const scrollNews = (dir: number) => {
     const track = newsTrackRef.current;
-    if (!track) return;
+
+    if (!track) {
+return;
+}
+
     const singleSetWidth = track.scrollWidth / 2;
     newsOffsetRef.current += dir * 320;
-    if (newsOffsetRef.current < 0) newsOffsetRef.current += singleSetWidth;
-    if (newsOffsetRef.current >= singleSetWidth) newsOffsetRef.current -= singleSetWidth;
+
+    if (newsOffsetRef.current < 0) {
+newsOffsetRef.current += singleSetWidth;
+}
+
+    if (newsOffsetRef.current >= singleSetWidth) {
+newsOffsetRef.current -= singleSetWidth;
+}
+
     track.style.transform = `translateX(-${newsOffsetRef.current}px)`;
   };
 
@@ -838,8 +920,12 @@ export default function Dashboard() {
             aria-label="Slide sebelumnya"
             className="absolute left-2 sm:left-4 top-1/2 -translate-y-1/2 z-50 size-7 sm:size-8 rounded-full flex items-center justify-center transition-all duration-150 active:scale-90"
             style={{ backgroundColor: "rgba(10,20,64,0.6)", border: "1px solid rgba(255,255,255,0.25)" }}
-            onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = "rgba(10,20,64,0.8)"; }}
-            onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = "rgba(10,20,64,0.6)"; }}
+            onMouseEnter={(e) => {
+ e.currentTarget.style.backgroundColor = "rgba(10,20,64,0.8)"; 
+}}
+            onMouseLeave={(e) => {
+ e.currentTarget.style.backgroundColor = "rgba(10,20,64,0.6)"; 
+}}
           >
             <ChevronLeft size={12} color="#fff" />
           </button>
@@ -848,8 +934,12 @@ export default function Dashboard() {
             aria-label="Slide berikutnya"
             className="absolute right-2 sm:right-4 top-1/2 -translate-y-1/2 z-50 size-7 sm:size-8 rounded-full flex items-center justify-center transition-all duration-150 active:scale-90"
             style={{ backgroundColor: "rgba(10,20,64,0.6)", border: "1px solid rgba(255,255,255,0.25)" }}
-            onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = "rgba(10,20,64,0.8)"; }}
-            onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = "rgba(10,20,64,0.6)"; }}
+            onMouseEnter={(e) => {
+ e.currentTarget.style.backgroundColor = "rgba(10,20,64,0.8)"; 
+}}
+            onMouseLeave={(e) => {
+ e.currentTarget.style.backgroundColor = "rgba(10,20,64,0.6)"; 
+}}
           >
             <ChevronRight size={12} color="#fff" />
           </button>
@@ -1014,8 +1104,12 @@ export default function Dashboard() {
                     rel="noopener noreferrer"
                     className="rounded-2xl overflow-hidden block flex flex-col h-full"
                     style={{ backgroundColor: C.navy800, transition: "transform 220ms ease, box-shadow 220ms ease" }}
-                    onMouseEnter={(e) => { e.currentTarget.style.transform = "translateY(-4px)"; e.currentTarget.style.boxShadow = "0 8px 24px rgba(0,0,0,0.3)"; }}
-                    onMouseLeave={(e) => { e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.boxShadow = "none"; }}
+                    onMouseEnter={(e) => {
+ e.currentTarget.style.transform = "translateY(-4px)"; e.currentTarget.style.boxShadow = "0 8px 24px rgba(0,0,0,0.3)"; 
+}}
+                    onMouseLeave={(e) => {
+ e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.boxShadow = "none"; 
+}}
                   >
                     <div className="h-36 relative overflow-hidden shrink-0">
                       <SafeImage
@@ -1118,6 +1212,7 @@ export default function Dashboard() {
             <div className="flex flex-nowrap sm:flex-wrap justify-start sm:justify-center gap-2 overflow-x-auto sm:overflow-visible pb-1 poster-thumbs snap-x snap-mandatory sm:snap-none">
               {POSTERS.map((p, i) => {
                 const isActive = i === posterIndex;
+
                 return (
                   <button
                     key={i}
@@ -1179,6 +1274,7 @@ export default function Dashboard() {
               <div className="flex flex-col gap-3">
                 {KONTAK.map((k, i) => {
                   const KIcon = k.icon;
+
                   return (
                     <div key={i} className="flex items-start gap-3">
                       <span className="w-8 h-8 rounded-full flex items-center justify-center shrink-0" style={{ backgroundColor: C.navy800 }}>
@@ -1211,6 +1307,7 @@ export default function Dashboard() {
               <div className="flex items-center gap-3">
                 {SOCIALS.map((s, i) => {
                   const SIcon = s.icon;
+
                   return (
                     <a
                       key={i}
