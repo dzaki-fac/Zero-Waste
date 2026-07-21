@@ -17,6 +17,10 @@ class HandleInertiaRequests extends Middleware
 
     public function share(Request $request): array
     {
+        $urlParts = parse_url(config('app.url'));
+        $path = $urlParts['path'] ?? '';
+        $assetBase = rtrim($path, '/') ?: '';
+
         return [
             ...parent::share($request),
             'name' => config('app.name'),
@@ -26,6 +30,7 @@ class HandleInertiaRequests extends Middleware
             'sidebarOpen' => ! $request->hasCookie('sidebar_state') || $request->cookie('sidebar_state') === 'true',
             'submitted' => $request->session()->get('submitted'),
             'success' => $request->session()->get('success'),
+            'assetBase' => $assetBase,
             'options' => OptionHelper::all(),
         ];
     }
