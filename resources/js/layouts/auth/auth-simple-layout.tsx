@@ -8,21 +8,25 @@ export default function AuthSimpleLayout({
     return (
         <div className="flex min-h-screen flex-col items-center justify-center bg-linear-to-b from-green-50 to-white p-6 md:p-10">
             <div className="w-full max-w-sm">
-                    <div className="flex flex-col items-center">
-            <img
-                src="/logo_zerolib.jpeg"
-                alt="ZeroLib Logo"
-                className="w-48 sm:w-56 md:w-64 object-contain -mb-15 max-w-[80vw]"
-            />
+            <div className="flex w-full flex-col items-center text-center">
+                <img
+                    src="/images/zerolib-logo.png"
+                    alt="ZeroLib Logo"
+                    className="h-auto w-full max-w-[280px] object-contain sm:max-w-[320px]"
+                />
 
-            <h1 className="text-xl font-medium text-center">
-                {title}
-            </h1>
+                <div className="mt-5">
+                    <h1 className="text-xl font-semibold text-gray-900">
+                        {title}
+                    </h1>
 
-            <p className="mt-1 text-center text-sm text-muted-foreground">
-                {description}
-            </p>
-        </div>
+                    {description && (
+                        <p className="mt-2 text-sm text-muted-foreground">
+                            {description}
+                        </p>
+                    )}
+                </div>
+            </div>
                 <div className="mt-6">
                     {children}
                 </div>
