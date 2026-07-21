@@ -462,47 +462,120 @@ return null;
                                     </span>
                                 </div>
                             </div>
-                            <Table className="table-fixed">
-                                {COLGROUP}
-                                <TableHeader>
-                                    <TableRow className="border-green-100 bg-green-50/30">
-                                        <TableHead className="text-green-700">No</TableHead>
-                                        <TableHead className="text-green-700">Tugas</TableHead>
-                                        <TableHead className="text-green-700">Area</TableHead>
-                                        <TableHead className="text-green-700 text-center">Jenis Pekerjaan</TableHead>
-                                        <TableHead className="text-green-700 text-center">Status</TableHead>
-                                    </TableRow>
-                                </TableHeader>
-                                <TableBody>
-                                    {groupItems.map((item) => {
-                                        const task = masterTasks.find((t) => t.id === item.master_pekerjaan_id);
 
-                                        return (
-                                            <TableRow key={item.master_pekerjaan_id} className="border-green-100">
-                                                <TableCell className="align-top pt-4">
-                                                    <span className="flex h-6 w-6 items-center justify-center rounded-full bg-green-100 text-xs font-medium text-green-700">
-                                                        {task?.urutan ?? '-'}
-                                                    </span>
-                                                </TableCell>
-                                                <TableCell className="align-top pt-4 text-sm text-green-900 whitespace-normal break-words">
-                                                    {item.tugas}
-                                                </TableCell>
-                                                <TableCell className="align-top pt-4 text-sm text-green-600">
-                                                    {activeArea || '-'}
-                                                </TableCell>
-                                                <TableCell className="align-top pt-4 text-center">
-                                                    <span className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-medium min-w-[90px] justify-center ${jenisBadgeClass[jenisLabel(item.jenis_pekerjaan)] ?? 'bg-gray-50 text-gray-600 border-gray-200'}`}>
-                                                        <span className={`h-1.5 w-1.5 rounded-full ${jenisLabel(item.jenis_pekerjaan) === 'Tidak Diketahui' ? 'bg-gray-400' : 'bg-current'}`} />
-                                                        {jenisLabel(item.jenis_pekerjaan)}
-                                                    </span>
-                                                </TableCell>
-                                                <TableCell className="align-top pt-3 text-center">
+                            {/* ---------- Desktop table ---------- */}
+                            <div className="hidden md:block">
+                                <div className="overflow-x-auto">
+                                    <Table className="min-w-[850px]">
+                                        {COLGROUP}
+                                        <TableHeader>
+                                            <TableRow className="border-green-100 bg-green-50/30">
+                                                <TableHead className="text-green-700">No</TableHead>
+                                                <TableHead className="text-green-700">Tugas</TableHead>
+                                                <TableHead className="text-green-700">Area</TableHead>
+                                                <TableHead className="text-green-700 text-center">Jenis Pekerjaan</TableHead>
+                                                <TableHead className="text-green-700 text-center">Status</TableHead>
+                                            </TableRow>
+                                        </TableHeader>
+                                        <TableBody>
+                                            {groupItems.map((item) => {
+                                                const task = masterTasks.find((t) => t.id === item.master_pekerjaan_id);
+
+                                                return (
+                                                    <TableRow key={item.master_pekerjaan_id} className="border-green-100">
+                                                        <TableCell className="align-top pt-4">
+                                                            <span className="flex h-6 w-6 items-center justify-center rounded-full bg-green-100 text-xs font-medium text-green-700">
+                                                                {task?.urutan ?? '-'}
+                                                            </span>
+                                                        </TableCell>
+                                                        <TableCell className="align-top pt-4 text-sm text-green-900 whitespace-normal break-words">
+                                                            {item.tugas}
+                                                        </TableCell>
+                                                        <TableCell className="align-top pt-4 text-sm text-green-600">
+                                                            {activeArea || '-'}
+                                                        </TableCell>
+                                                        <TableCell className="align-top pt-4 text-center">
+                                                            <span className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-medium min-w-[90px] justify-center ${jenisBadgeClass[jenisLabel(item.jenis_pekerjaan)] ?? 'bg-gray-50 text-gray-600 border-gray-200'}`}>
+                                                                <span className={`h-1.5 w-1.5 rounded-full ${jenisLabel(item.jenis_pekerjaan) === 'Tidak Diketahui' ? 'bg-gray-400' : 'bg-current'}`} />
+                                                                {jenisLabel(item.jenis_pekerjaan)}
+                                                            </span>
+                                                        </TableCell>
+                                                        <TableCell className="align-top pt-3 text-center">
+                                                            {readOnly ? (
+                                                                <div
+                                                                    role="checkbox"
+                                                                    aria-checked={item.status === 'sudah'}
+                                                                    aria-readonly="true"
+                                                                    className={`mx-auto flex h-7 w-7 items-center justify-center rounded-md border ${
+                                                                        item.status === 'sudah'
+                                                                            ? 'border-green-600 bg-green-600'
+                                                                            : 'border-gray-300 bg-gray-100'
+                                                                    }`}
+                                                                >
+                                                                    {item.status === 'sudah' && <CheckCircle2 className="h-5 w-5 text-white" />}
+                                                                </div>
+                                                            ) : (
+                                                                <label className="inline-flex cursor-pointer items-center justify-center">
+                                                                    <span className={`relative flex h-5 w-5 items-center justify-center rounded border-2 transition-colors ${
+                                                                        !areaSelected
+                                                                            ? 'border-gray-200 bg-gray-100'
+                                                                            : item.status === 'sudah'
+                                                                                ? 'border-green-500 bg-green-500 text-white'
+                                                                                : 'border-gray-300 bg-white hover:border-gray-400'
+                                                                    }`}>
+                                                                        {item.status === 'sudah' && <CheckCircle2 className="h-3.5 w-3.5" />}
+                                                                    </span>
+                                                                    <input
+                                                                        type="checkbox"
+                                                                        checked={item.status === 'sudah'}
+                                                                        onChange={() => toggleStatus(item.master_pekerjaan_id)}
+                                                                        className="sr-only"
+                                                                    />
+                                                                </label>
+                                                            )}
+                                                        </TableCell>
+                                                    </TableRow>
+                                                );
+                                            })}
+                                        </TableBody>
+                                    </Table>
+                                </div>
+                            </div>
+
+                            {/* ---------- Mobile card list ---------- */}
+                            <div className="block md:hidden divide-y divide-green-50">
+                                {groupItems.map((item) => {
+                                    const task = masterTasks.find((t) => t.id === item.master_pekerjaan_id);
+
+                                    return (
+                                        <div key={item.master_pekerjaan_id} className="px-4 py-3">
+                                            <div className="flex items-start gap-3">
+                                                <span className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-green-100 text-xs font-medium text-green-700">
+                                                    {task?.urutan ?? '-'}
+                                                </span>
+                                                <div className="min-w-0 flex-1">
+                                                    <div className="flex flex-wrap items-center gap-2 mb-1">
+                                                        <span className="text-sm font-medium text-green-900">
+                                                            {item.tugas}
+                                                        </span>
+                                                    </div>
+                                                    <div className="flex flex-wrap items-center gap-2">
+                                                        <span className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-0.5 text-xs font-medium ${jenisBadgeClass[jenisLabel(item.jenis_pekerjaan)] ?? 'bg-gray-50 text-gray-600 border-gray-200'}`}>
+                                                            <span className={`h-1.5 w-1.5 rounded-full ${jenisLabel(item.jenis_pekerjaan) === 'Tidak Diketahui' ? 'bg-gray-400' : 'bg-current'}`} />
+                                                            {jenisLabel(item.jenis_pekerjaan)}
+                                                        </span>
+                                                        <span className="text-xs text-green-600">
+                                                            {activeArea || '-'}
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                                <div className="shrink-0 pt-0.5">
                                                     {readOnly ? (
                                                         <div
                                                             role="checkbox"
                                                             aria-checked={item.status === 'sudah'}
                                                             aria-readonly="true"
-                                                            className={`mx-auto flex h-7 w-7 items-center justify-center rounded-md border ${
+                                                            className={`flex h-7 w-7 items-center justify-center rounded-md border ${
                                                                 item.status === 'sudah'
                                                                     ? 'border-green-600 bg-green-600'
                                                                     : 'border-gray-300 bg-gray-100'
@@ -512,14 +585,14 @@ return null;
                                                         </div>
                                                     ) : (
                                                         <label className="inline-flex cursor-pointer items-center justify-center">
-                                                            <span className={`relative flex h-5 w-5 items-center justify-center rounded border-2 transition-colors ${
+                                                            <span className={`relative flex h-7 w-7 items-center justify-center rounded-md border-2 transition-colors ${
                                                                 !areaSelected
                                                                     ? 'border-gray-200 bg-gray-100'
                                                                     : item.status === 'sudah'
                                                                         ? 'border-green-500 bg-green-500 text-white'
                                                                         : 'border-gray-300 bg-white hover:border-gray-400'
                                                             }`}>
-                                                                {item.status === 'sudah' && <CheckCircle2 className="h-3.5 w-3.5" />}
+                                                                {item.status === 'sudah' && <CheckCircle2 className="h-4 w-4" />}
                                                             </span>
                                                             <input
                                                                 type="checkbox"
@@ -529,12 +602,12 @@ return null;
                                                             />
                                                         </label>
                                                     )}
-                                                </TableCell>
-                                            </TableRow>
-                                        );
-                                    })}
-                                </TableBody>
-                            </Table>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    );
+                                })}
+                            </div>
                         </div>
                     );
                 })}

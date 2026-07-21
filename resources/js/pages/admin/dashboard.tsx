@@ -632,7 +632,7 @@ function DataDasarSummary({ dataDasar, rincianArea }: { dataDasar: DataDasarType
             <CardContent className="space-y-5">
                 <div className="flex flex-col gap-4 lg:flex-row">
                     {/* Identitas */}
-                    <div className="grid grid-cols-1 gap-4 rounded-lg border border-green-100 bg-green-50/30 p-4 sm:grid-cols-3 sm:grid-rows-2 lg:w-2/3">
+                    <div className="grid grid-cols-1 gap-4 rounded-lg border border-green-100 bg-green-50/30 p-4 sm:grid-cols-2 lg:w-2/3 lg:grid-cols-3 lg:grid-rows-2">
                         <ReadField label="Nama Tim / Unit" value={dataDasar.nama_tim} />
                         <ReadField label="Fakultas / Unit" value={dataDasar.fakultas} />
                         <ReadField label="Alamat / Lokasi Program" value={dataDasar.alamat} />
@@ -679,7 +679,7 @@ function DataDasarSummary({ dataDasar, rincianArea }: { dataDasar: DataDasarType
                     </div>
                 </div>
 
-                <div className="grid gap-4 lg:grid-cols-3">
+                <div className="grid gap-4 sm:grid-cols-1 md:grid-cols-3">
                     {/* Tabel 1: Data Warga */}
                     <div className="overflow-hidden rounded-lg border border-green-100">
                         <table className="w-full text-sm">
@@ -941,12 +941,12 @@ q.progress_date = value;
                         </p>
                     </div>
                     <div className="flex flex-wrap items-center gap-2">
-                        <div className="flex items-center rounded-lg border border-green-200 bg-white p-0.5">
+                        <div className="flex flex-wrap items-center rounded-lg border border-green-200 bg-white p-0.5">
                             {PRESETS.map((preset) => (
                                 <button
                                     key={preset.key}
                                     onClick={() => handlePreset(preset)}
-                                    className={`rounded-md px-3 py-1.5 text-xs font-medium transition-colors ${
+                                    className={`rounded-md px-2.5 py-1.5 text-xs font-medium transition-colors sm:px-3 ${
                                         activePreset === preset.key
                                             ? 'bg-green-600 text-white shadow-sm'
                                             : 'text-gray-600 hover:text-gray-900'
@@ -956,10 +956,10 @@ q.progress_date = value;
                                 </button>
                             ))}
                         </div>
-                        <div className="flex items-center gap-1.5 rounded-lg border border-green-200 bg-white px-2 py-1">
-                            <CalendarIcon className="size-3.5 text-gray-400" />
+                        <div className="flex flex-wrap items-center gap-1.5 rounded-lg border border-green-200 bg-white px-2 py-1">
+                            <CalendarIcon className="size-3.5 text-gray-400 shrink-0" />
                             <SimpleDatePicker value={startDate} onChange={setStartDate} placeholder="tt/bb/tttt" />
-                            <span className="text-xs text-gray-400">&ndash;</span>
+                            <span className="hidden text-xs text-gray-400 sm:inline">&ndash;</span>
                             <SimpleDatePicker value={endDate} onChange={setEndDate} placeholder="tt/bb/tttt" />
                             <Button
                                 variant="ghost"
@@ -1069,7 +1069,7 @@ q.progress_date = value;
                     />
                 </div>
 
-                <div className="grid gap-4 lg:grid-cols-3">
+                <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
                     <PieChartCard
                         title="Pilah Sampah per Jenis"
                         icon={Recycle}

@@ -10,9 +10,9 @@ export default function AuthSimpleLayout({
             <div className="w-full max-w-sm">
                     <div className="flex flex-col items-center">
             <img
-                src="/logo-zerolib.png"
+                src="/logo_zerolib.jpeg"
                 alt="ZeroLib Logo"
-                className="w-64 object-contain -mb-15"
+                className="w-48 sm:w-56 md:w-64 object-contain -mb-15 max-w-[80vw]"
             />
 
             <h1 className="text-xl font-medium text-center">

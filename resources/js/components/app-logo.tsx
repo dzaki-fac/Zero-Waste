@@ -18,7 +18,7 @@ export default function AppLogo() {
                 "
             >
                 <img
-                    src="/logo-zerolib.png"
+                    src="/zerolib-logo.png"
                     alt="ZeroLib"
                     className="
                         block h-auto w-[140px] max-w-none

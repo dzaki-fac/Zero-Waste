@@ -355,8 +355,8 @@ e.preventDefault()
                             </div>
                         )}
 
-                        <div className="rounded-xl border border-green-200 bg-white shadow-sm">
-                            <Table>
+                        <div className="overflow-x-auto rounded-xl border border-green-200 bg-white shadow-sm">
+                            <Table className="min-w-[600px]">
                                 <TableHeader>
                                     <TableRow className="border-green-100 bg-green-50/50">
                                         <TableHead className="text-green-700">No</TableHead>

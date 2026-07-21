@@ -32,9 +32,9 @@ const JAM_LAYANAN = [
 export default function Footer() {
   return (
     <footer style={{ backgroundColor: C.navy900 }}>
-      <div className="max-w-6xl mx-auto px-5 sm:px-8 pt-14 sm:pt-16 pb-8">
+      <div className="max-w-6xl mx-auto px-4 sm:px-8 pt-14 sm:pt-16 pb-8">
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-10 mb-10">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 sm:gap-10 mb-10">
           <div>
             <div className="text-xs font-semibold uppercase tracking-widest mb-4" style={{ ...body, color: "#8A8FB3" }}>
               Kontak
