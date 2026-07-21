@@ -8,6 +8,7 @@ use App\Models\Penimbangan;
 use App\Models\PilahSampah;
 use App\Models\Poster;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -29,18 +30,21 @@ class HomeController extends Controller
             $distribusiQuery->where('tanggal', '>=', $startDate);
         }
         if ($endDate) {
-            $penimbanganQuery->where('tanggal', '<=', $endDate);
-            $pilahQuery->where('tanggal', '<=', $endDate);
-            $distribusiQuery->where('tanggal', '<=', $endDate);
+            $endOfDay = Carbon::parse($endDate)->endOfDay();
+            $penimbanganQuery->where('tanggal', '<=', $endOfDay);
+            $pilahQuery->where('tanggal', '<=', $endOfDay);
+            $distribusiQuery->where('tanggal', '<=', $endOfDay);
         }
 
         $totalPenimbangan = (float) $penimbanganQuery->sum('berat_sampah');
         $totalPilah = (float) $pilahQuery->sum('berat');
-        $totalDistribusi = (float) $distribusiQuery->sum('berat');
+
+        $approvedDistribusiQuery = (clone $distribusiQuery)->where('review_status', 'approved');
+        $totalApprovedDistribusi = (float) $approvedDistribusiQuery->sum('berat');
 
         $penimbanganByArea = Penimbangan::query()
             ->when($startDate, fn ($q) => $q->where('tanggal', '>=', $startDate))
-            ->when($endDate, fn ($q) => $q->where('tanggal', '<=', $endDate))
+            ->when($endDate, fn ($q) => $q->where('tanggal', '<=', Carbon::parse($endDate)->endOfDay()))
             ->select('area', DB::raw('SUM(berat_sampah) as total'))
             ->groupBy('area')
             ->pluck('total', 'area')
@@ -50,7 +54,7 @@ class HomeController extends Controller
 
         $pilahByJenis = PilahSampah::query()
             ->when($startDate, fn ($q) => $q->where('tanggal', '>=', $startDate))
-            ->when($endDate, fn ($q) => $q->where('tanggal', '<=', $endDate))
+            ->when($endDate, fn ($q) => $q->where('tanggal', '<=', Carbon::parse($endDate)->endOfDay()))
             ->select('jenis_sampah', DB::raw('SUM(berat) as total'))
             ->groupBy('jenis_sampah')
             ->pluck('total', 'jenis_sampah')
@@ -59,8 +63,9 @@ class HomeController extends Controller
             ->toArray();
 
         $distribusiByTujuan = Distribusi::query()
+            ->where('review_status', 'approved')
             ->when($startDate, fn ($q) => $q->where('tanggal', '>=', $startDate))
-            ->when($endDate, fn ($q) => $q->where('tanggal', '<=', $endDate))
+            ->when($endDate, fn ($q) => $q->where('tanggal', '<=', Carbon::parse($endDate)->endOfDay()))
             ->select('tujuan_distribusi', DB::raw('SUM(berat) as total'))
             ->groupBy('tujuan_distribusi')
             ->pluck('total', 'tujuan_distribusi')
@@ -70,13 +75,14 @@ class HomeController extends Controller
 
         $statusBerat = [
             'menunggu_pemilahan' => max(0, $totalPenimbangan - $totalPilah),
-            'siap_didistribusikan' => max(0, $totalPilah - $totalDistribusi),
-            'sudah_didistribusikan' => $totalDistribusi,
+            'siap_didistribusikan' => max(0, $totalPilah - $totalApprovedDistribusi),
+            'sudah_didistribusikan' => $totalApprovedDistribusi,
         ];
 
         $distribusiByJenis = Distribusi::query()
+            ->where('review_status', 'approved')
             ->when($startDate, fn ($q) => $q->where('tanggal', '>=', $startDate))
-            ->when($endDate, fn ($q) => $q->where('tanggal', '<=', $endDate))
+            ->when($endDate, fn ($q) => $q->where('tanggal', '<=', Carbon::parse($endDate)->endOfDay()))
             ->select('jenis_sampah', DB::raw('SUM(berat) as total'))
             ->groupBy('jenis_sampah')
             ->pluck('total', 'jenis_sampah')
