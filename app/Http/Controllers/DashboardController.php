@@ -39,18 +39,21 @@ class DashboardController extends Controller
         }
 
         if ($endDate) {
-            $penimbanganQuery->where('tanggal', '<=', $endDate);
-            $pilahQuery->where('tanggal', '<=', $endDate);
-            $distribusiQuery->where('tanggal', '<=', $endDate);
+            $endOfDay = Carbon::parse($endDate)->endOfDay();
+            $penimbanganQuery->where('tanggal', '<=', $endOfDay);
+            $pilahQuery->where('tanggal', '<=', $endOfDay);
+            $distribusiQuery->where('tanggal', '<=', $endOfDay);
         }
 
         $totalPenimbangan = (float) $penimbanganQuery->sum('berat_sampah');
         $totalPilah = (float) $pilahQuery->sum('berat');
-        $totalDistribusi = (float) $distribusiQuery->sum('berat');
+
+        $approvedDistribusiQuery = (clone $distribusiQuery)->where('review_status', 'approved');
+        $totalApprovedDistribusi = (float) $approvedDistribusiQuery->sum('berat');
 
         $penimbanganByArea = Penimbangan::visibleTo($user)
             ->when($startDate, fn ($q) => $q->where('tanggal', '>=', $startDate))
-            ->when($endDate, fn ($q) => $q->where('tanggal', '<=', $endDate))
+            ->when($endDate, fn ($q) => $q->where('tanggal', '<=', Carbon::parse($endDate)->endOfDay()))
             ->select('area', DB::raw('SUM(berat_sampah) as total'))
             ->groupBy('area')
             ->pluck('total', 'area')
@@ -60,7 +63,7 @@ class DashboardController extends Controller
 
         $pilahByJenis = PilahSampah::visibleTo($user)
             ->when($startDate, fn ($q) => $q->where('tanggal', '>=', $startDate))
-            ->when($endDate, fn ($q) => $q->where('tanggal', '<=', $endDate))
+            ->when($endDate, fn ($q) => $q->where('tanggal', '<=', Carbon::parse($endDate)->endOfDay()))
             ->select('jenis_sampah', DB::raw('SUM(berat) as total'))
             ->groupBy('jenis_sampah')
             ->pluck('total', 'jenis_sampah')
@@ -69,8 +72,9 @@ class DashboardController extends Controller
             ->toArray();
 
         $distribusiByTujuan = Distribusi::visibleTo($user)
+            ->where('review_status', 'approved')
             ->when($startDate, fn ($q) => $q->where('tanggal', '>=', $startDate))
-            ->when($endDate, fn ($q) => $q->where('tanggal', '<=', $endDate))
+            ->when($endDate, fn ($q) => $q->where('tanggal', '<=', Carbon::parse($endDate)->endOfDay()))
             ->select('tujuan_distribusi', DB::raw('SUM(berat) as total'))
             ->groupBy('tujuan_distribusi')
             ->pluck('total', 'tujuan_distribusi')
@@ -89,19 +93,20 @@ class DashboardController extends Controller
             ->map(function ($petugas) use ($startDate, $endDate) {
                 $penimbangan = Penimbangan::where('user_id', $petugas->id)
                     ->when($startDate, fn ($q) => $q->where('tanggal', '>=', $startDate))
-                    ->when($endDate, fn ($q) => $q->where('tanggal', '<=', $endDate))
+                    ->when($endDate, fn ($q) => $q->where('tanggal', '<=', Carbon::parse($endDate)->endOfDay()))
                     ->selectRaw('COUNT(*) as jumlah, COALESCE(SUM(berat_sampah), 0) as total_berat')
                     ->first();
 
                 $pilah = PilahSampah::where('user_id', $petugas->id)
                     ->when($startDate, fn ($q) => $q->where('tanggal', '>=', $startDate))
-                    ->when($endDate, fn ($q) => $q->where('tanggal', '<=', $endDate))
+                    ->when($endDate, fn ($q) => $q->where('tanggal', '<=', Carbon::parse($endDate)->endOfDay()))
                     ->selectRaw('COUNT(*) as jumlah, COALESCE(SUM(berat), 0) as total_berat')
                     ->first();
 
                 $distribusi = Distribusi::where('user_id', $petugas->id)
+                    ->where('review_status', 'approved')
                     ->when($startDate, fn ($q) => $q->where('tanggal', '>=', $startDate))
-                    ->when($endDate, fn ($q) => $q->where('tanggal', '<=', $endDate))
+                    ->when($endDate, fn ($q) => $q->where('tanggal', '<=', Carbon::parse($endDate)->endOfDay()))
                     ->selectRaw('COUNT(*) as jumlah, COALESCE(SUM(berat), 0) as total_berat')
                     ->first();
 
@@ -124,13 +129,14 @@ class DashboardController extends Controller
 
         $statusBerat = [
             'menunggu_pemilahan' => max(0, $totalPenimbangan - $totalPilah),
-            'siap_didistribusikan' => max(0, $totalPilah - $totalDistribusi),
-            'sudah_didistribusikan' => $totalDistribusi,
+            'siap_didistribusikan' => max(0, $totalPilah - $totalApprovedDistribusi),
+            'sudah_didistribusikan' => $totalApprovedDistribusi,
         ];
 
         $distribusiByJenis = Distribusi::query()
+            ->where('review_status', 'approved')
             ->when($startDate, fn ($q) => $q->where('tanggal', '>=', $startDate))
-            ->when($endDate, fn ($q) => $q->where('tanggal', '<=', $endDate))
+            ->when($endDate, fn ($q) => $q->where('tanggal', '<=', Carbon::parse($endDate)->endOfDay()))
             ->select('jenis_sampah', DB::raw('SUM(berat) as total'))
             ->groupBy('jenis_sampah')
             ->pluck('total', 'jenis_sampah')
@@ -279,7 +285,7 @@ class DashboardController extends Controller
                 $checklistBase->where('tanggal', '>=', $startDate);
             }
             if ($endDate) {
-                $checklistBase->where('tanggal', '<=', $endDate);
+                $checklistBase->where('tanggal', '<=', Carbon::parse($endDate)->endOfDay());
             }
 
             $totalTugas = $checklistBase->clone()->count();

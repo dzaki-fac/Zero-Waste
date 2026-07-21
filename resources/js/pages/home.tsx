@@ -1016,7 +1016,7 @@ newsOffsetRef.current -= singleSetWidth;
       </section>
 
       {/* ---- Laporan ---- */}
-      <section id="laporan" ref={setSectionRef("laporan")} className="max-w-6xl mx-auto px-5 sm:px-8 pt-6 sm:pt-8 pb-8 sm:pb-10" style={{ scrollMarginTop: 72 }}>
+      <section id="laporan" ref={setSectionRef("laporan")} className="max-w-6xl mx-auto px-4 sm:px-8 pt-6 sm:pt-8 pb-8 sm:pb-10" style={{ scrollMarginTop: 64 }}>
         <Reveal>
           <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
             <div>
@@ -1026,12 +1026,12 @@ newsOffsetRef.current -= singleSetWidth;
               <p className="text-sm" style={{ color: C.ink500 }}>Rekap data pengelolaan sampah</p>
             </div>
             <div className="flex flex-wrap items-center gap-2 shrink-0">
-              <div className="flex items-center rounded-lg border bg-white p-0.5" style={{ borderColor: C.line }}>
+              <div className="flex flex-wrap items-center rounded-lg border bg-white p-0.5" style={{ borderColor: C.line }}>
                 {PRESETS.map((preset) => (
                   <button
                     key={preset.key}
                     onClick={() => handlePreset(preset)}
-                    className={`rounded-md px-3 py-1.5 text-xs font-medium transition-colors ${
+                    className={`rounded-md px-2 py-1.5 text-xs font-medium transition-colors sm:px-3 ${
                       activePreset === preset.key
                         ? 'bg-green-600 text-white shadow-sm'
                         : 'text-gray-600 hover:text-gray-900'
@@ -1041,20 +1041,20 @@ newsOffsetRef.current -= singleSetWidth;
                   </button>
                 ))}
               </div>
-              <div className="flex items-center gap-1.5 rounded-lg border bg-white px-2 py-1" style={{ borderColor: C.line }}>
-                <CalendarIcon className="size-3.5 text-gray-400" />
+              <div className="flex flex-wrap items-center gap-1.5 rounded-lg border bg-white px-2 py-1" style={{ borderColor: C.line }}>
+                <CalendarIcon className="size-3.5 text-gray-400 shrink-0" />
                 <input
                   type="date"
                   value={startDate}
                   onChange={(e) => setStartDate(e.target.value)}
-                  className="w-28 border-0 bg-transparent text-xs text-gray-700 outline-none hover:text-gray-900 [color-scheme:light]"
+                  className="w-24 sm:w-28 border-0 bg-transparent text-xs text-gray-700 outline-none hover:text-gray-900 [color-scheme:light]"
                 />
-                <span className="text-xs text-gray-400">&ndash;</span>
+                <span className="hidden text-xs text-gray-400 sm:inline">&ndash;</span>
                 <input
                   type="date"
                   value={endDate}
                   onChange={(e) => setEndDate(e.target.value)}
-                  className="w-28 border-0 bg-transparent text-xs text-gray-700 outline-none hover:text-gray-900 [color-scheme:light]"
+                  className="w-24 sm:w-28 border-0 bg-transparent text-xs text-gray-700 outline-none hover:text-gray-900 [color-scheme:light]"
                 />
                 <button
                   onClick={handleCustomDate}
@@ -1072,9 +1072,9 @@ newsOffsetRef.current -= singleSetWidth;
       </section>
 
       {/* ---- Berita ---- */}
-      <section id="berita" ref={setSectionRef("berita")} className="pt-6 sm:pt-8" style={{ backgroundColor: C.navy900, scrollMarginTop: 64 }}>
+      <section id="berita" ref={setSectionRef("berita")} className="pt-6 sm:pt-8" style={{ backgroundColor: C.navy900, scrollMarginTop: 56 }}>
         {news.length > 0 ? (
-        <div className="max-w-6xl mx-auto px-5 sm:px-8 pb-12">
+        <div className="max-w-6xl mx-auto px-4 sm:px-8 pb-12">
           <Reveal>
             <div className="flex items-end justify-between flex-wrap gap-3 mb-8">
               <div>
@@ -1143,7 +1143,7 @@ newsOffsetRef.current -= singleSetWidth;
           </div>
         </div>
         ) : (
-          <div className="max-w-6xl mx-auto px-5 sm:px-8 py-12 text-center">
+          <div className="max-w-6xl mx-auto px-4 sm:px-8 py-12 text-center">
             <p className="text-sm" style={{ color: "#8A8FB3" }}>Belum ada berita.</p>
           </div>
         )}
@@ -1293,9 +1293,8 @@ newsOffsetRef.current -= singleSetWidth;
       {/* ---- Footer ---- */}
       {/* ---- Footer ---- */}
       <footer style={{ backgroundColor: C.navy900 }}>
-        <div className="max-w-6xl mx-auto px-5 sm:px-8 pt-14 sm:pt-16 pb-8">
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-10 mb-10">
+        <div className="max-w-6xl mx-auto px-4 sm:px-8 pt-14 sm:pt-16 pb-8">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 sm:gap-10 mb-10">
             <div>
               <div className="text-xs font-semibold uppercase tracking-widest mb-4" style={{ ...body, color: "#8A8FB3" }}>
                 Kontak

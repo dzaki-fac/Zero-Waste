@@ -161,10 +161,10 @@ e.currentTarget.style.backgroundColor = "transparent";
       {children}
 
       <footer style={{ backgroundColor: C.navy900 }}>
-        <div className="max-w-6xl mx-auto px-5 sm:px-8 pt-14 sm:pt-16 pb-8">
+        <div className="max-w-6xl mx-auto px-4 sm:px-8 pt-14 sm:pt-16 pb-8">
           <div className="mb-10">
             <div className="text-xs font-semibold uppercase tracking-widest mb-4" style={{ ...body, color: "#8A8FB3" }}>Media &amp; Kanal Resmi</div>
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
               {SOCIALS.map((s, i) => {
                 const SIcon = s.icon;
 

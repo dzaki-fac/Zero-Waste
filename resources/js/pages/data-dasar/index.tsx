@@ -178,10 +178,10 @@ export default function DataDasarIndex({ dataDasar, rincianArea: rincianAreaProp
 
             <div className="flex h-full flex-1 flex-col gap-6 overflow-x-auto bg-gradient-to-b from-green-50/40 to-transparent p-4 rounded-xl">
                 {/* Header */}
-                <div className="flex flex-col gap-4 rounded-2xl border border-green-100 bg-white p-5 shadow-sm sm:flex-row sm:items-center sm:justify-between">
-                    <div className="flex items-start gap-4">
-                        <div className="hidden h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-green-600 text-white shadow-sm sm:flex">
-                            <Leaf className="h-6 w-6" />
+                <div className="flex flex-col gap-4 rounded-2xl border border-green-100 bg-white p-4 shadow-sm sm:flex-row sm:items-center sm:justify-between sm:p-5">
+                    <div className="flex items-start gap-3 sm:gap-4">
+                        <div className="hidden h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-green-600 text-white shadow-sm sm:flex sm:h-12 sm:w-12">
+                            <Leaf className="h-5 w-5 sm:h-6 sm:w-6" />
                         </div>
                         <div>
                             <Heading
@@ -206,7 +206,7 @@ export default function DataDasarIndex({ dataDasar, rincianArea: rincianAreaProp
                             )}
                         </div>
                     </div>
-                    <div className="flex shrink-0 items-center gap-2">
+                    <div className="flex shrink-0 flex-wrap items-center gap-2">
                         {isEditing ? (
                             <>
                                 <Button
@@ -857,7 +857,7 @@ export default function DataDasarIndex({ dataDasar, rincianArea: rincianAreaProp
                             <div className="divide-y divide-green-100 rounded-lg border border-green-100">
                                 {(computedJenisSampah ?? []).length === 0 && (
                                     <div className="px-3 py-2 text-xs text-slate-500 italic">
-                                        Belum ada data distribusi.
+                                        Belum ada data pemilahan.
                                     </div>
                                 )}
                                 {(computedJenisSampah ?? []).map(
