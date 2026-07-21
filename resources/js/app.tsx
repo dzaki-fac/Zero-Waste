@@ -13,6 +13,8 @@ import StrukturPage from "./pages/struktur";
 
 const appName = import.meta.env.VITE_APP_NAME || 'ZeroLib';
 
+const base = import.meta.env.BASE_URL || '/';
+
 createInertiaApp({
     title: (title) => (title ? `${title} - ${appName}` : appName),
     layout: (name) => {
@@ -31,7 +33,7 @@ createInertiaApp({
     withApp(app) {
         return (
             <TooltipProvider delayDuration={0}>
-                <BrowserRouter>
+                <BrowserRouter basename={base.replace(/\/$/, '')}>
                     <ScrollToTop />
                     <Routes>
                         <Route path="/pengertian" element={<PengertianPage />} />

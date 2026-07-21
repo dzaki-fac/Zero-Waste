@@ -4,6 +4,7 @@ import { useState, useCallback, useMemo } from 'react';
 import DistributionRevisionDialog from '@/components/distribution-revision-dialog';
 import Heading from '@/components/heading';
 import { Button } from '@/components/ui/button';
+import { baseUrl } from '@/lib/path';
 import {
     Dialog,
     DialogContent,
@@ -89,7 +90,7 @@ const years = Array.from({ length: 11 }, (_, i) => currentYear - i);
 
 export default function DistribusiIndex({ distribusi }: Props) {
     const { auth, options } = usePage().props as unknown as { auth: Auth; options: { jenis_sampah: string[]; jenis_detail: string[]; tujuan_distribusi: string[] } };
-    const prefix = auth.user.role === 'admin' ? '/admin' : '/petugas';
+    const prefix = baseUrl(auth.user.role === 'admin' ? '/admin' : '/petugas');
     const isAdmin = auth.user.role === 'admin';
 
     const jenisSampahOptions = options.jenis_sampah;
