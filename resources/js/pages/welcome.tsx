@@ -41,22 +41,22 @@ export default function Welcome() {
         <>
             <Head title="Welcome" />
 
-            <main className="relative flex min-h-screen flex-col items-center justify-center bg-linear-to-b from-green-50 to-white px-4 py-20 sm:px-6 sm:py-24">
+            <main className="relative flex min-h-screen flex-col items-center justify-center bg-linear-to-b from-green-50 to-white px-6 py-24">
                 {/* Header actions */}
-                <div className="absolute right-2 top-2 flex flex-wrap items-end justify-end gap-1.5 sm:right-4 sm:top-4 sm:gap-3">
+                <div className="absolute right-4 top-4 flex flex-wrap items-center justify-end gap-2 sm:right-6 sm:top-6 sm:gap-3">
                     {auth.user ? (
                         <>
-                            <span className="flex items-center gap-1 text-xs font-medium text-green-700 sm:text-sm">
-                                <User className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+                            <span className="flex items-center gap-1.5 text-sm font-medium text-green-700">
+                                <User className="h-4 w-4" />
                                 {auth.user.name}
                             </span>
 
                             {dashboardRoute && (
                                 <Link
                                     href={dashboardRoute}
-                                    className="inline-flex items-center gap-1.5 rounded-lg border border-green-200 bg-white px-3 py-2 text-xs font-medium text-green-700 shadow-sm transition hover:bg-green-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-500 sm:px-4 sm:py-2.5 sm:text-sm"
+                                    className="inline-flex items-center gap-2 rounded-lg border border-green-200 bg-white px-4 py-2.5 text-sm font-medium text-green-700 shadow-sm transition hover:bg-green-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-500"
                                 >
-                                    <LayoutDashboard className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+                                    <LayoutDashboard className="h-4 w-4" />
                                     Dashboard
                                 </Link>
                             )}
@@ -64,16 +64,16 @@ export default function Welcome() {
                             <button
                                 type="button"
                                 onClick={handleLogout}
-                                className="inline-flex items-center gap-1.5 rounded-lg border border-green-200 bg-white px-3 py-2 text-xs font-medium text-green-700 shadow-sm transition hover:bg-green-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-500 sm:px-4 sm:py-2.5 sm:text-sm"
+                                className="inline-flex items-center gap-2 rounded-lg border border-green-200 bg-white px-4 py-2.5 text-sm font-medium text-green-700 shadow-sm transition hover:bg-green-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-500"
                             >
-                                <LogOut className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+                                <LogOut className="h-4 w-4" />
                                 Keluar
                             </button>
                         </>
                     ) : (
                         <Link
                             href="/login"
-                            className="inline-flex items-center gap-2 rounded-lg border border-green-200 bg-white px-4 py-2 text-sm font-medium text-green-700 shadow-sm transition hover:bg-green-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-500 sm:px-6 sm:py-2.5"
+                            className="inline-flex items-center gap-2 rounded-lg border border-green-200 bg-white px-6 py-2.5 text-sm font-medium text-green-700 shadow-sm transition hover:bg-green-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-500"
                         >
                             Login
                         </Link>
@@ -86,12 +86,12 @@ export default function Welcome() {
                     <Link
                         href="/form"
                         aria-label="Open ZeroLib form page"
-                        className="flex h-24 sm:h-36 w-full max-w-[300px] sm:max-w-[430px] items-center justify-center overflow-hidden bg-transparent transition-opacity hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-500"
+                        className="flex h-24 sm:h-28 w-full max-w-[280px] sm:max-w-[320px] items-center justify-center overflow-hidden bg-transparent transition-opacity hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-500"
                     >
                     <img
-                src="/zerolib-logo.png"
+                src="/images/zerolib-logo.png"
                 alt="ZeroLib"
-                className="h-auto w-full max-w-[280px] sm:max-w-[420px] object-contain object-center"
+                className="h-auto w-full max-w-[260px] sm:max-w-[300px] object-contain object-center"
                 loading="eager"
                 draggable={false}
             />

@@ -24,6 +24,7 @@ import {
   CheckCircle,
   Send,
   CalendarIcon,
+  X,
 } from "lucide-react";
 import React, { useState, useRef, useEffect, useLayoutEffect   } from "react";
 import type {ReactNode, CSSProperties} from "react";
@@ -616,6 +617,7 @@ query.end_date = params.end_date;
   const [heroIndex, setHeroIndex] = useState(0);
   const [posterIndex, setPosterIndex] = useState(0);
   const [posterPaused, setPosterPaused] = useState(false);
+  const [modalPoster, setModalPoster] = useState<PosterItem | null>(null);
   const [newsPaused, setNewsPaused] = useState(false);
   const [activeSection, setActiveSection] = useState("beranda");
   const [scrollY, setScrollY] = useState(0);
@@ -1169,23 +1171,24 @@ newsOffsetRef.current -= singleSetWidth;
               </span>
             </div>
 
-            {/* Frame poster — rasio A3 vertikal (297 x 420), gambar dipusatkan.
-                Sengaja tidak ada overlay teks di atas gambar (judul/catatan),
-                supaya posternya kelihatan bersih & jelas. Tag di atas frame
-                (di luar gambar) sudah cukup jadi label. */}
-            <div
-              className="mx-auto rounded-2xl overflow-hidden relative mb-3"
-              style={{ aspectRatio: "297 / 420", width: "min(100%, min(420px, 85vw))", backgroundColor: C.navy050 }}
+            <button
+              type="button"
+              onClick={() => setModalPoster(activePoster)}
+              className="mx-auto block w-full cursor-zoom-in mb-1"
             >
-              <SafeImage
-                src={activePoster.image}
-                alt={activePoster.title}
-                icon={ImageIcon}
-                gradient={`linear-gradient(135deg, ${C.navy900}, ${C.navy700})`}
-                className="w-full h-full object-cover"
-                style={{ objectPosition: "center 65%" }}
-              />
-            </div>
+              <div
+                className="mx-auto rounded-2xl overflow-hidden relative"
+                style={{ width: "min(100%, min(420px, 85vw))", backgroundColor: C.navy050 }}
+              >
+                <SafeImage
+                  src={activePoster.image}
+                  alt={activePoster.title}
+                  icon={ImageIcon}
+                  gradient={`linear-gradient(135deg, ${C.navy900}, ${C.navy700})`}
+                  className="w-full object-contain"
+                />
+              </div>
+            </button>
 
             <div className="flex items-center justify-between mb-4">
               <button onClick={prevPoster} className="w-9 sm:w-10 h-9 sm:h-10 rounded-full flex items-center justify-center border transition-all duration-200 hover:scale-105 active:scale-90" style={{ borderColor: C.line }} aria-label="Poster sebelumnya">
@@ -1207,8 +1210,7 @@ newsOffsetRef.current -= singleSetWidth;
               </button>
             </div>
 
-            {/* Thumbnail strip — overlay penanda di thumbnail aktif tumbuh dari kiri
-                ke kanan selama 7 detik (pakai transform, jadi mulus/GPU-accelerated) */}
+            {/* Thumbnail strip */}
             <div className="flex flex-nowrap sm:flex-wrap justify-start sm:justify-center gap-2 overflow-x-auto sm:overflow-visible pb-1 poster-thumbs snap-x snap-mandatory sm:snap-none">
               {POSTERS.map((p, i) => {
                 const isActive = i === posterIndex;
@@ -1230,7 +1232,7 @@ newsOffsetRef.current -= singleSetWidth;
                       alt={p.title}
                       icon={ImageIcon}
                       gradient={`linear-gradient(135deg, ${C.navy700}, ${C.navy900})`}
-                      className="w-full h-full object-cover"
+                      className="w-full h-full object-contain"
                       style={{ opacity: isActive ? 1 : 0.55, transition: "opacity 200ms ease" }}
                     />
                     {isActive && (
@@ -1260,6 +1262,29 @@ newsOffsetRef.current -= singleSetWidth;
           </div>
         )}
       </section>
+
+      {/* ---- Poster Modal ---- */}
+      {modalPoster && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4"
+          onClick={() => setModalPoster(null)}
+        >
+          <button
+            type="button"
+            onClick={(e) => { e.stopPropagation(); setModalPoster(null); }}
+            className="absolute top-4 right-4 z-10 flex h-10 w-10 items-center justify-center rounded-full bg-black/50 text-white hover:bg-black/70 transition-colors"
+            aria-label="Tutup"
+          >
+            <X size={20} />
+          </button>
+          <img
+            src={modalPoster.image}
+            alt={modalPoster.title}
+            className="max-h-[90vh] max-w-[90vw] rounded-xl object-contain"
+            onClick={(e) => e.stopPropagation()}
+          />
+        </div>
+      )}
 
       {/* ---- Footer ---- */}
       {/* ---- Footer ---- */}

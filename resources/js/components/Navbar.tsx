@@ -39,7 +39,7 @@ export default function Navbar({ activeSection, onNavItemClick }: NavbarProps) {
         className="sticky top-0 z-40 border-b relative"
         style={{ backgroundColor: "#fff", borderColor: C.line }}
       >
-        <div className="w-full pl-3 sm:pl-8 pr-3 sm:pr-8 h-16 sm:h-20 md:h-24 flex items-center justify-between gap-2">
+        <div className="w-full pl-3 sm:pl-8 pr-3 sm:pr-8 h-14 sm:h-16 flex items-center justify-between gap-2 overflow-hidden">
           <button
             type="button"
             onClick={() => {
@@ -51,13 +51,13 @@ export default function Navbar({ activeSection, onNavItemClick }: NavbarProps) {
             }}
             className="flex items-center gap-1.5 sm:gap-4 cursor-pointer min-w-0 overflow-hidden"
           >
-            <div className="h-6 sm:h-8 md:h-10 lg:h-12 flex items-center shrink-0 [&>*]:!h-full [&>*]:!w-auto [&>*]:!max-w-none">
+            <div className="h-5 sm:h-9 flex items-center shrink-0 overflow-hidden [&>*]:!h-full [&>*]:!w-auto [&>*]:!max-w-none">
               <UndipLogoIcon />
             </div>
-            <div className="h-6 sm:h-8 md:h-10 lg:h-12 flex items-center shrink-0 [&>*]:!h-full [&>*]:!w-auto [&>*]:!max-w-none">
+            <div className="h-5 sm:h-9 flex items-center shrink-0 overflow-hidden [&>*]:!h-full [&>*]:!w-auto [&>*]:!max-w-none">
               <UptLogoIcon />
             </div>
-            <div className="h-6 sm:h-8 md:h-10 lg:h-12 flex items-center shrink-0 [&>*]:!h-full [&>*]:!w-auto [&>*]:!max-w-none">
+            <div className="h-4 sm:h-7 flex items-center shrink-0 overflow-hidden [&>*]:!h-full [&>*]:!w-auto [&>*]:!max-w-none">
               <ZeroLibLogoIcon />
             </div>
           </button>
@@ -130,7 +130,7 @@ e.currentTarget.style.color = C.ink500;
             luar menu akan menutupnya. Selalu di-render (bukan cuma pas
             open) supaya ada transisi keluar yang halus, bukan hilang tiba². */}
         <div
-          className="md:hidden fixed inset-0 top-16 sm:top-20 md:top-24 transition-opacity duration-300 ease-out"
+          className="md:hidden fixed inset-0 top-14 sm:top-16 transition-opacity duration-300 ease-out"
           style={{
             backgroundColor: "rgba(0,0,0,0.25)",
             opacity: mobileNavOpen ? 1 : 0,
