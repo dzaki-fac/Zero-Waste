@@ -1,5 +1,5 @@
 import type { AuthLayoutProps } from '@/types';
-import { baseUrl } from '@/lib/path';
+import { asset } from '@/lib/path';
 
 export default function AuthSimpleLayout({
     children,
@@ -11,7 +11,7 @@ export default function AuthSimpleLayout({
             <div className="w-full max-w-sm">
             <div className="flex w-full flex-col items-center text-center">
                 <img
-                    src={baseUrl('/images/zerolib-logo.png')}
+                    src={asset('/images/zerolib-logo.png')}
                     alt="ZeroLib Logo"
                     className="h-auto w-full max-w-[280px] object-contain sm:max-w-[320px]"
                 />

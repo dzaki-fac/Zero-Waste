@@ -13,7 +13,21 @@ import StrukturPage from "./pages/struktur";
 
 const appName = import.meta.env.VITE_APP_NAME || 'ZeroLib';
 
-const base = import.meta.env.BASE_URL || '/';
+(function () {
+    const el = document.getElementById('app');
+    if (el) {
+        try {
+            const pageData = JSON.parse(el.getAttribute('data-page') || '{}');
+            const ab = pageData.props?.assetBase;
+            if (ab !== undefined && ab !== null && ab !== '') {
+                window.__assetBase = ab;
+            }
+        } catch {
+        }
+    }
+})();
+
+const base = window.__assetBase || import.meta.env.BASE_URL || '/';
 
 createInertiaApp({
     title: (title) => (title ? `${title} - ${appName}` : appName),

@@ -9,7 +9,7 @@ import {
     Truck,
     User,
 } from 'lucide-react';
-import { baseUrl } from '@/lib/path';
+import { baseUrl, asset } from '@/lib/path';
 import { logout } from '@/routes';
 
 type AuthUser = {
@@ -91,7 +91,7 @@ export default function Welcome() {
                         className="flex h-24 sm:h-28 w-full max-w-[280px] sm:max-w-[320px] items-center justify-center overflow-hidden bg-transparent transition-opacity hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-500"
                     >
                     <img
-                src={baseUrl('/images/zerolib-logo.png')}
+                src={asset('/images/zerolib-logo.png')}
                 alt="ZeroLib"
                 className="h-auto w-full max-w-[260px] sm:max-w-[300px] object-contain object-center"
                 loading="eager"
