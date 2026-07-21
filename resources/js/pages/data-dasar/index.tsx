@@ -857,7 +857,7 @@ export default function DataDasarIndex({ dataDasar, rincianArea: rincianAreaProp
                             <div className="divide-y divide-green-100 rounded-lg border border-green-100">
                                 {(computedJenisSampah ?? []).length === 0 && (
                                     <div className="px-3 py-2 text-xs text-slate-500 italic">
-                                        Belum ada data distribusi.
+                                        Belum ada data pemilahan.
                                     </div>
                                 )}
                                 {(computedJenisSampah ?? []).map(

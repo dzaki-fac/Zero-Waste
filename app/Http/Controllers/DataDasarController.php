@@ -7,6 +7,7 @@ use App\Http\Requests\DataDasarRequest;
 use App\Models\DataDasar;
 use App\Models\Distribusi;
 use App\Models\Penimbangan;
+use App\Models\PilahSampah;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
@@ -54,7 +55,7 @@ class DataDasarController extends Controller
 
     private function computeJenisSampahDominan(): array
     {
-        $data = Distribusi::select(
+        $data = PilahSampah::select(
             'jenis_sampah',
             DB::raw('SUM(berat) as total_berat'),
             DB::raw('COUNT(DISTINCT DATE(tanggal)) as total_hari')
