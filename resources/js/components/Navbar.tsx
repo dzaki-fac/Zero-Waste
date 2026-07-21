@@ -1,6 +1,7 @@
 import { Menu, X } from "lucide-react";
 import { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
+import { baseUrl } from "@/lib/path";
 import { NAV_ITEMS, PAGE_ROUTES } from "../navData";
 import { C, display } from "../theme";
 import UndipLogoIcon from "./Undiplogoicon";
@@ -23,7 +24,7 @@ export default function Navbar({ activeSection, onNavItemClick }: NavbarProps) {
     if (PAGE_ROUTES[id]) {
       navigate(PAGE_ROUTES[id]);
     } else if (location.pathname !== "/") {
-      window.location.href = "/#" + id;
+      window.location.href = baseUrl("/") + "#" + id;
     } else {
       onNavItemClick?.(id);
     }
