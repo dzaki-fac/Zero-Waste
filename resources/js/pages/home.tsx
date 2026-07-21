@@ -586,7 +586,7 @@ query.start_date = params.start_date;
 query.end_date = params.end_date;
 }
 
-        router.get('/', query, { preserveState: true, preserveScroll: true, replace: true });
+        router.get(baseUrl('/'), query, { preserveState: true, preserveScroll: true, replace: true });
     }
 
     function handlePreset(preset: typeof PRESETS[number]) {

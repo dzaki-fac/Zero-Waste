@@ -3,6 +3,7 @@ import { ClipboardCheck, ClipboardList, Download, History, FileDown, Search, X }
 import { useState, useMemo } from 'react';
 import Heading from '@/components/heading';
 import { Button } from '@/components/ui/button';
+import { baseUrl } from '@/lib/path';
 import {
     Table,
     TableBody,
@@ -93,7 +94,7 @@ return;
                             )}
                         </div>
                         <a
-                            href="/admin/checklist-pekerjaan/export-all"
+                            href={baseUrl('/admin/checklist-pekerjaan/export-all')}
                             download
                             className="inline-flex shrink-0 items-center gap-2 rounded-md bg-green-600 px-4 py-2 text-sm font-medium text-white hover:bg-green-700 transition-colors"
                         >

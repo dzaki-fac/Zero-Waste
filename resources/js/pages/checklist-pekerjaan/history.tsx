@@ -3,6 +3,7 @@ import { ArrowLeft, CalendarDays, FileDown } from 'lucide-react';
 import { useState } from 'react';
 import Heading from '@/components/heading';
 import { Button } from '@/components/ui/button';
+import { baseUrl } from '@/lib/path';
 import {
     Table,
     TableBody,
@@ -76,7 +77,7 @@ export default function ChecklistPekerjaanHistory({ petugas, records }: Props) {
                     />
                     <div className="flex items-center gap-2">
                         <Button variant="outline" asChild className="border-green-200 text-green-700 hover:bg-green-50">
-                            <Link href="/admin/checklist-pekerjaan" className="flex items-center gap-1">
+                            <Link href={baseUrl('/admin/checklist-pekerjaan')} className="flex items-center gap-1">
                                 <ArrowLeft className="h-4 w-4" />
                                 Kembali
                             </Link>

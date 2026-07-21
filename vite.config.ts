@@ -7,6 +7,7 @@ import { bunny } from 'laravel-vite-plugin/fonts';
 import { defineConfig } from 'vite';
 
 export default defineConfig({
+    base: process.env.APP_ENV === 'local' ? '/' : (process.env.VITE_BASE_PATH || '/'),
     plugins: [
         laravel({
             input: ['resources/css/app.css', 'resources/js/main.tsx'],
