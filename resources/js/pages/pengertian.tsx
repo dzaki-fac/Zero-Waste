@@ -14,6 +14,42 @@ type DetailItem = {
     fullDesc?: string;
 };
 
+type Card = { title: string; content: string };
+
+function parseCards(item: DetailItem): Card[] {
+    const text = item.fullDesc || "";
+    const parts = text.split(/\n\n+/).filter((p) => p.trim());
+
+    if (item.key === "definisi") {
+        const titles = ["Definisi ZeroLib", "Integrasi Sistem", "Dampak & Tujuan"];
+        return parts.map((content, i) => ({
+            title: titles[i] || `Bagian ${i + 1}`,
+            content: content.trim(),
+        }));
+    }
+
+    if (item.key === "prinsip") {
+        return parts.slice(1).map((part) => {
+            const newlineIdx = part.indexOf("\n");
+            const firstLine = newlineIdx === -1 ? part : part.slice(0, newlineIdx);
+            const rest = newlineIdx === -1 ? "" : part.slice(newlineIdx + 1);
+            const title = firstLine.replace(/^\d+\.\s*/, "").trim();
+            return { title, content: rest.trim() };
+        }).filter((c) => c.title);
+    }
+
+    if (item.key === "manfaat") {
+        return parts.map((part) => {
+            const newlineIdx = part.indexOf("\n");
+            const title = newlineIdx === -1 ? part : part.slice(0, newlineIdx).trim();
+            const content = newlineIdx === -1 ? "" : part.slice(newlineIdx + 1).trim();
+            return { title, content };
+        }).filter((c) => c.title);
+    }
+
+    return [];
+}
+
 const PENGERTIAN_ITEMS: DetailItem[] = [
     {
         key: "definisi",
@@ -123,8 +159,7 @@ function useLockBodyScroll(locked: boolean) {
 function DetailModal({ item, onClose }: { item: DetailItem; onClose: () => void }) {
     const [animating, setAnimating] = useState(false);
     const Icon = item.icon;
-
-    useLockBodyScroll(true);
+    const cards = parseCards(item);
 
     useEffect(() => {
         requestAnimationFrame(() => setAnimating(true));
@@ -145,63 +180,119 @@ function DetailModal({ item, onClose }: { item: DetailItem; onClose: () => void 
 
     return (
         <div
-            className="fixed inset-0 z-50 flex items-center justify-center p-4"
+            className="fixed inset-0 z-50 flex items-start justify-center p-4 pt-16 sm:p-6 sm:pt-10"
             style={{
                 backgroundColor: "rgba(10, 20, 64, 0.55)",
                 backdropFilter: "blur(6px)",
                 WebkitBackdropFilter: "blur(6px)",
+                opacity: animating ? 1 : 0,
+                transition: "opacity 300ms ease-out",
             }}
             onClick={handleClose}
         >
-            <button
-                type="button"
-                onClick={(e) => { e.stopPropagation(); handleClose(); }}
-                className="absolute top-4 right-4 z-10 flex h-10 w-10 items-center justify-center rounded-full bg-white/20 text-white transition-colors hover:bg-white/30"
-                aria-label="Tutup"
-            >
-                <X size={20} />
-            </button>
-
             <div
                 onClick={(e) => e.stopPropagation()}
-                className="relative flex max-h-[90vh] w-[95vw] max-w-lg flex-col overflow-hidden rounded-2xl bg-white shadow-2xl sm:max-w-xl md:max-w-2xl"
+                className="relative flex max-h-[85dvh] w-full max-w-6xl flex-col overflow-hidden rounded-[2rem] bg-[#f7f5ef] shadow-2xl"
                 style={{
                     opacity: animating ? 1 : 0,
                     transform: animating ? "scale(1) translateY(0)" : "scale(0.92) translateY(24px)",
                     transition: "opacity 300ms ease-out, transform 300ms ease-out",
                 }}
             >
-                <div className="shrink-0 bg-gray-50 px-5 py-4 sm:px-6 sm:py-5">
-                    <div className="flex items-center gap-3">
-                        <span
-                            className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl"
-                            style={{ backgroundColor: C.leaf100 }}
-                        >
-                            <Icon size={18} color={C.leaf500} strokeWidth={2} />
-                        </span>
-                        <div className="min-w-0">
-                            <h3 className="text-lg font-semibold sm:text-xl" style={{ ...display, color: C.navy900 }}>
-                                {item.title}
-                            </h3>
-                            <p className="text-xs text-gray-500">Detail {item.title} ZeroLib</p>
-                        </div>
-                    </div>
+                <button
+                    type="button"
+                    onClick={(e) => { e.stopPropagation(); handleClose(); }}
+                    className="absolute top-4 right-4 z-20 flex h-10 w-10 items-center justify-center rounded-full bg-black/10 text-gray-600 backdrop-blur-sm transition-colors hover:bg-black/20"
+                    aria-label="Tutup"
+                >
+                    <X size={20} />
+                </button>
+
+                <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden="true">
+                    <div
+                        className="absolute -top-32 -right-32 h-[500px] w-[500px] rounded-full opacity-[0.12]"
+                        style={{ background: `radial-gradient(circle, ${C.navy700} 0%, transparent 70%)` }}
+                    />
+                    <div
+                        className="absolute -bottom-28 -left-28 h-[400px] w-[400px] rounded-full opacity-[0.10]"
+                        style={{ background: `radial-gradient(circle, ${C.navy700} 0%, transparent 70%)` }}
+                    />
+                    <div
+                        className="absolute top-1/3 left-1/2 h-72 w-72 -translate-x-1/2 rounded-full opacity-[0.08]"
+                        style={{ background: `radial-gradient(circle, ${C.gold500} 0%, transparent 70%)` }}
+                    />
                 </div>
 
-                <div
-                    className="flex-1 overflow-y-auto px-5 py-5 text-sm leading-relaxed whitespace-pre-line sm:px-6"
-                    style={{ color: C.ink500 }}
-                >
-                    {item.fullDesc}
+                <div className="relative flex-1 overflow-y-auto px-6 py-6 sm:px-8 sm:py-8">
+                    <div className="mb-6">
+                        <div className="mb-4 inline-flex items-center gap-3">
+                            <span
+                                className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl"
+                                style={{ backgroundColor: C.navy050 }}
+                            >
+                                <Icon size={18} color={C.navy700} strokeWidth={2} />
+                            </span>
+                        </div>
+                        <h2
+                            className="text-2xl font-bold sm:text-3xl"
+                            style={{ ...display, color: C.navy900 }}
+                        >
+                            {item.title}
+                        </h2>
+                        <p
+                            className="mt-3 max-w-2xl text-sm leading-relaxed"
+                            style={{ color: C.ink500 }}
+                        >
+                            {item.shortDesc}
+                        </p>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4">
+                        {cards.map((card, index) => (
+                            <div
+                                key={index}
+                                className="rounded-2xl bg-white p-4 sm:p-5 shadow-sm"
+                            >
+                                <div className="mb-3 flex items-start gap-3">
+                                    <span
+                                        className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-sm font-bold text-white"
+                                        style={{ backgroundColor: C.navy700 }}
+                                    >
+                                        {index + 1}
+                                    </span>
+                                    <h3
+                                        className="pt-0.5 text-lg font-semibold"
+                                        style={{ ...display, color: C.navy900 }}
+                                    >
+                                        {card.title}
+                                    </h3>
+                                </div>
+                                <p
+                                    className="text-sm leading-relaxed whitespace-pre-line"
+                                    style={{ color: C.ink500 }}
+                                >
+                                    {card.content}
+                                </p>
+                            </div>
+                        ))}
+                    </div>
+
+                    <button
+                        type="button"
+                        onClick={handleClose}
+                        className="mt-6 w-full rounded-2xl py-3 text-center text-sm font-semibold text-white transition-colors hover:opacity-90"
+                        style={{ backgroundColor: C.navy900 }}
+                    >
+                        Tutup
+                    </button>
                 </div>
             </div>
         </div>
     );
 }
 
-function PengertianContent() {
+function PengertianContent({ onOpenDetail }: { onOpenDetail: (item: DetailItem) => void }) {
     const [activeKey, setActiveKey] = useState<string | null>(null);
-    const [modalItem, setModalItem] = useState<DetailItem | null>(null);
     const hasHover = useHasHover();
 
     return (
@@ -227,7 +318,8 @@ function PengertianContent() {
 
                     const handleDetailClick = (e: React.MouseEvent) => {
                         e.stopPropagation();
-                        setModalItem(it);
+                        e.preventDefault();
+                        onOpenDetail(it);
                     };
 
                     return (
@@ -277,30 +369,30 @@ function PengertianContent() {
                                     {it.shortDesc}
                                 </p>
                                 {hasDetail && (
-                                    <button
-                                        type="button"
+                                    <span
+                                        role="button"
+                                        tabIndex={0}
                                         onClick={handleDetailClick}
-                                        className="inline-flex items-center gap-1.5 self-start rounded-full bg-white/20 px-4 py-2 text-xs font-semibold text-white backdrop-blur-sm transition-colors hover:bg-white/30"
+                                        onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); e.stopPropagation(); onOpenDetail(it); } }}
+                                        className="inline-flex items-center gap-1.5 self-start rounded-full bg-white/20 px-4 py-2 text-xs font-semibold text-white backdrop-blur-sm transition-colors hover:bg-white/30 cursor-pointer select-none"
                                     >
                                         <Eye size={14} />
                                         Lihat Detail
-                                    </button>
+                                    </span>
                                 )}
                             </div>
                         </button>
                     );
                 })}
             </div>
-
-            {modalItem && (
-                <DetailModal item={modalItem} onClose={() => setModalItem(null)} />
-            )}
         </>
     );
 }
 
 export default function PengertianPage() {
     const appName = import.meta.env.VITE_APP_NAME || 'ZeroLib';
+    const [modalItem, setModalItem] = useState<DetailItem | null>(null);
+
     useEffect(() => {
         document.title = `Tentang ZeroLib - ${appName}`;
     }, []);
@@ -313,10 +405,14 @@ export default function PengertianPage() {
                     <h2 className="text-2xl sm:text-3xl font-semibold mb-6" style={{ ...display, color: C.navy900 }}>Tentang ZeroLib</h2>
                 </Reveal>
                 <Reveal delay={80}>
-                    <PengertianContent />
+                    <PengertianContent onOpenDetail={setModalItem} />
                 </Reveal>
             </section>
             <Footer />
+
+            {modalItem && (
+                <DetailModal item={modalItem} onClose={() => setModalItem(null)} />
+            )}
         </div>
     );
 }

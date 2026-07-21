@@ -23,7 +23,7 @@ export default function Navbar({ activeSection, onNavItemClick }: NavbarProps) {
     if (PAGE_ROUTES[id]) {
       navigate(PAGE_ROUTES[id]);
     } else if (location.pathname !== "/") {
-      navigate("/", { state: { scrollTo: id } });
+      window.location.href = "/#" + id;
     } else {
       onNavItemClick?.(id);
     }
