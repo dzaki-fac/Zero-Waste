@@ -57,7 +57,7 @@ export default function Navbar({ activeSection, onNavItemClick }: NavbarProps) {
             <div className="h-5 sm:h-9 flex items-center shrink-0 overflow-hidden [&>*]:!h-full [&>*]:!w-auto [&>*]:!max-w-none">
               <UptLogoIcon />
             </div>
-            <div className="h-5 sm:h-9 flex items-center shrink-0 overflow-hidden [&>*]:!h-full [&>*]:!w-auto [&>*]:!max-w-none">
+            <div className="h-4 sm:h-7 flex items-center shrink-0 overflow-hidden [&>*]:!h-full [&>*]:!w-auto [&>*]:!max-w-none">
               <ZeroLibLogoIcon />
             </div>
           </button>
