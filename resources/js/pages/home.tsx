@@ -656,7 +656,7 @@ query.end_date = params.end_date;
       window.history.scrollRestoration = "manual";
     }
 
-    const scrollToId = (location.state as { scrollTo?: string })?.scrollTo;
+    const scrollToId = ((location.state as { scrollTo?: string })?.scrollTo) || (typeof window !== "undefined" ? window.location.hash.replace("#", "") : "") || null;
 
     if (scrollToId) {
       const align = () => {
@@ -684,6 +684,10 @@ return;
 
     if (scrollToId) {
       navigate(location.pathname, { replace: true, state: {} });
+    }
+
+    if (typeof window !== "undefined" && window.location.hash) {
+      window.history.replaceState(null, "", window.location.pathname + window.location.search);
     }
   }, [location.state]);
 
