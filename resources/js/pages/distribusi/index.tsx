@@ -4,7 +4,7 @@ import { useState, useCallback, useMemo } from 'react';
 import DistributionRevisionDialog from '@/components/distribution-revision-dialog';
 import Heading from '@/components/heading';
 import { Button } from '@/components/ui/button';
-import { baseUrl } from '@/lib/path';
+import { route } from 'ziggy-js';
 import {
     Dialog,
     DialogContent,
@@ -90,7 +90,7 @@ const years = Array.from({ length: 11 }, (_, i) => currentYear - i);
 
 export default function DistribusiIndex({ distribusi }: Props) {
     const { auth, options } = usePage().props as unknown as { auth: Auth; options: { jenis_sampah: string[]; jenis_detail: string[]; tujuan_distribusi: string[] } };
-    const prefix = baseUrl(auth.user.role === 'admin' ? '/admin' : '/petugas');
+    const role = auth.user.role;
     const isAdmin = auth.user.role === 'admin';
 
     const jenisSampahOptions = options.jenis_sampah;
@@ -183,7 +183,7 @@ return true;
 
     const handleDelete = (id: number) => {
         if (confirm('Yakin ingin menghapus data ini?')) {
-            router.delete(`${prefix}/distribusi/${id}`);
+            router.delete(route(`${role}.distribusi.destroy`, { distribusi: id }));
         }
     };
 
@@ -231,8 +231,8 @@ params.set('custom_end', customEndDate);
 
         const qs = params.toString();
 
-        return `${prefix}/distribusi/export${qs ? `?${qs}` : ''}`;
-    }, [search, filterJenis, filterTujuan, filterPeriod, weekRange, selectedMonth, selectedYear, customStartDate, customEndDate, prefix]);
+        return `${route(`${role}.distribusi.export`)}${qs ? `?${qs}` : ''}`;
+    }, [search, filterJenis, filterTujuan, filterPeriod, weekRange, selectedMonth, selectedYear, customStartDate, customEndDate, role]);
 
     const handleReviewChange = useCallback((id: number, status: string) => {
         if (status === 'pending') {
@@ -249,14 +249,14 @@ return;
         }
 
         router.patch(
-            `${prefix}/distribusi/${id}/review`,
+            route(`${role}.distribusi.review`, { distribusi: id }),
             { status, note: null },
             {
                 preserveScroll: true,
                 onSuccess: () => router.reload({ only: ['distribusi'] }),
             },
         );
-    }, [prefix]);
+    }, [role]);
 
     const handleRevisionSubmit = useCallback((note: string) => {
         if (!revisionDistribusiId) {
@@ -267,7 +267,7 @@ return;
         setRevisionError('');
 
         router.patch(
-            `${prefix}/distribusi/${revisionDistribusiId}/review`,
+            route(`${role}.distribusi.review`, { distribusi: revisionDistribusiId }),
             { status: 'needs_revision', note },
             {
                 preserveScroll: true,
@@ -284,7 +284,7 @@ return;
                 },
             },
         );
-    }, [prefix, revisionDistribusiId]);
+    }, [role, revisionDistribusiId]);
 
     const openNoteModal = (note: string) => {
         setNoteContent(note);
@@ -318,7 +318,7 @@ return false;
                             </a>
                         </Button>
                         <Button asChild className="bg-green-600 hover:bg-green-700">
-                            <Link href={`${prefix}/distribusi/create`} className="flex items-center gap-2">
+                            <Link href={route(`${role}.distribusi.create`)} className="flex items-center gap-2">
                                 <Plus className="h-4 w-4" />
                                 Tambah Baru
                             </Link>
@@ -346,7 +346,7 @@ return false;
                             Mulai catat data distribusi sampah untuk membantu pengelolaan lingkungan yang lebih baik.
                         </p>
                         <Button asChild className="mt-6 bg-green-600 hover:bg-green-700">
-                            <Link href={`${prefix}/distribusi/create`} className="flex items-center gap-2">
+                            <Link href={route(`${role}.distribusi.create`)} className="flex items-center gap-2">
                                 <Plus className="h-4 w-4" />
                                 Tambah Distribusi
                             </Link>
@@ -581,7 +581,7 @@ e.preventDefault()
                                                         <div className="flex justify-end gap-2">
                                                             {canEdit(item) && (
                                                                 <Button variant="outline" size="sm" asChild className="border-green-200 text-green-700 hover:bg-green-50 hover:text-green-800">
-                                                                    <Link href={`${prefix}/distribusi/${item.id}/edit`} className="flex items-center gap-1">
+                                                                     <Link href={route(`${role}.distribusi.edit`, { distribusi: item.id })} className="flex items-center gap-1">
                                                                         <Pencil className="h-3.5 w-3.5" />
                                                                         Edit
                                                                     </Link>

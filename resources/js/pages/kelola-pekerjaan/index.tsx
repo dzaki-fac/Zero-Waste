@@ -3,7 +3,7 @@ import { Circle, Pencil, Plus, Trash2 } from 'lucide-react';
 import { useState } from 'react';
 import Heading from '@/components/heading';
 import { Button } from '@/components/ui/button';
-import { baseUrl } from '@/lib/path';
+import { route } from 'ziggy-js';
 import {
     Dialog,
     DialogContent,
@@ -107,7 +107,7 @@ export default function KelolaPekerjaan({ pekerjaan, filter }: Props) {
 
     function handleAdd(e: React.FormEvent) {
         e.preventDefault();
-        addForm.post(baseUrl('/admin/kelola-pekerjaan'), {
+        addForm.post(route('admin.kelola-pekerjaan.store'), {
             preserveScroll: true,
             onSuccess: () => {
                 setAddOpen(false);
@@ -134,7 +134,7 @@ export default function KelolaPekerjaan({ pekerjaan, filter }: Props) {
 return;
 }
 
-        editForm.patch(baseUrl(`/admin/kelola-pekerjaan/${editingItem.id}`), {
+        editForm.patch(route('admin.kelola-pekerjaan.update', { masterPekerjaan: editingItem.id }), {
             preserveScroll: true,
             onSuccess: () => {
                 setEditOpen(false);
@@ -150,7 +150,7 @@ return;
 
         setDeleteError(null);
         setDeleteProcessing(true);
-        router.delete(baseUrl(`/admin/kelola-pekerjaan/${deletingItem.id}`), {
+        router.delete(route('admin.kelola-pekerjaan.destroy', { masterPekerjaan: deletingItem.id }), {
             preserveScroll: true,
             onSuccess: () => {
                 setDeleteOpen(false);
@@ -168,7 +168,7 @@ return;
     function handleFilterChange(value: string | null) {
         setActiveFilter(value);
         router.get(
-            '/admin/kelola-pekerjaan',
+            route('admin.kelola-pekerjaan.index'),
             value ? { jenis: value } : {},
             { preserveScroll: true, preserveState: true },
         );

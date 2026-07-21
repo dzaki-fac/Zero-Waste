@@ -18,10 +18,10 @@ use Illuminate\Support\Facades\Route;
 // Public landing page (BrowserRouter-based, no auth required)
 Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::get('/sop', [DocumentController::class, 'sopPage'])->name('sop');
-Route::inertia('/pengertian', 'pengertian');
+Route::inertia('/pengertian', 'pengertian')->name('pengertian');
 Route::get('/struktur', [DocumentController::class, 'strukturPage'])->name('struktur');
 Route::get('/peraturan', [DocumentController::class, 'peraturanPage'])->name('peraturan');
-Route::get('/api/document/{type}', [DocumentController::class, 'show']);
+Route::get('/api/document/{type}', [DocumentController::class, 'show'])->name('api.document.show');
 
 // Shared routes (accessible by both roles, no role check)
 Route::middleware(['auth'])->group(function () {
@@ -47,7 +47,7 @@ Route::middleware(['auth', CheckRole::class . ':admin'])
     ->prefix('admin')
     ->name('admin.')
     ->group(function () {
-        Route::get('/', [DashboardController::class, 'index']);
+        Route::get('/', [DashboardController::class, 'index'])->name('index');
         Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
         Route::get('penimbangan/export', [PenimbanganController::class, 'export'])->name('penimbangan.export');

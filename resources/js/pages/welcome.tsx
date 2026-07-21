@@ -9,7 +9,8 @@ import {
     Truck,
     User,
 } from 'lucide-react';
-import { baseUrl, asset } from '@/lib/path';
+import { route } from 'ziggy-js';
+import { asset } from '@/lib/path';
 import { logout } from '@/routes';
 
 type AuthUser = {
@@ -34,9 +35,9 @@ export default function Welcome() {
 
     const dashboardRoute =
         auth.user?.role === 'admin'
-            ? baseUrl('/admin/dashboard')
+            ? route('admin.dashboard')
             : auth.user?.role === 'petugas'
-              ? baseUrl('/petugas/dashboard')
+              ? route('petugas.dashboard')
               : null;
 
     return (
@@ -74,7 +75,7 @@ export default function Welcome() {
                         </>
                     ) : (
                         <Link
-                            href={baseUrl('/login')}
+                            href={route('login')}
                             className="inline-flex items-center gap-2 rounded-lg border border-green-200 bg-white px-6 py-2.5 text-sm font-medium text-green-700 shadow-sm transition hover:bg-green-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-500"
                         >
                             Login
@@ -86,7 +87,7 @@ export default function Welcome() {
                 <section className="flex w-full max-w-4xl flex-col items-center gap-5 text-center">
                     {/* Logo area */}
                     <Link
-                        href={baseUrl('/form')}
+                        href={route('form')}
                         aria-label="Open ZeroLib form page"
                         className="flex h-24 sm:h-28 w-full max-w-[280px] sm:max-w-[320px] items-center justify-center overflow-hidden bg-transparent transition-opacity hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-500"
                     >
@@ -121,7 +122,7 @@ export default function Welcome() {
                     {/* Operational modules */}
                     <div className="flex flex-wrap justify-center gap-3">
                         <Link
-                            href={baseUrl('/form/pekerjaan')}
+                            href={route('form.pekerjaan')}
                             className="inline-flex items-center gap-2 rounded-lg bg-green-600 px-6 py-2.5 text-sm font-medium text-white shadow-sm transition hover:bg-green-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-500 focus-visible:ring-offset-2"
                         >
                             <ClipboardCheck className="h-4 w-4" />
@@ -129,7 +130,7 @@ export default function Welcome() {
                         </Link>
 
                         <Link
-                            href={baseUrl('/form/penimbangan')}
+                            href={route('form.penimbangan')}
                             className="inline-flex items-center gap-2 rounded-lg bg-green-600 px-6 py-2.5 text-sm font-medium text-white shadow-sm transition hover:bg-green-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-500 focus-visible:ring-offset-2"
                         >
                             <Scale className="h-4 w-4" />
@@ -137,7 +138,7 @@ export default function Welcome() {
                         </Link>
 
                         <Link
-                            href={baseUrl('/form/pilah-sampah')}
+                            href={route('form.pilah-sampah')}
                             className="inline-flex items-center gap-2 rounded-lg bg-green-600 px-6 py-2.5 text-sm font-medium text-white shadow-sm transition hover:bg-green-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-500 focus-visible:ring-offset-2"
                         >
                             <Recycle className="h-4 w-4" />
@@ -145,7 +146,7 @@ export default function Welcome() {
                         </Link>
 
                         <Link
-                            href={baseUrl('/form/distribusi')}
+                            href={route('form.distribusi')}
                             className="inline-flex items-center gap-2 rounded-lg bg-green-600 px-6 py-2.5 text-sm font-medium text-white shadow-sm transition hover:bg-green-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-500 focus-visible:ring-offset-2"
                         >
                             <Truck className="h-4 w-4" />

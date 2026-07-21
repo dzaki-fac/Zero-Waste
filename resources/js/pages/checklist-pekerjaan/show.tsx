@@ -135,8 +135,8 @@ export default function ChecklistPekerjaanShow({ petugas, tanggal, masterTasks, 
     const selectedDateRef = useRef(selectedDate);
     const petugasNipRef = useRef(petugas.nip);
 
-    const baseUrl = readOnly ? '/petugas/checklist-pekerjaan' : `/admin/checklist-pekerjaan/${petugas.nip}`;
-    const backUrl = readOnly ? '/petugas/dashboard' : '/admin/checklist-pekerjaan';
+    const baseUrl = readOnly ? route('petugas.checklist-pekerjaan.index') : route('admin.checklist-pekerjaan.show', { checklist_pekerjaan: petugas.nip });
+    const backUrl = readOnly ? route('petugas.dashboard') : route('admin.checklist-pekerjaan.index');
 
     useEffect(() => {
         activeAreaRef.current = activeArea;
@@ -178,7 +178,7 @@ return;
 }
 
         router.post(
-            '/admin/checklist-pekerjaan',
+            route('admin.checklist-pekerjaan.store'),
             {
                 nip,
                 tanggal: date,
@@ -240,7 +240,7 @@ return;
 }
 
         router.get(
-            `/admin/checklist-pekerjaan/${petugas.nip}`,
+            route('admin.checklist-pekerjaan.show', { checklist_pekerjaan: petugas.nip }),
             { tanggal: newDate, jenis: activeFilter ?? undefined, area: activeArea || undefined },
             {
                 preserveState: false,
@@ -267,7 +267,7 @@ return;
 }
 
         router.get(
-            `/admin/checklist-pekerjaan/${petugas.nip}`,
+            route('admin.checklist-pekerjaan.show', { checklist_pekerjaan: petugas.nip }),
             { tanggal: selectedDate, jenis: value ?? undefined, area: activeArea || undefined },
             { preserveState: true, preserveScroll: true },
         );
@@ -292,7 +292,7 @@ return;
 }
 
         router.get(
-            `/admin/checklist-pekerjaan/${petugas.nip}`,
+            route('admin.checklist-pekerjaan.show', { checklist_pekerjaan: petugas.nip }),
             { tanggal: selectedDate, jenis: activeFilter ?? undefined, area: value || undefined },
             { preserveState: false, preserveScroll: true },
         );
