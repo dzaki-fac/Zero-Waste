@@ -294,7 +294,7 @@ export default function AdminAccounts() {
 
                 <div className="rounded-xl border border-green-200 bg-white shadow-sm">
                     <div className="overflow-x-auto">
-                        <Table>
+                        <Table className="min-w-[650px]">
                             <TableHeader>
                                 <TableRow className="border-green-100 bg-green-50/50">
                                     <TableHead className="text-green-700">No</TableHead>

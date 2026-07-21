@@ -1,13 +1,13 @@
 import { Head, Link, router, usePage } from '@inertiajs/react';
-import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from 'recharts';
-import type { PieLabelRenderProps } from 'recharts';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
 import { Scale, Recycle, Truck, Users, CalendarIcon, Clock, Package, CheckCircle, ChevronLeft, ChevronRight, Send, Leaf } from 'lucide-react';
 import { useState, useRef, useEffect } from 'react';
-import type { Auth } from '@/types';
+import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from 'recharts';
+import type { PieLabelRenderProps } from 'recharts';
 import ChecklistProgress from '@/components/checklist-progress';
 import NativeDatePicker from '@/components/native-date-picker';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import type { Auth } from '@/types';
 
 type ChartData = {
     name: string;
@@ -116,16 +116,19 @@ const COLORS = [
 const categoryColorMap = new Map<string, string>();
 function getCategoryColor(name: string): string {
     let color = categoryColorMap.get(name);
+
     if (!color) {
         color = COLORS[categoryColorMap.size % COLORS.length];
         categoryColorMap.set(name, color);
     }
+
     return color;
 }
 
 function CustomTooltip({ active, payload }: { active?: boolean; payload?: Array<{ name: string; value: number; payload: { percent?: number } }> }) {
     if (active && payload && payload.length) {
         const data = payload[0];
+
         return (
             <div className="rounded-lg border bg-white px-3 py-2 shadow-md">
                 <p className="text-sm font-medium text-gray-900">{data.name}</p>
@@ -135,13 +138,21 @@ function CustomTooltip({ active, payload }: { active?: boolean; payload?: Array<
             </div>
         );
     }
+
     return null;
 }
 
 function renderCustomLabel(props: PieLabelRenderProps) {
     const { cx, cy, midAngle, innerRadius, outerRadius, percent } = props;
-    if (typeof percent !== 'number' || percent < 0.05) return null;
-    if (typeof cx !== 'number' || typeof cy !== 'number' || typeof midAngle !== 'number' || typeof innerRadius !== 'number' || typeof outerRadius !== 'number') return null;
+
+    if (typeof percent !== 'number' || percent < 0.05) {
+return null;
+}
+
+    if (typeof cx !== 'number' || typeof cy !== 'number' || typeof midAngle !== 'number' || typeof innerRadius !== 'number' || typeof outerRadius !== 'number') {
+return null;
+}
+
     const RADIAN = Math.PI / 180;
     const radius = innerRadius + (outerRadius - innerRadius) * 0.5;
     const x = cx + radius * Math.cos(-midAngle * RADIAN);
@@ -208,6 +219,7 @@ function PieChartCard({ title, icon: Icon, data, totalLabel, legendPosition = 'b
                                     .sort((a, b) => b.value - a.value)
                                     .map((item) => {
                                         const percent = total > 0 ? (item.value / total) * 100 : 0;
+
                                         return (
                                             <div key={item.name} className="flex items-center gap-2">
                                                 <span
@@ -263,6 +275,7 @@ function PieChartCard({ title, icon: Icon, data, totalLabel, legendPosition = 'b
                                         .sort((a, b) => b.value - a.value)
                                         .map((item) => {
                                             const percent = total > 0 ? (item.value / total) * 100 : 0;
+
                                             return (
                                                 <div key={item.name} className="flex items-center gap-2">
                                                     <span
@@ -306,14 +319,30 @@ const PRESETS: { key: PresetKey; label: string; days: number | null }[] = [
 ];
 
 function getPresetKey(start: string | null, end: string | null): PresetKey {
-    if (!start && !end) return 'all';
+    if (!start && !end) {
+return 'all';
+}
+
     if (start && end) {
-        if (start === end) return 'today';
+        if (start === end) {
+return 'today';
+}
+
         const diff = Math.round((new Date(end).getTime() - new Date(start).getTime()) / 86400000);
-        if (diff === 6) return '7d';
-        if (diff === 29) return '30d';
-        if (diff === 89) return '3m';
+
+        if (diff === 6) {
+return '7d';
+}
+
+        if (diff === 29) {
+return '30d';
+}
+
+        if (diff === 89) {
+return '3m';
+}
     }
+
     return 'all';
 }
 
@@ -326,6 +355,7 @@ function formatDisplayDate(dateStr: string): string {
     const dd = String(d.getDate()).padStart(2, '0');
     const mm = String(d.getMonth() + 1).padStart(2, '0');
     const yyyy = d.getFullYear();
+
     return `${dd}/${mm}/${yyyy}`;
 }
 
@@ -334,6 +364,7 @@ const MONTH_NAMES = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Se
 function daysAgo(n: number): string {
     const d = new Date();
     d.setDate(d.getDate() - n);
+
     return formatDateInput(d);
 }
 
@@ -365,6 +396,7 @@ function SimpleDatePicker({ value, onChange, placeholder }: { value: string; onC
             }
         }
         document.addEventListener('mousedown', handleClick);
+
         return () => document.removeEventListener('mousedown', handleClick);
     }, [value]);
 
@@ -386,13 +418,19 @@ function SimpleDatePicker({ value, onChange, placeholder }: { value: string; onC
     const WEEK_DAYS = ['Min', 'Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab'];
 
     function prevMonth() {
-        if (viewMonth === 0) { setViewMonth(11); setViewYear(viewYear - 1); }
-        else setViewMonth(viewMonth - 1);
+        if (viewMonth === 0) {
+ setViewMonth(11); setViewYear(viewYear - 1); 
+} else {
+setViewMonth(viewMonth - 1);
+}
     }
 
     function nextMonth() {
-        if (viewMonth === 11) { setViewMonth(0); setViewYear(viewYear + 1); }
-        else setViewMonth(viewMonth + 1);
+        if (viewMonth === 11) {
+ setViewMonth(0); setViewYear(viewYear + 1); 
+} else {
+setViewMonth(viewMonth + 1);
+}
     }
 
     function selectDay(day: number) {
@@ -408,26 +446,38 @@ function SimpleDatePicker({ value, onChange, placeholder }: { value: string; onC
     function parseTypedInput(raw: string): string | null {
         const cleaned = raw.trim().replace(/[/\.]/g, '-');
         const mdy = cleaned.match(/^(\d{1,2})-(\d{1,2})-(\d{4})$/);
+
         if (mdy) {
             const d = new Date(Number(mdy[3]), Number(mdy[2]) - 1, Number(mdy[1]));
-            if (!isNaN(d.getTime())) return formatDateInput(d);
+
+            if (!isNaN(d.getTime())) {
+return formatDateInput(d);
+}
         }
+
         const iso = cleaned.match(/^(\d{4})-(\d{1,2})-(\d{1,2})$/);
+
         if (iso) {
             const d = new Date(Number(iso[1]), Number(iso[2]) - 1, Number(iso[3]));
-            if (!isNaN(d.getTime())) return formatDateInput(d);
+
+            if (!isNaN(d.getTime())) {
+return formatDateInput(d);
+}
         }
+
         return null;
     }
 
     function commitTypedValue() {
         const parsed = parseTypedInput(inputValue);
+
         if (parsed) {
             onChange(parsed);
             setInputValue(formatDisplayDate(parsed));
         } else {
             setInputValue(value ? formatDisplayDate(value) : '');
         }
+
         setTyping(false);
     }
 
@@ -437,14 +487,34 @@ function SimpleDatePicker({ value, onChange, placeholder }: { value: string; onC
                 type="text"
                 value={typing ? inputValue : (value ? formatDisplayDate(value) : '')}
                 placeholder={placeholder ?? 'tt/bb/tttt'}
-                onFocus={() => { setOpen(true); setTyping(true); setInputValue(value ? formatDisplayDate(value) : ''); }}
-                onChange={(e) => { setInputValue(e.target.value); setTyping(true); }}
-                onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); commitTypedValue(); setOpen(false); } if (e.key === 'Escape') { setInputValue(value ? formatDisplayDate(value) : ''); setTyping(false); setOpen(false); } }}
-                onBlur={() => { if (typing) commitTypedValue(); }}
+                onFocus={() => {
+ setOpen(true); setTyping(true); setInputValue(value ? formatDisplayDate(value) : ''); 
+}}
+                onChange={(e) => {
+ setInputValue(e.target.value); setTyping(true); 
+}}
+                onKeyDown={(e) => {
+ if (e.key === 'Enter') {
+ e.preventDefault(); commitTypedValue(); setOpen(false); 
+}
+
+ if (e.key === 'Escape') {
+ setInputValue(value ? formatDisplayDate(value) : ''); setTyping(false); setOpen(false); 
+} 
+}}
+                onBlur={() => {
+ if (typing) {
+commitTypedValue();
+} 
+}}
                 className="w-32.5 border-0 bg-transparent text-xs text-gray-700 outline-none hover:text-gray-900 cursor-text placeholder:text-gray-400"
             />
             {open && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40" onMouseDown={(e) => { if (e.target === e.currentTarget) { commitTypedValue(); setOpen(false); } }}>
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40" onMouseDown={(e) => {
+ if (e.target === e.currentTarget) {
+ commitTypedValue(); setOpen(false); 
+} 
+}}>
                     <div className="w-full max-w-sm rounded-xl border border-gray-200 bg-white p-5 shadow-2xl">
                         <div className="mb-4 flex items-center justify-between">
                             <button type="button" onClick={prevMonth} className="rounded-lg p-2 hover:bg-gray-100">
@@ -479,7 +549,9 @@ function SimpleDatePicker({ value, onChange, placeholder }: { value: string; onC
                             )}
                         </div>
                         <div className="mt-4 flex justify-center">
-                            <button type="button" onClick={() => { commitTypedValue(); setOpen(false); }} className="rounded-lg bg-gray-100 px-4 py-2 text-xs font-medium text-gray-600 hover:bg-gray-200">
+                            <button type="button" onClick={() => {
+ commitTypedValue(); setOpen(false); 
+}} className="rounded-lg bg-gray-100 px-4 py-2 text-xs font-medium text-gray-600 hover:bg-gray-200">
                                 Tutup
                             </button>
                         </div>
@@ -560,7 +632,7 @@ function DataDasarSummary({ dataDasar, rincianArea }: { dataDasar: DataDasarType
             <CardContent className="space-y-5">
                 <div className="flex flex-col gap-4 lg:flex-row">
                     {/* Identitas */}
-                    <div className="grid grid-cols-1 gap-4 rounded-lg border border-green-100 bg-green-50/30 p-4 sm:grid-cols-3 sm:grid-rows-2 lg:w-2/3">
+                    <div className="grid grid-cols-1 gap-4 rounded-lg border border-green-100 bg-green-50/30 p-4 sm:grid-cols-2 lg:w-2/3 lg:grid-cols-3 lg:grid-rows-2">
                         <ReadField label="Nama Tim / Unit" value={dataDasar.nama_tim} />
                         <ReadField label="Fakultas / Unit" value={dataDasar.fakultas} />
                         <ReadField label="Alamat / Lokasi Program" value={dataDasar.alamat} />
@@ -607,7 +679,7 @@ function DataDasarSummary({ dataDasar, rincianArea }: { dataDasar: DataDasarType
                     </div>
                 </div>
 
-                <div className="grid gap-4 lg:grid-cols-3">
+                <div className="grid gap-4 sm:grid-cols-1 md:grid-cols-3">
                     {/* Tabel 1: Data Warga */}
                     <div className="overflow-hidden rounded-lg border border-green-100">
                         <table className="w-full text-sm">
@@ -742,42 +814,89 @@ export default function Dashboard() {
 
     function applyFilter(params: { start_date?: string | null; end_date?: string | null; progress_petugas?: string | null; progress_date?: string | null }) {
         const query: Record<string, string> = {};
-        if (params.start_date) query.start_date = params.start_date;
-        if (params.end_date) query.end_date = params.end_date;
-        if (params.progress_petugas) query.progress_petugas = params.progress_petugas;
-        if (params.progress_date) query.progress_date = params.progress_date;
+
+        if (params.start_date) {
+query.start_date = params.start_date;
+}
+
+        if (params.end_date) {
+query.end_date = params.end_date;
+}
+
+        if (params.progress_petugas) {
+query.progress_petugas = params.progress_petugas;
+}
+
+        if (params.progress_date) {
+query.progress_date = params.progress_date;
+}
+
         router.get(dashboardUrl, query, { preserveState: true, preserveScroll: true, replace: true });
     }
 
     function progressParams() {
         const p: Record<string, string> = {};
-        if (progressPetugas !== 'all') p.progress_petugas = progressPetugas;
-        if (progressDateState) p.progress_date = progressDateState;
+
+        if (progressPetugas !== 'all') {
+p.progress_petugas = progressPetugas;
+}
+
+        if (progressDateState) {
+p.progress_date = progressDateState;
+}
+
         return p;
     }
 
     function handleProgressPetugasChange(value: string) {
         setProgressPetugas(value);
         const q: Record<string, string> = {};
-        if (startDate) q.start_date = startDate;
-        if (endDate) q.end_date = endDate;
-        if (value !== 'all') q.progress_petugas = value;
-        if (progressDateState) q.progress_date = progressDateState;
+
+        if (startDate) {
+q.start_date = startDate;
+}
+
+        if (endDate) {
+q.end_date = endDate;
+}
+
+        if (value !== 'all') {
+q.progress_petugas = value;
+}
+
+        if (progressDateState) {
+q.progress_date = progressDateState;
+}
+
         router.get(dashboardUrl, q, { preserveState: true, preserveScroll: true, replace: true });
     }
 
     function handleProgressDateChange(value: string) {
         setProgressDateState(value);
         const q: Record<string, string> = {};
-        if (startDate) q.start_date = startDate;
-        if (endDate) q.end_date = endDate;
-        if (progressPetugas !== 'all') q.progress_petugas = progressPetugas;
-        if (value) q.progress_date = value;
+
+        if (startDate) {
+q.start_date = startDate;
+}
+
+        if (endDate) {
+q.end_date = endDate;
+}
+
+        if (progressPetugas !== 'all') {
+q.progress_petugas = progressPetugas;
+}
+
+        if (value) {
+q.progress_date = value;
+}
+
         router.get(dashboardUrl, q, { preserveState: true, preserveScroll: true, replace: true });
     }
 
     function handlePreset(preset: typeof PRESETS[number]) {
         setActivePreset(preset.key);
+
         if (preset.days === null) {
             setStartDate('');
             setEndDate('');
@@ -822,12 +941,12 @@ export default function Dashboard() {
                         </p>
                     </div>
                     <div className="flex flex-wrap items-center gap-2">
-                        <div className="flex items-center rounded-lg border border-green-200 bg-white p-0.5">
+                        <div className="flex flex-wrap items-center rounded-lg border border-green-200 bg-white p-0.5">
                             {PRESETS.map((preset) => (
                                 <button
                                     key={preset.key}
                                     onClick={() => handlePreset(preset)}
-                                    className={`rounded-md px-3 py-1.5 text-xs font-medium transition-colors ${
+                                    className={`rounded-md px-2.5 py-1.5 text-xs font-medium transition-colors sm:px-3 ${
                                         activePreset === preset.key
                                             ? 'bg-green-600 text-white shadow-sm'
                                             : 'text-gray-600 hover:text-gray-900'
@@ -837,10 +956,10 @@ export default function Dashboard() {
                                 </button>
                             ))}
                         </div>
-                        <div className="flex items-center gap-1.5 rounded-lg border border-green-200 bg-white px-2 py-1">
-                            <CalendarIcon className="size-3.5 text-gray-400" />
+                        <div className="flex flex-wrap items-center gap-1.5 rounded-lg border border-green-200 bg-white px-2 py-1">
+                            <CalendarIcon className="size-3.5 text-gray-400 shrink-0" />
                             <SimpleDatePicker value={startDate} onChange={setStartDate} placeholder="tt/bb/tttt" />
-                            <span className="text-xs text-gray-400">&ndash;</span>
+                            <span className="hidden text-xs text-gray-400 sm:inline">&ndash;</span>
                             <SimpleDatePicker value={endDate} onChange={setEndDate} placeholder="tt/bb/tttt" />
                             <Button
                                 variant="ghost"
@@ -910,6 +1029,7 @@ export default function Dashboard() {
                                             {chartData.map((item, index) => {
                                                 const pct = total > 0 ? (item.value / total) * 100 : 0;
                                                 const Icon = STATUS_ICONS[index];
+
                                                 return (
                                                     <div key={item.key} className="flex items-center gap-3 rounded-lg border border-gray-100 bg-gray-50 p-3">
                                                         <div className="flex size-9 shrink-0 items-center justify-center rounded-lg" style={{ backgroundColor: `${STATUS_COLORS[index]}15` }}>
@@ -949,7 +1069,7 @@ export default function Dashboard() {
                     />
                 </div>
 
-                <div className="grid gap-4 lg:grid-cols-3">
+                <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
                     <PieChartCard
                         title="Pilah Sampah per Jenis"
                         icon={Recycle}
@@ -1005,6 +1125,7 @@ export default function Dashboard() {
                                             {siapSortedData
                                             .map((item) => {
                                                 const percent = siapTotal > 0 ? (item.value / siapTotal) * 100 : 0;
+
                                                 return (
                                                     <div key={item.name} className="flex items-center gap-2">
                                                         <span
@@ -1108,6 +1229,7 @@ export default function Dashboard() {
                                     return petugasStats.slice().sort((a, b) => {
                                         const totalA = a.penimbangan.total_berat + a.pilah_sampah.total_berat + a.distribusi.total_berat;
                                         const totalB = b.penimbangan.total_berat + b.pilah_sampah.total_berat + b.distribusi.total_berat;
+
                                         return totalB - totalA;
                                     }).map((p) => {
                                         const totalBerat = p.penimbangan.total_berat + p.pilah_sampah.total_berat + p.distribusi.total_berat;
@@ -1133,9 +1255,14 @@ export default function Dashboard() {
                                                     >
                                                         {segments.map((seg, idx) => {
                                                             const pct = totalBerat > 0 ? (seg.berat / totalBerat) * 100 : 0;
-                                                            if (pct === 0) return null;
+
+                                                            if (pct === 0) {
+return null;
+}
+
                                                             const isFirst = idx === 0 || !segments.slice(0, idx).some((s) => s.berat > 0);
                                                             const isLast = idx === segments.length - 1 || !segments.slice(idx + 1).some((s) => s.berat > 0);
+
                                                             return (
                                                                 <div
                                                                     key={seg.key}

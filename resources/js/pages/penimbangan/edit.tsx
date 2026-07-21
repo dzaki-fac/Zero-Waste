@@ -39,6 +39,7 @@ export default function PenimbanganEdit({ penimbangan }: Props) {
 
     const initialTanggal = (() => {
         const d = new Date(penimbangan.tanggal);
+
         return new Date(d.getTime() - d.getTimezoneOffset() * 60000).toISOString().slice(0, 16);
     })();
 

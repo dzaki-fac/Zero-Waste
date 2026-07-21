@@ -86,12 +86,12 @@ export default function Welcome() {
                     <Link
                         href="/form"
                         aria-label="Open ZeroLib form page"
-                        className="flex h-36 w-full max-w-[430px] items-center justify-center overflow-hidden bg-transparent transition-opacity hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-500"
+                        className="flex h-24 sm:h-28 w-full max-w-[280px] sm:max-w-[320px] items-center justify-center overflow-hidden bg-transparent transition-opacity hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-500"
                     >
                     <img
-                src="/logo-zerolib.png"
+                src="/images/zerolib-logo.png"
                 alt="ZeroLib"
-                className="h-auto w-full max-w-[420px] object-contain object-center"
+                className="h-auto w-full max-w-[260px] sm:max-w-[300px] object-contain object-center"
                 loading="eager"
                 draggable={false}
             />

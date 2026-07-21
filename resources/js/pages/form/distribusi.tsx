@@ -1,14 +1,14 @@
+import { Head, Link, router, useForm, usePage } from '@inertiajs/react';
+import { ArrowLeft, Send, Calendar, User, Trash2, MapPin, Ship, CheckCircle2 } from 'lucide-react';
+import { useEffect, useState } from 'react';
 import Heading from '@/components/heading';
 import InputError from '@/components/input-error';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Head, Link, router, useForm, usePage } from '@inertiajs/react';
-import { ArrowLeft, Send, Calendar, User, Trash2, MapPin, Ship, CheckCircle2 } from 'lucide-react';
 import {
     Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle,
 } from '@/components/ui/dialog';
-import { useEffect, useState } from 'react';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 
 type Options = {
     area: Array<{ value: string; label: string; icon: string }>;
@@ -41,19 +41,27 @@ export default function FormDistribusi() {
     const [submitError, setSubmitError] = useState('');
 
     useEffect(() => {
-        if (submitted) setShowSuccess(true);
+        if (submitted) {
+setShowSuccess(true);
+}
     }, [submitted]);
 
     useEffect(() => {
-        if (data.tujuan_distribusi) setTujuanError('');
+        if (data.tujuan_distribusi) {
+setTujuanError('');
+}
     }, [data.tujuan_distribusi]);
 
     useEffect(() => {
-        if (data.tujuan_lainnya) setTujuanError('');
+        if (data.tujuan_lainnya) {
+setTujuanError('');
+}
     }, [data.tujuan_lainnya]);
 
     useEffect(() => {
-        if (data.lokasi) setLokasiError('');
+        if (data.lokasi) {
+setLokasiError('');
+}
     }, [data.lokasi]);
 
     const totalBerat = data.items.reduce((sum, item) => sum + (parseFloat(item.berat) || 0), 0);
@@ -65,27 +73,37 @@ export default function FormDistribusi() {
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
+
         if (!data.tujuan_distribusi) {
             setTujuanError('Pilih tujuan distribusi');
             scrollTo('section-distribusi');
+
             return;
         }
+
         if (data.tujuan_distribusi === 'Tujuan lainnya' && !data.tujuan_lainnya) {
             setTujuanError('Isi tujuan distribusi lainnya');
             scrollTo('section-distribusi');
+
             return;
         }
+
         if (!data.lokasi) {
             setLokasiError('Masukkan lokasi');
             scrollTo('section-lokasi');
+
             return;
         }
+
         const hasBerat = data.items.some((item) => parseFloat(item.berat) > 0);
+
         if (!hasBerat) {
             setSubmitError('Minimal isi berat pada 1 jenis sampah');
             scrollTo('section-jenis-berat');
+
             return;
         }
+
         router.post('/form/distribusi', {
             ...data,
             tujuan_distribusi: data.tujuan_distribusi === 'Tujuan lainnya' ? data.tujuan_lainnya : data.tujuan_distribusi,
@@ -180,6 +198,7 @@ export default function FormDistribusi() {
                                     <div className="grid grid-cols-2 gap-2">
                                         {tujuanOptions.map((opt) => {
                                             const isSelected = data.tujuan_distribusi === opt;
+
                                             return (
                                                 <button
                                                     key={opt}

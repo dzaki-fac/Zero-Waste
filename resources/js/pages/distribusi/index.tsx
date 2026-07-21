@@ -1,8 +1,16 @@
-import { useState, useCallback, useMemo } from 'react';
 import { Head, Link, router, usePage } from '@inertiajs/react';
 import { CalendarDays, FileDown, Leaf, Plus, Trash2, Pencil, Search, MessageSquareText, CheckCircle2, AlertTriangle, XCircle, Clock } from 'lucide-react';
+import { useState, useCallback, useMemo } from 'react';
+import DistributionRevisionDialog from '@/components/distribution-revision-dialog';
 import Heading from '@/components/heading';
 import { Button } from '@/components/ui/button';
+import {
+    Dialog,
+    DialogContent,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+} from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import {
     Select,
@@ -19,14 +27,6 @@ import {
     TableHeader,
     TableRow,
 } from '@/components/ui/table';
-import {
-    Dialog,
-    DialogContent,
-    DialogFooter,
-    DialogHeader,
-    DialogTitle,
-} from '@/components/ui/dialog';
-import DistributionRevisionDialog from '@/components/distribution-revision-dialog';
 import type { Auth } from '@/types';
 
 type DistribusiReviewStatus = 'pending' | 'approved' | 'needs_revision' | 'rejected';
@@ -115,7 +115,10 @@ export default function DistribusiIndex({ distribusi }: Props) {
     const [noteContent, setNoteContent] = useState('');
 
     const matchesDate = useCallback((tanggal: string) => {
-        if (filterPeriod === 'all') return true;
+        if (filterPeriod === 'all') {
+return true;
+}
+
         const date = new Date(tanggal);
         const now = new Date();
         const startOfDay = (d: Date) => new Date(d.getFullYear(), d.getMonth(), d.getDate());
@@ -125,6 +128,7 @@ export default function DistribusiIndex({ distribusi }: Props) {
                 const start = startOfDay(now);
                 const end = new Date(start);
                 end.setDate(end.getDate() + 1);
+
                 return date >= start && date < end;
             }
             case 'mingguan': {
@@ -133,16 +137,19 @@ export default function DistribusiIndex({ distribusi }: Props) {
                 start.setDate(start.getDate() - (days - 1));
                 const end = new Date(startOfDay(now));
                 end.setDate(end.getDate() + 1);
+
                 return date >= start && date < end;
             }
             case 'bulanan': {
                 const start = new Date(Number(selectedYear), Number(selectedMonth) - 1, 1);
                 const end = new Date(Number(selectedYear), Number(selectedMonth), 1);
+
                 return date >= start && date < end;
             }
             case 'tahunan': {
                 const start = new Date(Number(selectedYear), 0, 1);
                 const end = new Date(Number(selectedYear) + 1, 0, 1);
+
                 return date >= start && date < end;
             }
             case 'custom': {
@@ -150,8 +157,10 @@ export default function DistribusiIndex({ distribusi }: Props) {
                     const start = new Date(customStartDate);
                     const end = new Date(customEndDate);
                     end.setDate(end.getDate() + 1);
+
                     return date >= start && date < end;
                 }
+
                 return true;
             }
             default:
@@ -164,6 +173,7 @@ export default function DistribusiIndex({ distribusi }: Props) {
         const matchJenis = filterJenis === 'all' || item.jenis_sampah === filterJenis;
         const matchTujuan = filterTujuan === 'all' || item.tujuan_distribusi === filterTujuan;
         const matchDate = matchesDate(item.tanggal);
+
         return matchSearch && matchJenis && matchTujuan && matchDate;
     }), [distribusi, search, filterJenis, filterTujuan, matchesDate]);
 
@@ -176,14 +186,64 @@ export default function DistribusiIndex({ distribusi }: Props) {
         }
     };
 
+    const exportUrl = useMemo(() => {
+        const params = new URLSearchParams();
+
+        if (search) {
+params.set('search', search);
+}
+
+        if (filterJenis !== 'all') {
+params.set('filter_jenis', filterJenis);
+}
+
+        if (filterTujuan !== 'all') {
+params.set('filter_tujuan', filterTujuan);
+}
+
+        if (filterPeriod !== 'all') {
+params.set('filter_period', filterPeriod);
+}
+
+        if (filterPeriod === 'mingguan') {
+params.set('week_range', weekRange);
+}
+
+        if (filterPeriod === 'bulanan') {
+            params.set('month', selectedMonth);
+            params.set('year', selectedYear);
+        }
+
+        if (filterPeriod === 'tahunan') {
+params.set('year', selectedYear);
+}
+
+        if (filterPeriod === 'custom') {
+            if (customStartDate) {
+params.set('custom_start', customStartDate);
+}
+
+            if (customEndDate) {
+params.set('custom_end', customEndDate);
+}
+        }
+
+        const qs = params.toString();
+
+        return `${prefix}/distribusi/export${qs ? `?${qs}` : ''}`;
+    }, [search, filterJenis, filterTujuan, filterPeriod, weekRange, selectedMonth, selectedYear, customStartDate, customEndDate, prefix]);
+
     const handleReviewChange = useCallback((id: number, status: string) => {
-        if (status === 'pending') return;
+        if (status === 'pending') {
+return;
+}
 
         if (status === 'needs_revision') {
             setRevisionDistribusiId(id);
             setRevisionError('');
             setRevisionSubmitting(false);
             setRevisionModal(true);
+
             return;
         }
 
@@ -198,7 +258,9 @@ export default function DistribusiIndex({ distribusi }: Props) {
     }, [prefix]);
 
     const handleRevisionSubmit = useCallback((note: string) => {
-        if (!revisionDistribusiId) return;
+        if (!revisionDistribusiId) {
+return;
+}
 
         setRevisionSubmitting(true);
         setRevisionError('');
@@ -229,7 +291,10 @@ export default function DistribusiIndex({ distribusi }: Props) {
     };
 
     const canEdit = (item: Distribusi) => {
-        if (isAdmin) return false;
+        if (isAdmin) {
+return false;
+}
+
         return item.review_status === 'needs_revision';
     };
 
@@ -246,7 +311,7 @@ export default function DistribusiIndex({ distribusi }: Props) {
 
                     <div className="flex items-center gap-2">
                         <Button asChild variant="outline" className="border-green-200 text-green-700 hover:bg-green-50">
-                            <a href={`${prefix}/distribusi/export`}>
+                            <a href={exportUrl}>
                                 <FileDown className="h-4 w-4" />
                                 Export CSV
                             </a>
@@ -401,7 +466,9 @@ export default function DistribusiIndex({ distribusi }: Props) {
                                         value={customStartDate}
                                         onChange={(e) => setCustomStartDate(e.target.value)}
                                         onKeyDown={(e) => {
-                                            if (e.key !== 'Tab') e.preventDefault()
+                                            if (e.key !== 'Tab') {
+e.preventDefault()
+}
                                         }}
                                         className="w-full sm:w-[180px] pl-9 border-green-200 focus-visible:border-green-500 focus-visible:ring-green-500/20"
                                     />
@@ -421,7 +488,9 @@ export default function DistribusiIndex({ distribusi }: Props) {
                                         value={customEndDate}
                                         onChange={(e) => setCustomEndDate(e.target.value)}
                                         onKeyDown={(e) => {
-                                            if (e.key !== 'Tab') e.preventDefault()
+                                            if (e.key !== 'Tab') {
+e.preventDefault()
+}
                                         }}
                                         className="w-full sm:w-[180px] pl-9 border-green-200 focus-visible:border-green-500 focus-visible:ring-green-500/20"
                                     />
@@ -429,8 +498,8 @@ export default function DistribusiIndex({ distribusi }: Props) {
                             </div>
                         )}
 
-                        <div className="rounded-xl border border-green-200 bg-white shadow-sm">
-                            <Table>
+                        <div className="overflow-x-auto rounded-xl border border-green-200 bg-white shadow-sm">
+                            <Table className="min-w-[900px]">
                                 <TableHeader>
                                     <TableRow className="border-green-100 bg-green-50/50">
                                         <TableHead className="text-green-700">No</TableHead>

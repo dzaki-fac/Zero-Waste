@@ -1,6 +1,6 @@
-import { useState, useMemo } from 'react';
 import { Head, Link } from '@inertiajs/react';
 import { ClipboardCheck, ClipboardList, Download, History, FileDown, Search, X } from 'lucide-react';
+import { useState, useMemo } from 'react';
 import Heading from '@/components/heading';
 import { Button } from '@/components/ui/button';
 import {
@@ -29,7 +29,10 @@ export default function ChecklistPekerjaanIndex({ petugas }: Props) {
 
     const query = searchQuery.trim().toLowerCase();
     const filteredPetugas = useMemo(() => {
-        if (!query) return petugas;
+        if (!query) {
+return petugas;
+}
+
         return petugas.filter(
             (p) =>
                 p.name.toLowerCase().includes(query) ||
@@ -40,7 +43,10 @@ export default function ChecklistPekerjaanIndex({ petugas }: Props) {
     const searchEmpty = !isEmpty && query && filteredPetugas.length === 0;
 
     const handleExport = (nip: string) => {
-        if (exportingNip === nip) return;
+        if (exportingNip === nip) {
+return;
+}
+
         setExportingNip(nip);
         const a = document.createElement('a');
         a.href = `/admin/checklist-pekerjaan/export?nip=${nip}`;
@@ -122,8 +128,8 @@ export default function ChecklistPekerjaanIndex({ petugas }: Props) {
                         </p>
                     </div>
                 ) : (
-                    <div className="rounded-xl border border-green-200 bg-white shadow-sm">
-                        <Table>
+                    <div className="overflow-x-auto rounded-xl border border-green-200 bg-white shadow-sm">
+                        <Table className="min-w-[500px]">
                             <TableHeader>
                                 <TableRow className="border-green-100 bg-green-50/50">
                                     <TableHead className="text-green-700">No</TableHead>

@@ -6,6 +6,7 @@ use App\Http\Requests\DistribusiRequest;
 use App\Http\Requests\ReviewDistribusiRequest;
 use App\Models\Distribusi;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -155,12 +156,30 @@ class DistribusiController extends Controller
         return back()->with('success', 'Status distribusi berhasil diperbarui.');
     }
 
-    public function export(): \Symfony\Component\HttpFoundation\StreamedResponse
+    public function export(Request $request): \Symfony\Component\HttpFoundation\StreamedResponse
     {
         $user = auth()->user();
-        $records = Distribusi::visibleTo($user)
-            ->latest('tanggal')
-            ->get();
+        $query = Distribusi::visibleTo($user);
+
+        if ($search = $request->query('search')) {
+            $query->where('nama', 'like', "%{$search}%");
+        }
+
+        if ($jenis = $request->query('filter_jenis')) {
+            if ($jenis !== 'all') {
+                $query->where('jenis_sampah', $jenis);
+            }
+        }
+
+        if ($tujuan = $request->query('filter_tujuan')) {
+            if ($tujuan !== 'all') {
+                $query->where('tujuan_distribusi', $tujuan);
+            }
+        }
+
+        $this->applyDateFilter($query, $request);
+
+        $records = $query->latest('tanggal')->get();
 
         $filename = 'distribusi_' . now()->toDateString() . '.csv';
 
@@ -201,5 +220,38 @@ class DistribusiController extends Controller
         return response()->streamDownload($callback, $filename, [
             'Content-Type' => 'text/csv; charset=UTF-8',
         ]);
+    }
+
+    private function applyDateFilter($query, Request $request): void
+    {
+        $period = $request->query('filter_period', 'all');
+
+        switch ($period) {
+            case 'harian':
+                $query->whereDate('tanggal', now()->toDateString());
+                break;
+            case 'mingguan':
+                $days = (int) $request->query('week_range', 7);
+                $start = now()->subDays($days - 1)->startOfDay();
+                $end = now()->addDay()->startOfDay();
+                $query->where('tanggal', '>=', $start)->where('tanggal', '<', $end);
+                break;
+            case 'bulanan':
+                $month = (int) $request->query('month', now()->month);
+                $year = (int) $request->query('year', now()->year);
+                $query->whereYear('tanggal', $year)->whereMonth('tanggal', $month);
+                break;
+            case 'tahunan':
+                $year = (int) $request->query('year', now()->year);
+                $query->whereYear('tanggal', $year);
+                break;
+            case 'custom':
+                $start = $request->query('custom_start');
+                $end = $request->query('custom_end');
+                if ($start && $end) {
+                    $query->where('tanggal', '>=', $start)->where('tanggal', '<', $end . ' 23:59:59');
+                }
+                break;
+        }
     }
 }

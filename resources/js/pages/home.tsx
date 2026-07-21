@@ -1,6 +1,5 @@
 import { Head } from '@inertiajs/react';
-import React, { useState, useRef, useEffect, useLayoutEffect, type ReactNode, type CSSProperties } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { usePage, router } from '@inertiajs/react';
 import type { LucideIcon } from "lucide-react";
 import {
   Recycle,
@@ -25,13 +24,16 @@ import {
   CheckCircle,
   Send,
   CalendarIcon,
+  X,
 } from "lucide-react";
-import { usePage, router } from '@inertiajs/react';
+import React, { useState, useRef, useEffect, useLayoutEffect   } from "react";
+import type {ReactNode, CSSProperties} from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from 'recharts';
-import { C, display, body } from "../theme";
-import Navbar from "../components/Navbar";
 import { ChartTooltip, ChartLabel, getCategoryColor, PieLegend } from "../components/charts";
 import type { ChartData } from "../components/charts";
+import Navbar from "../components/Navbar";
+import { C, display, body } from "../theme";
 
 // ---- Ikon media sosial ----
 function WebsiteIcon({ size = 16, color = "currentColor" }: { size?: number; color?: string }) {
@@ -191,7 +193,11 @@ function useInView(threshold = 0.18) {
   const [inView, setInView] = useState(false);
   useEffect(() => {
     const el = ref.current;
-    if (!el) return;
+
+    if (!el) {
+return;
+}
+
     const obs = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
@@ -204,8 +210,10 @@ function useInView(threshold = 0.18) {
       { threshold, rootMargin: "0px 0px -8% 0px" }
     );
     obs.observe(el);
+
     return () => obs.disconnect();
   }, [threshold]);
+
   return [ref, inView] as const;
 }
 
@@ -221,6 +229,7 @@ function Reveal({
   style?: CSSProperties;
 }) {
   const [ref, inView] = useInView();
+
   return (
     <div
       ref={ref}
@@ -240,18 +249,26 @@ function Reveal({
 function useCountUp(target: number, active: boolean, duration = 1400) {
   const [value, setValue] = useState(0);
   useEffect(() => {
-    if (!active) return;
+    if (!active) {
+return;
+}
+
     let raf: number;
     const start = performance.now();
     const step = (t: number) => {
       const p = Math.min((t - start) / duration, 1);
       const eased = 1 - Math.pow(1 - p, 3);
       setValue(Math.round(eased * target));
-      if (p < 1) raf = requestAnimationFrame(step);
+
+      if (p < 1) {
+raf = requestAnimationFrame(step);
+}
     };
     raf = requestAnimationFrame(step);
+
     return () => cancelAnimationFrame(raf);
   }, [active, target, duration]);
+
   return value;
 }
 
@@ -259,9 +276,11 @@ function StatCounter({ stat, delay }: { stat: (typeof HERO_STATS)[number]; delay
   const [started, setStarted] = useState(false);
   useEffect(() => {
     const t = setTimeout(() => setStarted(true), delay);
+
     return () => clearTimeout(t);
   }, [delay]);
   const value = useCountUp(stat.value, started);
+
   return (
     <div>
       <div className="text-xl sm:text-2xl font-semibold text-white" style={display}>
@@ -328,6 +347,7 @@ const PRESETS: { key: PresetKey; label: string; days: number | null }[] = [
 function daysAgo(n: number): string {
     const d = new Date();
     d.setDate(d.getDate() - n);
+
     return d.toISOString().split('T')[0];
 }
 
@@ -420,6 +440,7 @@ function LaporanCharts({ data }: { data: PageProps }) {
                             {STATUS_DATA.map((item) => {
                                 const pct = statusTotal > 0 ? (item.value / statusTotal) * 100 : 0;
                                 const Icon = item.icon;
+
                                 return (
                                     <div key={item.key} className="flex items-center gap-3 rounded-lg p-3" style={{ backgroundColor: `${item.color}0d` }}>
                                         <div className="flex size-8 shrink-0 items-center justify-center rounded-lg" style={{ backgroundColor: `${item.color}1a` }}>
@@ -449,6 +470,7 @@ function LaporanCharts({ data }: { data: PageProps }) {
                     const data = penimbanganByArea;
                     const total = data.reduce((s, d) => s + d.value, 0);
                     const sorted = data.slice().sort((a, b) => b.value - a.value);
+
                     return (
                         <div className="rounded-2xl border bg-white p-5" style={{ borderColor: C.line }}>
                             <div className="mb-1 flex items-center gap-2">
@@ -498,6 +520,7 @@ function LaporanCharts({ data }: { data: PageProps }) {
                 ] as const).map((card) => {
                     const total = card.data.reduce((s, d) => s + d.value, 0);
                     const sorted = card.data.slice().sort((a, b) => b.value - a.value);
+
                     return (
                         <div key={card.title} className="rounded-2xl border bg-white p-5" style={{ borderColor: C.line }}>
                             <div className="mb-1 flex items-center gap-2">
@@ -554,13 +577,21 @@ export default function Dashboard() {
 
     function applyFilter(params: { start_date?: string | null; end_date?: string | null }) {
         const query: Record<string, string> = {};
-        if (params.start_date) query.start_date = params.start_date;
-        if (params.end_date) query.end_date = params.end_date;
+
+        if (params.start_date) {
+query.start_date = params.start_date;
+}
+
+        if (params.end_date) {
+query.end_date = params.end_date;
+}
+
         router.get('/', query, { preserveState: true, preserveScroll: true, replace: true });
     }
 
     function handlePreset(preset: typeof PRESETS[number]) {
         setActivePreset(preset.key);
+
         if (preset.days === null) {
             setStartDate('');
             setEndDate('');
@@ -586,6 +617,7 @@ export default function Dashboard() {
   const [heroIndex, setHeroIndex] = useState(0);
   const [posterIndex, setPosterIndex] = useState(0);
   const [posterPaused, setPosterPaused] = useState(false);
+  const [modalPoster, setModalPoster] = useState<PosterItem | null>(null);
   const [newsPaused, setNewsPaused] = useState(false);
   const [activeSection, setActiveSection] = useState("beranda");
   const [scrollY, setScrollY] = useState(0);
@@ -612,6 +644,7 @@ export default function Dashboard() {
     const headerEl = document.querySelector("header");
     const navHeight = headerEl ? headerEl.getBoundingClientRect().height : 64;
     const EXTRA_BUFFER: Record<string, number> = { berita: 0, edukasi: 0, laporan: 0 };
+
     return navHeight + (EXTRA_BUFFER[id] ?? 8);
   };
 
@@ -622,11 +655,17 @@ export default function Dashboard() {
     if (typeof window !== "undefined" && "scrollRestoration" in window.history) {
       window.history.scrollRestoration = "manual";
     }
+
     const scrollToId = (location.state as { scrollTo?: string })?.scrollTo;
+
     if (scrollToId) {
       const align = () => {
         const el = sectionRefs.current[scrollToId];
-        if (!el) return;
+
+        if (!el) {
+return;
+}
+
         const offset = getNavOffset(scrollToId);
         const top = el.getBoundingClientRect().top + window.scrollY - offset;
         window.scrollTo({ top, behavior: "instant" });
@@ -642,6 +681,7 @@ export default function Dashboard() {
   // ulang saat user navigasi lain / refresh.
   useEffect(() => {
     const scrollToId = (location.state as { scrollTo?: string })?.scrollTo;
+
     if (scrollToId) {
       navigate(location.pathname, { replace: true, state: {} });
     }
@@ -651,6 +691,7 @@ export default function Dashboard() {
     const t = setInterval(() => {
       setHeroIndex((i) => (i + 1) % HERO_SLIDES.length);
     }, 8000);
+
     return () => clearInterval(t);
   }, []);
 
@@ -659,6 +700,7 @@ export default function Dashboard() {
     const raf1 = requestAnimationFrame(() => {
       raf2 = requestAnimationFrame(() => setHeroMounted(true));
     });
+
     return () => {
       cancelAnimationFrame(raf1);
       cancelAnimationFrame(raf2);
@@ -669,10 +711,14 @@ export default function Dashboard() {
   // posterIndex berubah (baik otomatis maupun diklik manual), jadi hitungan
   // mundurnya selalu mulai dari 0 lagi. Berhenti sementara saat kartu di-hover.
   useEffect(() => {
-    if (posterPaused) return;
+    if (posterPaused) {
+return;
+}
+
     const t = setTimeout(() => {
       setPosterIndex((i) => (i + 1) % POSTERS.length);
     }, POSTER_AUTOPLAY_MS);
+
     return () => clearTimeout(t);
   }, [posterIndex, posterPaused]);
 
@@ -687,49 +733,69 @@ export default function Dashboard() {
 
     const onScroll = () => {
       setScrollY(window.scrollY);
-      if (Date.now() < suppressObserverUntilRef.current) return;
+
+      if (Date.now() < suppressObserverUntilRef.current) {
+return;
+}
 
       const headerEl = document.querySelector("header");
       const headerHeight = headerEl ? headerEl.getBoundingClientRect().height : 64;
       const referenceLine = headerHeight + 4;
 
       let current = SECTION_ORDER[0];
+
       for (const id of SECTION_ORDER) {
         const el = sectionRefs.current[id];
-        if (!el) continue;
+
+        if (!el) {
+continue;
+}
+
         const top = el.getBoundingClientRect().top;
+
         if (top <= referenceLine) {
           current = id;
         }
       }
+
       setActiveSection(current);
     };
 
     window.addEventListener("scroll", onScroll, { passive: true });
     onScroll();
+
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
   useEffect(() => {
     const track = newsTrackRef.current;
-    if (!track) return;
+
+    if (!track) {
+return;
+}
+
     const SPEED_PX_PER_SEC = 32;
     let raf = 0;
     let last = performance.now();
     const step = (now: number) => {
       const dt = (now - last) / 1000;
       last = now;
+
       if (!newsPaused && track) {
         newsOffsetRef.current += SPEED_PX_PER_SEC * dt;
         const singleSetWidth = track.scrollWidth / 2;
+
         if (newsOffsetRef.current >= singleSetWidth) {
           newsOffsetRef.current -= singleSetWidth;
         }
+
         track.style.transform = `translateX(-${newsOffsetRef.current}px)`;
       }
+
       raf = requestAnimationFrame(step);
     };
     raf = requestAnimationFrame(step);
+
     return () => cancelAnimationFrame(raf);
   }, [newsPaused]);
 
@@ -737,11 +803,18 @@ export default function Dashboard() {
     setActiveSection(id);
     suppressObserverUntilRef.current = Date.now() + 1900;
     const el = sectionRefs.current[id];
-    if (!el) return;
+
+    if (!el) {
+return;
+}
 
     const align = (behavior: ScrollBehavior) => {
       const target = sectionRefs.current[id];
-      if (!target) return;
+
+      if (!target) {
+return;
+}
+
       const offset = getNavOffset(id);
       const top = target.getBoundingClientRect().top + window.scrollY - offset;
       window.scrollTo({ top, behavior });
@@ -768,11 +841,22 @@ export default function Dashboard() {
 
   const scrollNews = (dir: number) => {
     const track = newsTrackRef.current;
-    if (!track) return;
+
+    if (!track) {
+return;
+}
+
     const singleSetWidth = track.scrollWidth / 2;
     newsOffsetRef.current += dir * 320;
-    if (newsOffsetRef.current < 0) newsOffsetRef.current += singleSetWidth;
-    if (newsOffsetRef.current >= singleSetWidth) newsOffsetRef.current -= singleSetWidth;
+
+    if (newsOffsetRef.current < 0) {
+newsOffsetRef.current += singleSetWidth;
+}
+
+    if (newsOffsetRef.current >= singleSetWidth) {
+newsOffsetRef.current -= singleSetWidth;
+}
+
     track.style.transform = `translateX(-${newsOffsetRef.current}px)`;
   };
 
@@ -838,8 +922,12 @@ export default function Dashboard() {
             aria-label="Slide sebelumnya"
             className="absolute left-2 sm:left-4 top-1/2 -translate-y-1/2 z-50 size-7 sm:size-8 rounded-full flex items-center justify-center transition-all duration-150 active:scale-90"
             style={{ backgroundColor: "rgba(10,20,64,0.6)", border: "1px solid rgba(255,255,255,0.25)" }}
-            onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = "rgba(10,20,64,0.8)"; }}
-            onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = "rgba(10,20,64,0.6)"; }}
+            onMouseEnter={(e) => {
+ e.currentTarget.style.backgroundColor = "rgba(10,20,64,0.8)"; 
+}}
+            onMouseLeave={(e) => {
+ e.currentTarget.style.backgroundColor = "rgba(10,20,64,0.6)"; 
+}}
           >
             <ChevronLeft size={12} color="#fff" />
           </button>
@@ -848,8 +936,12 @@ export default function Dashboard() {
             aria-label="Slide berikutnya"
             className="absolute right-2 sm:right-4 top-1/2 -translate-y-1/2 z-50 size-7 sm:size-8 rounded-full flex items-center justify-center transition-all duration-150 active:scale-90"
             style={{ backgroundColor: "rgba(10,20,64,0.6)", border: "1px solid rgba(255,255,255,0.25)" }}
-            onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = "rgba(10,20,64,0.8)"; }}
-            onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = "rgba(10,20,64,0.6)"; }}
+            onMouseEnter={(e) => {
+ e.currentTarget.style.backgroundColor = "rgba(10,20,64,0.8)"; 
+}}
+            onMouseLeave={(e) => {
+ e.currentTarget.style.backgroundColor = "rgba(10,20,64,0.6)"; 
+}}
           >
             <ChevronRight size={12} color="#fff" />
           </button>
@@ -920,7 +1012,7 @@ export default function Dashboard() {
       </section>
 
       {/* ---- Laporan ---- */}
-      <section id="laporan" ref={setSectionRef("laporan")} className="max-w-6xl mx-auto px-5 sm:px-8 pt-6 sm:pt-8 pb-8 sm:pb-10" style={{ scrollMarginTop: 72 }}>
+      <section id="laporan" ref={setSectionRef("laporan")} className="max-w-6xl mx-auto px-4 sm:px-8 pt-6 sm:pt-8 pb-8 sm:pb-10" style={{ scrollMarginTop: 64 }}>
         <Reveal>
           <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
             <div>
@@ -930,12 +1022,12 @@ export default function Dashboard() {
               <p className="text-sm" style={{ color: C.ink500 }}>Rekap data pengelolaan sampah</p>
             </div>
             <div className="flex flex-wrap items-center gap-2 shrink-0">
-              <div className="flex items-center rounded-lg border bg-white p-0.5" style={{ borderColor: C.line }}>
+              <div className="flex flex-wrap items-center rounded-lg border bg-white p-0.5" style={{ borderColor: C.line }}>
                 {PRESETS.map((preset) => (
                   <button
                     key={preset.key}
                     onClick={() => handlePreset(preset)}
-                    className={`rounded-md px-3 py-1.5 text-xs font-medium transition-colors ${
+                    className={`rounded-md px-2 py-1.5 text-xs font-medium transition-colors sm:px-3 ${
                       activePreset === preset.key
                         ? 'bg-green-600 text-white shadow-sm'
                         : 'text-gray-600 hover:text-gray-900'
@@ -945,20 +1037,20 @@ export default function Dashboard() {
                   </button>
                 ))}
               </div>
-              <div className="flex items-center gap-1.5 rounded-lg border bg-white px-2 py-1" style={{ borderColor: C.line }}>
-                <CalendarIcon className="size-3.5 text-gray-400" />
+              <div className="flex flex-wrap items-center gap-1.5 rounded-lg border bg-white px-2 py-1" style={{ borderColor: C.line }}>
+                <CalendarIcon className="size-3.5 text-gray-400 shrink-0" />
                 <input
                   type="date"
                   value={startDate}
                   onChange={(e) => setStartDate(e.target.value)}
-                  className="w-28 border-0 bg-transparent text-xs text-gray-700 outline-none hover:text-gray-900 [color-scheme:light]"
+                  className="w-24 sm:w-28 border-0 bg-transparent text-xs text-gray-700 outline-none hover:text-gray-900 [color-scheme:light]"
                 />
-                <span className="text-xs text-gray-400">&ndash;</span>
+                <span className="hidden text-xs text-gray-400 sm:inline">&ndash;</span>
                 <input
                   type="date"
                   value={endDate}
                   onChange={(e) => setEndDate(e.target.value)}
-                  className="w-28 border-0 bg-transparent text-xs text-gray-700 outline-none hover:text-gray-900 [color-scheme:light]"
+                  className="w-24 sm:w-28 border-0 bg-transparent text-xs text-gray-700 outline-none hover:text-gray-900 [color-scheme:light]"
                 />
                 <button
                   onClick={handleCustomDate}
@@ -976,9 +1068,9 @@ export default function Dashboard() {
       </section>
 
       {/* ---- Berita ---- */}
-      <section id="berita" ref={setSectionRef("berita")} className="pt-6 sm:pt-8" style={{ backgroundColor: C.navy900, scrollMarginTop: 64 }}>
+      <section id="berita" ref={setSectionRef("berita")} className="pt-6 sm:pt-8" style={{ backgroundColor: C.navy900, scrollMarginTop: 56 }}>
         {news.length > 0 ? (
-        <div className="max-w-6xl mx-auto px-5 sm:px-8 pb-12">
+        <div className="max-w-6xl mx-auto px-4 sm:px-8 pb-12">
           <Reveal>
             <div className="flex items-end justify-between flex-wrap gap-3 mb-8">
               <div>
@@ -1014,8 +1106,12 @@ export default function Dashboard() {
                     rel="noopener noreferrer"
                     className="rounded-2xl overflow-hidden block flex flex-col h-full"
                     style={{ backgroundColor: C.navy800, transition: "transform 220ms ease, box-shadow 220ms ease" }}
-                    onMouseEnter={(e) => { e.currentTarget.style.transform = "translateY(-4px)"; e.currentTarget.style.boxShadow = "0 8px 24px rgba(0,0,0,0.3)"; }}
-                    onMouseLeave={(e) => { e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.boxShadow = "none"; }}
+                    onMouseEnter={(e) => {
+ e.currentTarget.style.transform = "translateY(-4px)"; e.currentTarget.style.boxShadow = "0 8px 24px rgba(0,0,0,0.3)"; 
+}}
+                    onMouseLeave={(e) => {
+ e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.boxShadow = "none"; 
+}}
                   >
                     <div className="h-36 relative overflow-hidden shrink-0">
                       <SafeImage
@@ -1043,14 +1139,14 @@ export default function Dashboard() {
           </div>
         </div>
         ) : (
-          <div className="max-w-6xl mx-auto px-5 sm:px-8 py-12 text-center">
+          <div className="max-w-6xl mx-auto px-4 sm:px-8 py-12 text-center">
             <p className="text-sm" style={{ color: "#8A8FB3" }}>Belum ada berita.</p>
           </div>
         )}
       </section>
 
       {/* ---- Edukasi: poster slideshow ---- */}
-      <section id="edukasi" ref={setSectionRef("edukasi")} className="max-w-6xl mx-auto px-5 sm:px-8 pt-6 sm:pt-8 pb-20" style={{ scrollMarginTop: 64 }}>
+      <section id="edukasi" ref={setSectionRef("edukasi")} className="max-w-6xl mx-auto px-4 sm:px-8 pt-6 sm:pt-8 pb-20" style={{ scrollMarginTop: 56 }}>
         {posters.length > 0 ? (
         <>
         <Reveal>
@@ -1075,23 +1171,24 @@ export default function Dashboard() {
               </span>
             </div>
 
-            {/* Frame poster — rasio A3 vertikal (297 x 420), gambar dipusatkan.
-                Sengaja tidak ada overlay teks di atas gambar (judul/catatan),
-                supaya posternya kelihatan bersih & jelas. Tag di atas frame
-                (di luar gambar) sudah cukup jadi label. */}
-            <div
-              className="mx-auto rounded-2xl overflow-hidden relative mb-3"
-              style={{ aspectRatio: "297 / 420", width: "min(100%, min(420px, 85vw))", backgroundColor: C.navy050 }}
+            <button
+              type="button"
+              onClick={() => setModalPoster(activePoster)}
+              className="mx-auto block w-full cursor-zoom-in mb-1"
             >
-              <SafeImage
-                src={activePoster.image}
-                alt={activePoster.title}
-                icon={ImageIcon}
-                gradient={`linear-gradient(135deg, ${C.navy900}, ${C.navy700})`}
-                className="w-full h-full object-cover"
-                style={{ objectPosition: "center 65%" }}
-              />
-            </div>
+              <div
+                className="mx-auto rounded-2xl overflow-hidden relative"
+                style={{ width: "min(100%, min(420px, 85vw))", backgroundColor: C.navy050 }}
+              >
+                <SafeImage
+                  src={activePoster.image}
+                  alt={activePoster.title}
+                  icon={ImageIcon}
+                  gradient={`linear-gradient(135deg, ${C.navy900}, ${C.navy700})`}
+                  className="w-full object-contain"
+                />
+              </div>
+            </button>
 
             <div className="flex items-center justify-between mb-4">
               <button onClick={prevPoster} className="w-9 sm:w-10 h-9 sm:h-10 rounded-full flex items-center justify-center border transition-all duration-200 hover:scale-105 active:scale-90" style={{ borderColor: C.line }} aria-label="Poster sebelumnya">
@@ -1113,11 +1210,11 @@ export default function Dashboard() {
               </button>
             </div>
 
-            {/* Thumbnail strip — overlay penanda di thumbnail aktif tumbuh dari kiri
-                ke kanan selama 7 detik (pakai transform, jadi mulus/GPU-accelerated) */}
+            {/* Thumbnail strip */}
             <div className="flex flex-nowrap sm:flex-wrap justify-start sm:justify-center gap-2 overflow-x-auto sm:overflow-visible pb-1 poster-thumbs snap-x snap-mandatory sm:snap-none">
               {POSTERS.map((p, i) => {
                 const isActive = i === posterIndex;
+
                 return (
                   <button
                     key={i}
@@ -1135,7 +1232,7 @@ export default function Dashboard() {
                       alt={p.title}
                       icon={ImageIcon}
                       gradient={`linear-gradient(135deg, ${C.navy700}, ${C.navy900})`}
-                      className="w-full h-full object-cover"
+                      className="w-full h-full object-contain"
                       style={{ opacity: isActive ? 1 : 0.55, transition: "opacity 200ms ease" }}
                     />
                     {isActive && (
@@ -1166,12 +1263,34 @@ export default function Dashboard() {
         )}
       </section>
 
+      {/* ---- Poster Modal ---- */}
+      {modalPoster && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4"
+          onClick={() => setModalPoster(null)}
+        >
+          <button
+            type="button"
+            onClick={(e) => { e.stopPropagation(); setModalPoster(null); }}
+            className="absolute top-4 right-4 z-10 flex h-10 w-10 items-center justify-center rounded-full bg-black/50 text-white hover:bg-black/70 transition-colors"
+            aria-label="Tutup"
+          >
+            <X size={20} />
+          </button>
+          <img
+            src={modalPoster.image}
+            alt={modalPoster.title}
+            className="max-h-[90vh] max-w-[90vw] rounded-xl object-contain"
+            onClick={(e) => e.stopPropagation()}
+          />
+        </div>
+      )}
+
       {/* ---- Footer ---- */}
       {/* ---- Footer ---- */}
       <footer style={{ backgroundColor: C.navy900 }}>
-        <div className="max-w-6xl mx-auto px-5 sm:px-8 pt-14 sm:pt-16 pb-8">
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-10 mb-10">
+        <div className="max-w-6xl mx-auto px-4 sm:px-8 pt-14 sm:pt-16 pb-8">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 sm:gap-10 mb-10">
             <div>
               <div className="text-xs font-semibold uppercase tracking-widest mb-4" style={{ ...body, color: "#8A8FB3" }}>
                 Kontak
@@ -1179,6 +1298,7 @@ export default function Dashboard() {
               <div className="flex flex-col gap-3">
                 {KONTAK.map((k, i) => {
                   const KIcon = k.icon;
+
                   return (
                     <div key={i} className="flex items-start gap-3">
                       <span className="w-8 h-8 rounded-full flex items-center justify-center shrink-0" style={{ backgroundColor: C.navy800 }}>
@@ -1211,6 +1331,7 @@ export default function Dashboard() {
               <div className="flex items-center gap-3">
                 {SOCIALS.map((s, i) => {
                   const SIcon = s.icon;
+
                   return (
                     <a
                       key={i}

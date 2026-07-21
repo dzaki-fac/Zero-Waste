@@ -1,6 +1,6 @@
-import { useState, useEffect } from 'react';
 import { Head, Link, useForm, usePage } from '@inertiajs/react';
 import { ArrowLeft, Save, Calendar, User, MapPin } from 'lucide-react';
+import { useState, useEffect } from 'react';
 import Heading from '@/components/heading';
 import InputError from '@/components/input-error';
 import { Button } from '@/components/ui/button';
@@ -32,7 +32,9 @@ export default function PenimbanganCreate() {
     const [areaError, setAreaError] = useState('');
 
     useEffect(() => {
-        if (data.area) setAreaError('');
+        if (data.area) {
+setAreaError('');
+}
     }, [data.area]);
 
     const prefix = auth.user.role === 'admin' ? '/admin' : '/petugas';
@@ -41,15 +43,21 @@ export default function PenimbanganCreate() {
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
+
         if (!data.area) {
             setAreaError('Pilih area terlebih dahulu');
+
             return;
         }
+
         const filled = data.items.filter((item) => parseFloat(item.berat) > 0).length;
+
         if (!filled) {
             setSubmitError('Minimal isi berat pada 1 jenis sampah');
+
             return;
         }
+
         setSubmitError('');
         post(`${prefix}/penimbangan`);
     };
@@ -117,6 +125,7 @@ export default function PenimbanganCreate() {
                             <div className="flex flex-wrap gap-2">
                                 {options.area.map((opt) => {
                                     const isSelected = data.area === opt;
+
                                     return (
                                         <button
                                             key={opt}

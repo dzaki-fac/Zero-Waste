@@ -1,6 +1,6 @@
-import { useState } from 'react';
 import { Head, Link, useForm, usePage } from '@inertiajs/react';
 import { ArrowLeft, Save } from 'lucide-react';
+import { useState } from 'react';
 import Heading from '@/components/heading';
 import InputError from '@/components/input-error';
 import { Button } from '@/components/ui/button';
@@ -36,10 +36,13 @@ export default function PilahSampahCreate() {
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
         const filled = data.items.filter((item) => parseFloat(item.berat) > 0).length;
+
         if (!filled) {
             setSubmitError('Minimal isi berat pada 1 jenis sampah');
+
             return;
         }
+
         setSubmitError('');
         post(`${prefix}/pilah-sampah`);
     };

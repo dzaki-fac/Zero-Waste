@@ -1,14 +1,14 @@
+import { Head, Link, router, useForm, usePage } from '@inertiajs/react';
+import { ArrowLeft, Send, Calendar, User, Trash2, CheckCircle2 } from 'lucide-react';
+import { useEffect, useState } from 'react';
 import Heading from '@/components/heading';
 import InputError from '@/components/input-error';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Head, Link, router, useForm, usePage } from '@inertiajs/react';
-import { ArrowLeft, Send, Calendar, User, Trash2, CheckCircle2 } from 'lucide-react';
 import {
     Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle,
 } from '@/components/ui/dialog';
-import { useEffect, useState } from 'react';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 
 type Options = {
     area: string[];
@@ -35,7 +35,9 @@ export default function FormPilahSampah() {
     const [submitError, setSubmitError] = useState('');
 
     useEffect(() => {
-        if (submitted) setShowSuccess(true);
+        if (submitted) {
+setShowSuccess(true);
+}
     }, [submitted]);
 
     const totalBerat = data.items.reduce((sum, item) => sum + (parseFloat(item.berat) || 0), 0);
@@ -44,10 +46,13 @@ export default function FormPilahSampah() {
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
         const filledCount = data.items.filter((item) => parseFloat(item.berat) > 0).length;
+
         if (!filledCount) {
             setSubmitError('Minimal isi berat pada 1 jenis sampah');
+
             return;
         }
+
         setSubmitError('');
         post('/form/pilah-sampah');
     };

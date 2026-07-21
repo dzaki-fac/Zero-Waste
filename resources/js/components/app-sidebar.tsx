@@ -56,7 +56,7 @@ export function AppSidebar() {
                 <Link
                     href="/form"
                     prefetch
-                    className="grid w-full grid-cols-[120px_minmax(0,1fr)] items-center gap-2 px-4 py-4 group-data-[collapsible=icon]:grid-cols-1 group-data-[collapsible=icon]:gap-0 group-data-[collapsible=icon]:px-2 group-data-[collapsible=icon]:py-2"
+                    className="grid w-full items-center px-4 py-4 group-data-[collapsible=icon]:px-2 group-data-[collapsible=icon]:py-2"
                 >
                     <AppLogo />
                 </Link>

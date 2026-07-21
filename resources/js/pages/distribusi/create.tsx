@@ -1,6 +1,6 @@
-import { useState } from 'react';
 import { Head, Link, useForm, usePage } from '@inertiajs/react';
 import { ArrowLeft, Save, Ship, MapPin } from 'lucide-react';
+import { useState } from 'react';
 import Heading from '@/components/heading';
 import InputError from '@/components/input-error';
 import { Button } from '@/components/ui/button';
@@ -41,23 +41,33 @@ export default function DistribusiCreate() {
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
+
         if (!data.tujuan_distribusi) {
             setTujuanError('Pilih tujuan distribusi');
+
             return;
         }
+
         if (data.tujuan_distribusi === 'Tujuan lainnya' && !data.tujuan_lainnya) {
             setTujuanError('Isi tujuan distribusi lainnya');
+
             return;
         }
+
         if (!data.lokasi) {
             setLokasiError('Masukkan lokasi');
+
             return;
         }
+
         const hasBerat = data.items.some((item) => parseFloat(item.berat) > 0);
+
         if (!hasBerat) {
             setSubmitError('Minimal isi berat pada 1 jenis sampah');
+
             return;
         }
+
         post(`${prefix}/distribusi`, {
             ...data,
             tujuan_distribusi: data.tujuan_distribusi === 'Tujuan lainnya' ? data.tujuan_lainnya : data.tujuan_distribusi,
@@ -127,6 +137,7 @@ export default function DistribusiCreate() {
                             <div className="flex flex-wrap gap-2">
                                 {tujuanOptions.map((opt) => {
                                     const isSelected = data.tujuan_distribusi === opt;
+
                                     return (
                                         <button
                                             key={opt}

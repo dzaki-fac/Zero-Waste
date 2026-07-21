@@ -3,6 +3,7 @@ import { FileText, Upload, Trash2, FileDown, Eye } from 'lucide-react';
 import { useState } from 'react';
 import Heading from '@/components/heading';
 import { Button } from '@/components/ui/button';
+import { Checkbox } from '@/components/ui/checkbox';
 import {
     Dialog,
     DialogContent,
@@ -13,7 +14,6 @@ import {
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Checkbox } from '@/components/ui/checkbox';
 
 type DocumentItem = {
     id: number;
@@ -36,8 +36,14 @@ const DOC_TYPES = [
 ] as const;
 
 function formatFileSize(bytes: number): string {
-    if (bytes < 1024) return bytes + ' B';
-    if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+    if (bytes < 1024) {
+return bytes + ' B';
+}
+
+    if (bytes < 1024 * 1024) {
+return (bytes / 1024).toFixed(1) + ' KB';
+}
+
     return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
 }
 
@@ -75,7 +81,11 @@ export default function KelolaDokumen({ documents }: Props) {
 
     function openReplace(type: string) {
         const doc = documents[type];
-        if (!doc) return;
+
+        if (!doc) {
+return;
+}
+
         replaceForm.reset();
         replaceForm.clearErrors();
         replaceForm.setData({
@@ -89,9 +99,17 @@ export default function KelolaDokumen({ documents }: Props) {
 
     function handleReplace(e: React.FormEvent) {
         e.preventDefault();
-        if (!replaceType) return;
+
+        if (!replaceType) {
+return;
+}
+
         const doc = documents[replaceType];
-        if (!doc) return;
+
+        if (!doc) {
+return;
+}
+
         replaceForm.patch(`/admin/dokumen/${doc.id}`, {
             preserveScroll: true,
             onSuccess: () => {
@@ -108,9 +126,16 @@ export default function KelolaDokumen({ documents }: Props) {
     }
 
     function handleDelete() {
-        if (!deletingType) return;
+        if (!deletingType) {
+return;
+}
+
         const doc = documents[deletingType];
-        if (!doc) return;
+
+        if (!doc) {
+return;
+}
+
         setDeleteError(null);
         setDeleteProcessing(true);
         uploadForm.delete(`/admin/dokumen/${doc.id}`, {
@@ -226,7 +251,11 @@ export default function KelolaDokumen({ documents }: Props) {
                                             <form
                                                 onSubmit={(e) => {
                                                     e.preventDefault();
-                                                    if (!uploadForm.data.pdf) return;
+
+                                                    if (!uploadForm.data.pdf) {
+return;
+}
+
                                                     uploadForm.post('/admin/dokumen', {
                                                         preserveScroll: true,
                                                         onSuccess: () => {
@@ -246,11 +275,14 @@ export default function KelolaDokumen({ documents }: Props) {
                                                         accept="application/pdf"
                                                         onChange={(e) => {
                                                             const file = e.target.files?.[0] ?? null;
+
                                                             if (file && file.size > 10 * 1024 * 1024) {
                                                                 alert('Ukuran file terlalu besar. Maksimal 10 MB.');
                                                                 e.target.value = '';
+
                                                                 return;
                                                             }
+
                                                             uploadForm.setData('pdf', file);
                                                             uploadForm.setData('type', key);
                                                             uploadForm.setData('title', label);
@@ -295,7 +327,11 @@ export default function KelolaDokumen({ documents }: Props) {
                 </div>
             </div>
 
-            <Dialog open={!!replaceType} onOpenChange={(open) => { if (!open) setReplaceType(null); }}>
+            <Dialog open={!!replaceType} onOpenChange={(open) => {
+ if (!open) {
+setReplaceType(null);
+} 
+}}>
                 <DialogContent className="sm:max-w-md">
                     <DialogHeader>
                         <DialogTitle>Ganti Dokumen</DialogTitle>
@@ -322,11 +358,14 @@ export default function KelolaDokumen({ documents }: Props) {
                                 accept="application/pdf"
                                 onChange={(e) => {
                                     const file = e.target.files?.[0] ?? null;
+
                                     if (file && file.size > 10 * 1024 * 1024) {
                                         alert('Ukuran file terlalu besar. Maksimal 10 MB.');
                                         e.target.value = '';
+
                                         return;
                                     }
+
                                     replaceForm.setData('pdf', file);
                                 }}
                                 className="border-green-200 focus-visible:border-green-500 focus-visible:ring-green-500/20 file:mr-3 file:rounded-md file:border-0 file:bg-green-600 file:px-3 file:py-1 file:text-xs file:text-white file:hover:bg-green-700"
@@ -364,7 +403,13 @@ export default function KelolaDokumen({ documents }: Props) {
                 </DialogContent>
             </Dialog>
 
-            <Dialog open={deleteOpen} onOpenChange={(open) => { if (!open) { setDeleteError(null); } setDeleteOpen(open); }}>
+            <Dialog open={deleteOpen} onOpenChange={(open) => {
+ if (!open) {
+ setDeleteError(null); 
+}
+
+ setDeleteOpen(open); 
+}}>
                 <DialogContent className="sm:max-w-sm">
                     <DialogHeader>
                         <DialogTitle>Hapus Dokumen</DialogTitle>
@@ -383,7 +428,9 @@ export default function KelolaDokumen({ documents }: Props) {
                     <DialogFooter>
                         <Button
                             variant="outline"
-                            onClick={() => { setDeleteError(null); setDeleteOpen(false); }}
+                            onClick={() => {
+ setDeleteError(null); setDeleteOpen(false); 
+}}
                             disabled={deleteProcessing}
                             className="border-green-200 text-green-700 hover:bg-green-50"
                         >

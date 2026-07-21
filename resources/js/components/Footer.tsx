@@ -32,9 +32,9 @@ const JAM_LAYANAN = [
 export default function Footer() {
   return (
     <footer style={{ backgroundColor: C.navy900 }}>
-      <div className="max-w-6xl mx-auto px-5 sm:px-8 pt-14 sm:pt-16 pb-8">
+      <div className="max-w-6xl mx-auto px-4 sm:px-8 pt-14 sm:pt-16 pb-8">
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-10 mb-10">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 sm:gap-10 mb-10">
           <div>
             <div className="text-xs font-semibold uppercase tracking-widest mb-4" style={{ ...body, color: "#8A8FB3" }}>
               Kontak
@@ -42,6 +42,7 @@ export default function Footer() {
             <div className="flex flex-col gap-3">
               {KONTAK.map((k, i) => {
                 const KIcon = k.icon;
+
                 return (
                   <div key={i} className="flex items-start gap-3">
                     <span className="w-8 h-8 rounded-full flex items-center justify-center shrink-0" style={{ backgroundColor: C.navy800 }}>
@@ -74,6 +75,7 @@ export default function Footer() {
             <div className="flex items-center gap-3">
               {SOCIALS.map((s, i) => {
                 const SIcon = s.icon;
+
                 return (
                   <a
                     key={i}
@@ -83,8 +85,12 @@ export default function Footer() {
                     aria-label={s.label}
                     className="w-10 h-10 rounded-full flex items-center justify-center shrink-0 border transition-colors"
                     style={{ backgroundColor: C.navy800, borderColor: C.navy700 }}
-                    onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = C.navy700; e.currentTarget.style.borderColor = C.leaf500; }}
-                    onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = C.navy800; e.currentTarget.style.borderColor = C.navy700; }}
+                    onMouseEnter={(e) => {
+ e.currentTarget.style.backgroundColor = C.navy700; e.currentTarget.style.borderColor = C.leaf500; 
+}}
+                    onMouseLeave={(e) => {
+ e.currentTarget.style.backgroundColor = C.navy800; e.currentTarget.style.borderColor = C.navy700; 
+}}
                   >
                     <SIcon size={16} color={C.leaf400} />
                   </a>

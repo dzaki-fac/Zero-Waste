@@ -1,5 +1,6 @@
-import React, { useState, useRef, useEffect, type ReactNode, type CSSProperties } from "react";
 import type { LucideIcon } from "lucide-react";
+import React, { useState, useRef, useEffect   } from "react";
+import type {ReactNode, CSSProperties} from "react";
 import { C, body } from "../theme";
 
 export function useInView(threshold = 0.18) {
@@ -7,7 +8,11 @@ export function useInView(threshold = 0.18) {
   const [inView, setInView] = useState(false);
   useEffect(() => {
     const el = ref.current;
-    if (!el) return;
+
+    if (!el) {
+return;
+}
+
     const obs = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
@@ -20,13 +25,16 @@ export function useInView(threshold = 0.18) {
       { threshold, rootMargin: "0px 0px -8% 0px" }
     );
     obs.observe(el);
+
     return () => obs.disconnect();
   }, [threshold]);
+
   return [ref, inView] as const;
 }
 
 export function Reveal({ children, delay = 0, className, style }: { children: ReactNode; delay?: number; className?: string; style?: CSSProperties }) {
   const [ref, inView] = useInView();
+
   return (
     <div
       ref={ref}
@@ -58,10 +66,21 @@ export function SafeImage({ src, alt, icon: Icon, gradient, className, style }: 
     let cancelled = false;
     setState('loading');
     const img = new Image();
-    img.onload = () => { if (!cancelled) setState('loaded'); };
-    img.onerror = () => { if (!cancelled) setState('failed'); };
+    img.onload = () => {
+ if (!cancelled) {
+setState('loaded');
+} 
+};
+    img.onerror = () => {
+ if (!cancelled) {
+setState('failed');
+} 
+};
     img.src = src;
-    return () => { cancelled = true; img.onload = null; img.onerror = null; };
+
+    return () => {
+ cancelled = true; img.onload = null; img.onerror = null; 
+};
   }, [src]);
 
   if (state === 'failed' || state === 'loading') {

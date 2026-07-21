@@ -1,12 +1,12 @@
+import { ChevronLeft, ChevronRight, ZoomIn, ZoomOut, Download, ScrollText, FileText } from "lucide-react";
 import { useState, useRef, useEffect } from "react";
 import { Document, Page, pdfjs } from "react-pdf";
-import { ChevronLeft, ChevronRight, ZoomIn, ZoomOut, Download, ScrollText, FileText } from "lucide-react";
 import "react-pdf/dist/Page/AnnotationLayer.css";
 import "react-pdf/dist/Page/TextLayer.css";
-import { C, display, body } from "../theme";
-import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
+import Navbar from "../components/Navbar";
 import { Reveal } from "../components/shared";
+import { C, display, body } from "../theme";
 
 pdfjs.GlobalWorkerOptions.workerSrc = new URL(
   "pdfjs-dist/build/pdf.worker.min.mjs",
@@ -54,10 +54,14 @@ export default function PeraturanPage() {
   // Keep scale in sync with viewport size, unless the user has manually zoomed.
   useEffect(() => {
     const handleResize = () => {
-      if (userAdjustedScale) return;
+      if (userAdjustedScale) {
+return;
+}
+
       setScale(getScaleForWidth(window.innerWidth));
     };
     window.addEventListener("resize", handleResize);
+
     return () => window.removeEventListener("resize", handleResize);
   }, [userAdjustedScale]);
 
@@ -65,27 +69,38 @@ export default function PeraturanPage() {
   const suppressObserverUntilRef = useRef(0);
 
   useEffect(() => {
-    if (mode !== "all" || numPages === 0) return;
+    if (mode !== "all" || numPages === 0) {
+return;
+}
 
     const observer = new IntersectionObserver(
       (entries) => {
-        if (Date.now() < suppressObserverUntilRef.current) return;
+        if (Date.now() < suppressObserverUntilRef.current) {
+return;
+}
+
         let bestPage = pageNumber;
         let bestRatio = 0;
         entries.forEach((entry) => {
           const page = Number((entry.target as HTMLElement).dataset.page);
+
           if (entry.intersectionRatio > bestRatio) {
             bestRatio = entry.intersectionRatio;
             bestPage = page;
           }
         });
-        if (bestRatio > 0) setPageNumber(bestPage);
+
+        if (bestRatio > 0) {
+setPageNumber(bestPage);
+}
       },
       { threshold: [0.25, 0.5, 0.75, 1] }
     );
 
     Object.values(pageRefs.current).forEach((el) => {
-      if (el) observer.observe(el);
+      if (el) {
+observer.observe(el);
+}
     });
 
     return () => observer.disconnect();
@@ -94,10 +109,14 @@ export default function PeraturanPage() {
   const goToPage = (target: number) => {
     const clamped = Math.min(Math.max(1, target), numPages || 1);
     setPageNumber(clamped);
+
     if (mode === "all") {
       suppressObserverUntilRef.current = Date.now() + 700;
       const el = pageRefs.current[clamped];
-      if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+
+      if (el) {
+el.scrollIntoView({ behavior: "smooth", block: "start" });
+}
     }
   };
 
@@ -271,7 +290,9 @@ export default function PeraturanPage() {
                   }
                 >
                   {Array.from({ length: numPages }, (_, i) => i + 1).map((p) => (
-                    <div key={p} data-page={p} ref={(el) => { pageRefs.current[p] = el; }} className="flex flex-col items-center gap-2">
+                    <div key={p} data-page={p} ref={(el) => {
+ pageRefs.current[p] = el; 
+}} className="flex flex-col items-center gap-2">
                       <Page
                         pageNumber={p}
                         scale={scale}
