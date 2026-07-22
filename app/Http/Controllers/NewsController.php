@@ -43,12 +43,23 @@ class NewsController extends Controller
             'tag' => ['required', 'string', 'max:255'],
             'title' => ['required', 'string', 'max:255'],
             'date' => ['required', 'string', 'max:255'],
-            'image_url' => ['required', 'url', 'max:2048'],
+            'image' => ['nullable', 'image', 'mimes:jpeg,png,jpg,webp', 'max:2048'],
             'href' => ['required', 'url', 'max:2048'],
             'is_published' => ['boolean'],
             'order' => ['integer', 'min:0'],
         ]);
 
+        if ($request->hasFile('image')) {
+            $oldPath = str_replace('/storage/', '', $news->image_url);
+            if ($oldPath && Storage::disk('public')->exists($oldPath)) {
+                Storage::disk('public')->delete($oldPath);
+            }
+            $validated['image_url'] = Storage::url(
+                $request->file('image')->store('images', 'public')
+            );
+        }
+
+        unset($validated['image']);
         $news->update($validated);
 
         return to_route('admin.berita.index');
