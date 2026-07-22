@@ -50,6 +50,7 @@ export default function KelolaBerita({ news }: Props) {
     const [editKey, setEditKey] = useState(0);
 
     const [imagePreview, setImagePreview] = useState<string | null>(null);
+    const [editImagePreview, setEditImagePreview] = useState<string | null>(null);
 
     const addForm = useForm({
         tag: '',
@@ -65,7 +66,7 @@ export default function KelolaBerita({ news }: Props) {
         tag: '',
         title: '',
         date: '',
-        image_url: '',
+        image: null as File | null,
         href: '',
         is_published: true,
         order: 0,
@@ -94,12 +95,13 @@ URL.revokeObjectURL(imagePreview);
             tag: item.tag,
             title: item.title,
             date: item.date,
-            image_url: item.image_url,
+            image: null as File | null,
             href: item.href,
             is_published: item.is_published,
             order: item.order,
         });
         editForm.clearErrors();
+        setEditImagePreview(item.image_url);
         setEditKey((k) => k + 1);
         setEditOpen(true);
     }
@@ -108,14 +110,16 @@ URL.revokeObjectURL(imagePreview);
         e.preventDefault();
 
         if (!editingItem) {
-return;
-}
+            return;
+        }
 
         editForm.patch(baseUrl(`/admin/berita/${editingItem.id}`), {
             preserveScroll: true,
             onSuccess: () => {
                 setEditOpen(false);
                 setEditingItem(null);
+                setEditImagePreview(null);
+                editForm.reset();
             },
         });
     }
@@ -473,26 +477,42 @@ URL.revokeObjectURL(imagePreview);
                             )}
                         </div>
                         <div className="grid gap-2">
-                            <Label htmlFor="edit-image_url">URL Gambar</Label>
+                            <Label htmlFor="edit-image">Gambar</Label>
                             <Input
-                                id="edit-image_url"
-                                type="url"
-                                value={editForm.data.image_url}
-                                onChange={(e) => editForm.setData('image_url', e.target.value)}
-                                required
-                                className="border-green-200 focus-visible:border-green-500 focus-visible:ring-green-500/20"
+                                id="edit-image"
+                                type="file"
+                                accept="image/jpeg,image/png,image/jpg,image/webp"
+                                onChange={(e) => {
+                                    const file = e.target.files?.[0] ?? null;
+
+                                    if (file && file.size > 2 * 1024 * 1024) {
+                                        alert('Ukuran gambar terlalu besar. Maksimal 2 MB.');
+                                        e.target.value = '';
+
+                                        return;
+                                    }
+
+                                    editForm.setData('image', file);
+
+                                    if (editImagePreview && editImagePreview !== editingItem?.image_url) {
+                                        URL.revokeObjectURL(editImagePreview);
+                                    }
+
+                                    setEditImagePreview(file ? URL.createObjectURL(file) : (editingItem?.image_url ?? null));
+                                }}
+                                className="border-green-200 focus-visible:border-green-500 focus-visible:ring-green-500/20 file:mr-3 file:rounded-md file:border-0 file:bg-green-600 file:px-3 file:py-1 file:text-white file:hover:bg-green-700"
                             />
-                            {editForm.errors.image_url && (
-                                <p className="text-sm text-red-500">{editForm.errors.image_url}</p>
+                            {editForm.errors.image && (
+                                <p className="text-sm text-red-500">{editForm.errors.image}</p>
                             )}
-                            {editForm.data.image_url && (
+                            {editImagePreview && (
                                 <img
-                                    src={editForm.data.image_url}
+                                    src={editImagePreview}
                                     alt="preview"
                                     className="mt-1 h-20 rounded-md object-cover border border-green-100"
                                     onError={(e) => {
- (e.currentTarget as HTMLImageElement).style.display = 'none'; 
-}}
+                                        (e.currentTarget as HTMLImageElement).style.display = 'none';
+                                    }}
                                 />
                             )}
                         </div>
