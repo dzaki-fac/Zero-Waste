@@ -205,7 +205,7 @@ setLokasiError('');
                                                     key={opt}
                                                     type="button"
                                                     onClick={() => setData('tujuan_distribusi', opt)}
-                                                    className={`rounded-xl border-2 px-4 py-3 text-sm font-medium transition-all active:scale-95 ${
+                                                    className={`rounded-xl border-2 px-4 py-3 text-sm font-medium transition-all active:scale-95 break-words ${
                                                         isSelected
                                                             ? 'border-green-500 bg-green-50 text-green-700 shadow-sm'
                                                             : 'border-gray-100 bg-gray-50 text-gray-600 hover:border-green-200 hover:bg-green-50/50'

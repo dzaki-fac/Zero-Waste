@@ -214,7 +214,7 @@ function PieChartCard({ title, icon: Icon, data, totalLabel, legendPosition = 'b
                                     </PieChart>
                                 </ResponsiveContainer>
                             </div>
-                            <div className="w-full space-y-1.5 lg:pl-4">
+                            <div className="w-full space-y-2 lg:pl-4">
                                 {data
                                     .slice()
                                     .sort((a, b) => b.value - a.value)
@@ -222,20 +222,24 @@ function PieChartCard({ title, icon: Icon, data, totalLabel, legendPosition = 'b
                                         const percent = total > 0 ? (item.value / total) * 100 : 0;
 
                                         return (
-                                            <div key={item.name} className="flex items-center gap-2">
-                                                <span
-                                                    className="size-2.5 shrink-0 rounded-full"
-                                                    style={{ backgroundColor: getCategoryColor(item.name) }}
-                                                />
-                                                <span className="min-w-0 flex-1 truncate text-xs text-gray-700">
-                                                    {item.name}
-                                                </span>
-                                                <span className="shrink-0 text-xs font-medium tabular-nums text-gray-900">
-                                                    {item.value.toLocaleString('id-ID', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} kg
-                                                </span>
-                                                <span className="shrink-0 text-xs tabular-nums text-gray-500">
-                                                    ({percent.toFixed(1)}%)
-                                                </span>
+                                            <div key={item.name}>
+                                                <div className="flex items-start gap-2">
+                                                    <span
+                                                        className="mt-1 size-2.5 shrink-0 rounded-full"
+                                                        style={{ backgroundColor: getCategoryColor(item.name) }}
+                                                    />
+                                                    <span className="min-w-0 text-xs text-gray-700 leading-snug break-words">
+                                                        {item.name}
+                                                    </span>
+                                                </div>
+                                                <div className="ml-4.5 flex items-baseline gap-1.5">
+                                                    <span className="text-xs font-medium tabular-nums text-gray-900">
+                                                        {item.value.toLocaleString('id-ID', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} kg
+                                                    </span>
+                                                    <span className="text-xs tabular-nums text-gray-500">
+                                                        ({percent.toFixed(1)}%)
+                                                    </span>
+                                                </div>
                                             </div>
                                         );
                                     })}
@@ -270,7 +274,7 @@ function PieChartCard({ title, icon: Icon, data, totalLabel, legendPosition = 'b
                                 </ResponsiveContainer>
                             </div>
                             {data.length > 0 && (
-                                <div className="mt-2 space-y-1.5">
+                                <div className="mt-2 space-y-2">
                                     {data
                                         .slice()
                                         .sort((a, b) => b.value - a.value)
@@ -278,20 +282,24 @@ function PieChartCard({ title, icon: Icon, data, totalLabel, legendPosition = 'b
                                             const percent = total > 0 ? (item.value / total) * 100 : 0;
 
                                             return (
-                                                <div key={item.name} className="flex items-center gap-2">
-                                                    <span
-                                                        className="size-2.5 shrink-0 rounded-full"
-                                                        style={{ backgroundColor: getCategoryColor(item.name) }}
-                                                    />
-                                                    <span className="min-w-0 flex-1 truncate text-xs text-gray-700">
-                                                        {item.name}
-                                                    </span>
-                                                    <span className="shrink-0 text-xs font-medium tabular-nums text-gray-900">
-                                                        {item.value.toLocaleString('id-ID', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} kg
-                                                    </span>
-                                                    <span className="shrink-0 text-xs tabular-nums text-gray-500">
-                                                        ({percent.toFixed(1)}%)
-                                                    </span>
+                                                <div key={item.name}>
+                                                    <div className="flex items-start gap-2">
+                                                        <span
+                                                            className="mt-1 size-2.5 shrink-0 rounded-full"
+                                                            style={{ backgroundColor: getCategoryColor(item.name) }}
+                                                        />
+                                                        <span className="min-w-0 text-xs text-gray-700 leading-snug break-words">
+                                                            {item.name}
+                                                        </span>
+                                                    </div>
+                                                    <div className="ml-4.5 flex items-baseline gap-1.5">
+                                                        <span className="text-xs font-medium tabular-nums text-gray-900">
+                                                            {item.value.toLocaleString('id-ID', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} kg
+                                                        </span>
+                                                        <span className="text-xs tabular-nums text-gray-500">
+                                                            ({percent.toFixed(1)}%)
+                                                        </span>
+                                                    </div>
                                                 </div>
                                             );
                                         })}
@@ -1061,13 +1069,12 @@ q.progress_date = value;
                         </CardContent>
                     </Card>
 
-                    <PieChartCard
-                        title="Penimbangan per Area"
-                        icon={Scale}
-                        data={penimbanganByArea}
-                        totalLabel="Total berat ditimbang"
-                        legendPosition="right"
-                    />
+                     <PieChartCard
+                         title="Penimbangan per Area"
+                         icon={Scale}
+                         data={penimbanganByArea}
+                         totalLabel="Total berat ditimbang"
+                     />
                 </div>
 
                 <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
@@ -1122,26 +1129,30 @@ q.progress_date = value;
                                             </PieChart>
                                         </ResponsiveContainer>
                                     </div>
-                                    <div className="mt-2 space-y-1.5">
+                                    <div className="mt-2 space-y-2">
                                             {siapSortedData
                                             .map((item) => {
                                                 const percent = siapTotal > 0 ? (item.value / siapTotal) * 100 : 0;
 
                                                 return (
-                                                    <div key={item.name} className="flex items-center gap-2">
-                                                        <span
-                                                            className="size-2.5 shrink-0 rounded-full"
-                                                            style={{ backgroundColor: getCategoryColor(item.name) }}
-                                                        />
-                                                        <span className="min-w-0 flex-1 truncate text-xs text-gray-700">
-                                                            {item.name}
-                                                        </span>
-                                                        <span className="shrink-0 text-xs font-medium tabular-nums text-gray-900">
-                                                            {item.value.toLocaleString('id-ID', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} kg
-                                                        </span>
-                                                        <span className="shrink-0 text-xs tabular-nums text-gray-500">
-                                                            ({percent.toFixed(1)}%)
-                                                        </span>
+                                                    <div key={item.name}>
+                                                        <div className="flex items-start gap-2">
+                                                            <span
+                                                                className="mt-1 size-2.5 shrink-0 rounded-full"
+                                                                style={{ backgroundColor: getCategoryColor(item.name) }}
+                                                            />
+                                                            <span className="min-w-0 text-xs text-gray-700 leading-snug break-words">
+                                                                {item.name}
+                                                            </span>
+                                                        </div>
+                                                        <div className="ml-4.5 flex items-baseline gap-1.5">
+                                                            <span className="text-xs font-medium tabular-nums text-gray-900">
+                                                                {item.value.toLocaleString('id-ID', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} kg
+                                                            </span>
+                                                            <span className="text-xs tabular-nums text-gray-500">
+                                                                ({percent.toFixed(1)}%)
+                                                            </span>
+                                                        </div>
                                                     </div>
                                                 );
                                             })}
