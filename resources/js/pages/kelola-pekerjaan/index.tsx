@@ -3,7 +3,6 @@ import { Circle, Pencil, Plus, Trash2 } from 'lucide-react';
 import { useState } from 'react';
 import Heading from '@/components/heading';
 import { Button } from '@/components/ui/button';
-import { baseUrl } from '@/lib/path';
 import {
     Dialog,
     DialogContent,
@@ -107,7 +106,7 @@ export default function KelolaPekerjaan({ pekerjaan, filter }: Props) {
 
     function handleAdd(e: React.FormEvent) {
         e.preventDefault();
-        addForm.post(baseUrl('/admin/kelola-pekerjaan'), {
+        addForm.post('/admin/kelola-pekerjaan', {
             preserveScroll: true,
             onSuccess: () => {
                 setAddOpen(false);
@@ -134,7 +133,7 @@ export default function KelolaPekerjaan({ pekerjaan, filter }: Props) {
 return;
 }
 
-        editForm.patch(baseUrl(`/admin/kelola-pekerjaan/${editingItem.id}`), {
+        editForm.patch(`/admin/kelola-pekerjaan/${editingItem.id}`, {
             preserveScroll: true,
             onSuccess: () => {
                 setEditOpen(false);
@@ -150,7 +149,7 @@ return;
 
         setDeleteError(null);
         setDeleteProcessing(true);
-        router.delete(baseUrl(`/admin/kelola-pekerjaan/${deletingItem.id}`), {
+        router.delete(`/admin/kelola-pekerjaan/${deletingItem.id}`, {
             preserveScroll: true,
             onSuccess: () => {
                 setDeleteOpen(false);

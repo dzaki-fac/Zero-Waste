@@ -22,7 +22,6 @@ import {
     TableHeader,
     TableRow,
 } from '@/components/ui/table';
-import { baseUrl } from '@/lib/path';
 
 type NewsItem = {
     id: number;
@@ -74,7 +73,7 @@ export default function KelolaBerita({ news }: Props) {
 
     function handleAdd(e: React.FormEvent) {
         e.preventDefault();
-        addForm.post(baseUrl('/admin/berita'), {
+        addForm.post('/admin/berita', {
             preserveScroll: true,
             onSuccess: () => {
                 setAddOpen(false);
@@ -113,7 +112,7 @@ URL.revokeObjectURL(imagePreview);
             return;
         }
 
-        editForm.patch(baseUrl(`/admin/berita/${editingItem.id}`), {
+        editForm.patch(`/admin/berita/${editingItem.id}`, {
             preserveScroll: true,
             onSuccess: () => {
                 setEditOpen(false);
@@ -131,7 +130,7 @@ return;
 
         setDeleteError(null);
         setDeleteProcessing(true);
-        router.delete(baseUrl(`/admin/berita/${deletingItem.id}`), {
+        router.delete(`/admin/berita/${deletingItem.id}`, {
             preserveScroll: true,
             onSuccess: () => {
                 setDeleteOpen(false);

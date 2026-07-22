@@ -3,7 +3,6 @@ import { ArrowLeft, Send, Calendar, User, Trash2, MapPin, Ship, CheckCircle2 } f
 import { useEffect, useState } from 'react';
 import Heading from '@/components/heading';
 import InputError from '@/components/input-error';
-import { baseUrl } from '@/lib/path';
 import { Button } from '@/components/ui/button';
 import {
     Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle,
@@ -105,7 +104,7 @@ setLokasiError('');
             return;
         }
 
-        router.post(baseUrl('/form/distribusi'), {
+        router.post('/form/distribusi', {
             ...data,
             tujuan_distribusi: data.tujuan_distribusi === 'Tujuan lainnya' ? data.tujuan_lainnya : data.tujuan_distribusi,
         });
@@ -315,7 +314,7 @@ setLokasiError('');
                             asChild
                             className="flex-1 border-green-200 text-sm text-green-700 hover:bg-green-50"
                         >
-                            <Link href={baseUrl('/form')} className="flex items-center justify-center gap-2">
+                            <Link href="/form" className="flex items-center justify-center gap-2">
                                 <ArrowLeft className="h-4 w-4" />
                                 Batal
                             </Link>
@@ -380,7 +379,7 @@ setLokasiError('');
                         </div>
                     </div>
 
-                    <Button onClick={() => router.visit(baseUrl('/form'))} className="w-full bg-green-600 hover:bg-green-700">
+                    <Button onClick={() => router.visit('/form')} className="w-full bg-green-600 hover:bg-green-700">
                         Tutup
                     </Button>
                 </DialogContent>

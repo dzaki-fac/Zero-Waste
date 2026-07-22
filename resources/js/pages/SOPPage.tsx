@@ -7,7 +7,6 @@ import Footer from "../components/Footer";
 import Navbar from "../components/Navbar";
 import { Reveal } from "../components/shared";
 import { C, display, body } from "../theme";
-import { apiUrl } from "../lib/path";
 
 pdfjs.GlobalWorkerOptions.workerSrc = new URL(
   "pdfjs-dist/build/pdf.worker.min.mjs",
@@ -46,7 +45,7 @@ export default function SOPPage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch(apiUrl("/api/document/sop"))
+    fetch("/api/document/sop")
       .then((res) => res.json())
       .then((data) => setDoc(data.document ?? null))
       .finally(() => setLoading(false));

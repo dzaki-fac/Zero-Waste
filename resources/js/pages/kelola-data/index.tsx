@@ -8,7 +8,6 @@ import {
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { baseUrl } from '@/lib/path';
 
 type RincianArea = {
     nama: string;
@@ -79,7 +78,7 @@ export default function Settings() {
     const current = sections.find((s) => s.key === activeKey)!;
 
     const save = (next: Options) => {
-        router.post(baseUrl('/admin/kelola-data'), next, { preserveScroll: true });
+        router.post('/admin/kelola-data', next, { preserveScroll: true });
     };
 
     const openAdd = (key: ListKey) => {
