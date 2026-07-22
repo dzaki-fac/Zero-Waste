@@ -3,7 +3,7 @@ import { ArrowLeft, Save, Calendar, User, MapPin } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import Heading from '@/components/heading';
 import InputError from '@/components/input-error';
-import { baseUrl } from '@/lib/path';
+import { route } from 'ziggy-js';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -38,7 +38,6 @@ setAreaError('');
 }
     }, [data.area]);
 
-    const prefix = baseUrl(auth.user.role === 'admin' ? '/admin' : '/petugas');
     const totalBerat = data.items.reduce((sum, item) => sum + (parseFloat(item.berat) || 0), 0);
     const filledCount = data.items.filter((item) => parseFloat(item.berat) > 0).length;
 
@@ -60,7 +59,7 @@ setAreaError('');
         }
 
         setSubmitError('');
-        post(`${prefix}/penimbangan`);
+        post(route(auth.user.role === 'admin' ? 'admin.penimbangan.index' : 'petugas.penimbangan.index'));
     };
 
     const now = new Date(Date.now() - new Date().getTimezoneOffset() * 60000).toISOString().slice(0, 16);
@@ -196,7 +195,7 @@ setAreaError('');
                                 {processing ? 'Menyimpan...' : 'Simpan'}
                             </Button>
                             <Button variant="outline" asChild className="border-green-200 text-green-700 hover:bg-green-50">
-                                <Link href={`${prefix}/penimbangan`} className="flex items-center gap-1">
+                                <Link href={route(auth.user.role === 'admin' ? 'admin.penimbangan.index' : 'petugas.penimbangan.index')} className="flex items-center gap-1">
                                     <ArrowLeft className="h-4 w-4" />
                                     Batal
                                 </Link>

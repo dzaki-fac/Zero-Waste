@@ -10,41 +10,42 @@ import {
     SidebarHeader,
 } from '@/components/ui/sidebar';
 import type { Auth, NavItem } from '@/types';
-import { baseUrl } from '@/lib/path';
+import { route } from 'ziggy-js';
 
 export function AppSidebar() {
     const { auth } = usePage().props as { auth: Auth };
 
-    const prefix = auth.user.role === 'admin' ? 'admin' : 'petugas';
+    const isAdmin = auth.user.role === 'admin';
+    const prefix = isAdmin ? 'admin' : 'petugas';
 
     const sharedNavItems: NavItem[] = [
-        { title: 'Dashboard', href: baseUrl(`/${prefix}/dashboard`), icon: LayoutDashboard },
-        { title: 'Penimbangan', href: baseUrl(`/${prefix}/penimbangan`), icon: Scale },
-        { title: 'Pilah Sampah', href: baseUrl(`/${prefix}/pilah-sampah`), icon: Recycle },
-        { title: 'Distribusi', href: baseUrl(`/${prefix}/distribusi`), icon: Truck },
+        { title: 'Dashboard', href: route(isAdmin ? 'admin.dashboard' : 'petugas.dashboard'), icon: LayoutDashboard },
+        { title: 'Penimbangan', href: route(isAdmin ? 'admin.penimbangan.index' : 'petugas.penimbangan.index'), icon: Scale },
+        { title: 'Pilah Sampah', href: route(isAdmin ? 'admin.pilah-sampah.index' : 'petugas.pilah-sampah.index'), icon: Recycle },
+        { title: 'Distribusi', href: route(isAdmin ? 'admin.distribusi.index' : 'petugas.distribusi.index'), icon: Truck },
     ];
 
     const adminNavItems: NavItem[] = [
-        { title: 'Checklist Pekerjaan', href: baseUrl('/admin/checklist-pekerjaan'), icon: LayoutDashboard },
-        { title: 'Kelola Pekerjaan', href: baseUrl('/admin/kelola-pekerjaan'), icon: ListTodo },
+        { title: 'Checklist Pekerjaan', href: route('admin.checklist-pekerjaan.index'), icon: LayoutDashboard },
+        { title: 'Kelola Pekerjaan', href: route('admin.kelola-pekerjaan.index'), icon: ListTodo },
         {
             title: 'Kelola Website',
             icon: Globe,
             items: [
-                { title: 'Peraturan', href: baseUrl('/admin/dokumen') },
-                { title: 'Struktur', href: baseUrl('/admin/dokumen') },
-                { title: 'SOP', href: baseUrl('/admin/dokumen') },
-                { title: 'Berita', href: baseUrl('/admin/berita') },
-                { title: 'Poster Edukasi', href: baseUrl('/admin/poster') },
+                { title: 'Peraturan', href: route('admin.dokumen.index') },
+                { title: 'Struktur', href: route('admin.dokumen.index') },
+                { title: 'SOP', href: route('admin.dokumen.index') },
+                { title: 'Berita', href: route('admin.berita.index') },
+                { title: 'Poster Edukasi', href: route('admin.poster.index') },
             ],
         },
-        { title: 'Data Dasar', href: baseUrl('/admin/data-dasar'), icon: Database },
-        { title: 'Kelola Data', href: baseUrl('/admin/kelola-data'), icon: Settings },
-        { title: 'Akun', href: baseUrl('/admin/akun'), icon: Users },
+        { title: 'Data Dasar', href: route('admin.data-dasar.index'), icon: Database },
+        { title: 'Kelola Data', href: route('settings.index'), icon: Settings },
+        { title: 'Akun', href: route('admin.accounts.index'), icon: Users },
     ];
 
     const petugasNavItems: NavItem[] = [
-        { title: 'Checklist Pekerjaan', href: baseUrl('/petugas/checklist-pekerjaan'), icon: ClipboardCheck },
+        { title: 'Checklist Pekerjaan', href: route('petugas.checklist-pekerjaan.index'), icon: ClipboardCheck },
     ];
 
     const navItems: NavItem[] = auth.user.role === 'admin'
@@ -54,11 +55,11 @@ export function AppSidebar() {
     return (
         <Sidebar collapsible="icon">
             <SidebarHeader>
-                <Link
-                    href={baseUrl('/form')}
-                    prefetch
-                    className="grid w-full items-center px-4 py-4 group-data-[collapsible=icon]:px-2 group-data-[collapsible=icon]:py-2"
-                >
+                    <Link
+                        href={route('form')}
+                        prefetch
+                        className="grid w-full items-center px-4 py-4 group-data-[collapsible=icon]:px-2 group-data-[collapsible=icon]:py-2"
+                    >
                     <AppLogo />
                 </Link>
             </SidebarHeader>
@@ -74,6 +75,3 @@ export function AppSidebar() {
     );
 }
 
-function portalHref(path: string): string {
-    return baseUrl(`/${path}`);
-}

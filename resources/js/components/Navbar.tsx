@@ -1,7 +1,7 @@
 import { Menu, X } from "lucide-react";
 import { useState } from "react";
-import { useNavigate, useLocation } from "react-router-dom";
-import { baseUrl } from "@/lib/path";
+import { router } from '@inertiajs/react';
+import { route } from 'ziggy-js';
 import { NAV_ITEMS, PAGE_ROUTES } from "../navData";
 import { C, display } from "../theme";
 import UndipLogoIcon from "./Undiplogoicon";
@@ -15,16 +15,14 @@ interface NavbarProps {
 
 export default function Navbar({ activeSection, onNavItemClick }: NavbarProps) {
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
-  const navigate = useNavigate();
-  const location = useLocation();
 
   const handleNavClick = (id: string) => {
     setMobileNavOpen(false);
 
     if (PAGE_ROUTES[id]) {
-      navigate(PAGE_ROUTES[id]);
-    } else if (location.pathname !== "/") {
-      window.location.href = baseUrl("/") + "#" + id;
+      router.visit(route(PAGE_ROUTES[id]));
+    } else if (window.location.pathname !== route('home')) {
+      window.location.href = route('home') + "#" + id;
     } else {
       onNavItemClick?.(id);
     }
@@ -44,10 +42,10 @@ export default function Navbar({ activeSection, onNavItemClick }: NavbarProps) {
           <button
             type="button"
             onClick={() => {
-              if (location.pathname === "/") {
+              if (window.location.pathname === route('home')) {
                 window.scrollTo({ top: 0, behavior: "smooth" });
               } else {
-                navigate("/");
+                router.visit(route('home'));
               }
             }}
             className="flex items-center gap-1.5 sm:gap-4 cursor-pointer min-w-0 overflow-hidden"

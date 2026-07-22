@@ -2,6 +2,7 @@ import { Link, usePage } from "@inertiajs/react";
 import { Menu, X, Instagram, Youtube, Globe } from "lucide-react";
 import React, { useState  } from "react";
 import type {ReactNode} from "react";
+import { route } from 'ziggy-js';
 import { asset } from '@/lib/path';
 
 export const C = {
@@ -32,12 +33,12 @@ export function TiktokIcon({ size = 16, color = "currentColor" }: { size?: numbe
 
 type NavItem =
   | { id: string; label: string; type: "anchor" }
-  | { id: string; label: string; type: "page"; href: string };
+  | { id: string; label: string; type: "page"; routeName: string };
 
 export const NAV_ITEMS: NavItem[] = [
   { id: "beranda", label: "Beranda", type: "anchor" },
-  { id: "pengertian", label: "Tentang ZeroLib", type: "page", href: "/pengertian" },
-  { id: "struktur", label: "Struktur", type: "page", href: "/struktur" },
+  { id: "pengertian", label: "Tentang ZeroLib", type: "page", routeName: "pengertian" },
+  { id: "struktur", label: "Struktur", type: "page", routeName: "struktur" },
   { id: "sop", label: "SOP", type: "anchor" },
   { id: "laporan", label: "Laporan", type: "anchor" },
   { id: "berita", label: "Berita", type: "anchor" },
@@ -73,7 +74,7 @@ export default function Layout({
   const { url } = usePage();
 
   const renderNavButton = (item: NavItem, mobile = false) => {
-    const active = item.type === "page" ? url.startsWith(item.href) : activeNav === item.id;
+    const active = item.type === "page" ? url.startsWith(route(item.routeName)) : activeNav === item.id;
     const sharedStyle = { color: active ? "#fff" : "#D9DCEE", backgroundColor: active ? C.navy700 : "transparent" };
     const cls = mobile
       ? "text-left px-3 py-2.5 rounded-lg text-sm font-medium"
@@ -81,7 +82,7 @@ export default function Layout({
 
     if (item.type === "page") {
       return (
-        <Link key={item.id} href={item.href} onClick={() => setMobileNavOpen(false)} className={cls} style={sharedStyle}>
+        <Link key={item.id} href={route(item.routeName)} onClick={() => setMobileNavOpen(false)} className={cls} style={sharedStyle}>
           {item.label}
           {!mobile && (
             <span className="absolute left-3.5 right-3.5 -bottom-[1px] h-[2px] rounded-full" style={{ backgroundColor: C.leaf400, transform: active ? "scaleX(1)" : "scaleX(0)", transition: "transform 220ms ease" }} />
@@ -97,9 +98,9 @@ export default function Layout({
           setMobileNavOpen(false);
 
           if (onAnchorClick) {
-onAnchorClick(item.id);
+ onAnchorClick(item.id);
 } else {
-window.location.href = `/#${item.id}`;
+window.location.href = route('home') + '#' + item.id;
 }
         }}
         className={cls}

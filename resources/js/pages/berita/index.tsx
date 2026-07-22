@@ -22,7 +22,7 @@ import {
     TableHeader,
     TableRow,
 } from '@/components/ui/table';
-import { baseUrl } from '@/lib/path';
+import { route } from 'ziggy-js';
 
 type NewsItem = {
     id: number;
@@ -73,7 +73,7 @@ export default function KelolaBerita({ news }: Props) {
 
     function handleAdd(e: React.FormEvent) {
         e.preventDefault();
-        addForm.post(baseUrl('/admin/berita'), {
+        addForm.post(route('admin.berita.index'), {
             preserveScroll: true,
             onSuccess: () => {
                 setAddOpen(false);
@@ -111,7 +111,7 @@ URL.revokeObjectURL(imagePreview);
 return;
 }
 
-        editForm.patch(baseUrl(`/admin/berita/${editingItem.id}`), {
+        editForm.patch(route('admin.berita.update', { news: editingItem.id }), {
             preserveScroll: true,
             onSuccess: () => {
                 setEditOpen(false);
@@ -127,7 +127,7 @@ return;
 
         setDeleteError(null);
         setDeleteProcessing(true);
-        router.delete(baseUrl(`/admin/berita/${deletingItem.id}`), {
+        router.delete(route('admin.berita.update', { news: deletingItem.id }), {
             preserveScroll: true,
             onSuccess: () => {
                 setDeleteOpen(false);

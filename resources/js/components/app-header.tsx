@@ -25,7 +25,7 @@ import AppLogoIcon from '@/components/Undiplogoicon';
 import { UserMenuContent } from '@/components/user-menu-content';
 import { useInitials } from '@/hooks/use-initials';
 import { cn, toUrl } from '@/lib/utils';
-import { home } from '@/routes';
+import { route } from 'ziggy-js';
 import type { BreadcrumbItem, NavItem } from '@/types';
 
 type Props = {
@@ -35,7 +35,7 @@ type Props = {
 const mainNavItems: NavItem[] = [
     {
         title: 'Dashboard',
-        href: home(),
+        href: route('home'),
         icon: LayoutGrid,
     },
 ];
@@ -109,7 +109,7 @@ export function AppHeader({ breadcrumbs = [] }: Props) {
                     </div>
 
                     <Link
-                        href={auth.user ? (auth.user.role === 'petugas' ? '/form' : '/admin/dashboard') : home()}
+                        href={auth.user ? (auth.user.role === 'petugas' ? route('form') : route('admin.dashboard')) : route('home')}
                         prefetch
                         className="flex items-center space-x-2"
                     >

@@ -128,7 +128,7 @@ Bagi Institusi
         title: "Ruang Lingkup",
         shortDesc:
             "Ruang lingkup program mencakup seluruh area Perpustakaan Universitas Diponegoro, meliputi lantai satu hingga empat, area baca, ruang kantor, ruang pertemuan, toilet, teras, halaman, area parkir, dan UNDIP Press sebagai bagian dari lingkungan operasional perpustakaan.",
-        image: "/perpus.jpeg",
+        image: import.meta.env.BASE_URL + 'perpus.jpeg',
     },
 ];
 

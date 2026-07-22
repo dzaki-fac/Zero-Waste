@@ -7,7 +7,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { UserInfo } from '@/components/user-info';
 import { useMobileNavigation } from '@/hooks/use-mobile-navigation';
-import { logout as logoutRoute } from '@/routes';
+import { route } from 'ziggy-js';
 import type { User } from '@/types';
 
 type Props = {
@@ -19,7 +19,7 @@ export function UserMenuContent({ user }: Props) {
 
     const handleLogout = () => {
         cleanup();
-        router.post(logoutRoute().url, {}, { preserveScroll: false });
+        router.post(route('logout'), {}, { preserveScroll: false });
     };
 
     return (

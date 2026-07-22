@@ -3,7 +3,7 @@ import { ArrowLeft, Save } from 'lucide-react';
 import Heading from '@/components/heading';
 import InputError from '@/components/input-error';
 import { Button } from '@/components/ui/button';
-import { baseUrl } from '@/lib/path';
+import { route } from 'ziggy-js';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import {
@@ -36,7 +36,6 @@ type Props = {
 
 export default function PenimbanganEdit({ penimbangan }: Props) {
     const { auth, options } = usePage().props as unknown as { auth: Auth; options: Options };
-    const prefix = baseUrl(auth.user.role === 'admin' ? '/admin' : '/petugas');
 
     const initialTanggal = (() => {
         const d = new Date(penimbangan.tanggal);
@@ -54,7 +53,7 @@ export default function PenimbanganEdit({ penimbangan }: Props) {
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        put(`${prefix}/penimbangan/${penimbangan.id}`);
+        put(route(auth.user.role === 'admin' ? 'admin.penimbangan.update' : 'petugas.penimbangan.update', { penimbangan: penimbangan.id }));
     };
 
     return (
@@ -149,7 +148,7 @@ export default function PenimbanganEdit({ penimbangan }: Props) {
                                 Perbarui
                             </Button>
                             <Button variant="outline" asChild className="border-green-200 text-green-700 hover:bg-green-50">
-                                <Link href={`${prefix}/penimbangan`} className="flex items-center gap-1">
+                                <Link href={route(auth.user.role === 'admin' ? 'admin.penimbangan.index' : 'petugas.penimbangan.index')} className="flex items-center gap-1">
                                     <ArrowLeft className="h-4 w-4" />
                                     Batal
                                 </Link>

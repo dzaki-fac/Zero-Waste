@@ -6,7 +6,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Spinner } from '@/components/ui/spinner';
-import { store } from '@/routes/login';
+import { route } from 'ziggy-js';
 
 type Props = {
     status?: string;
@@ -21,7 +21,7 @@ export default function Login({ status }: Props) {
 
     function handleSubmit(e: React.FormEvent) {
         e.preventDefault();
-        post(store.url(), {
+        post(route('login'), {
             onSuccess: () => reset('password'),
         });
     }

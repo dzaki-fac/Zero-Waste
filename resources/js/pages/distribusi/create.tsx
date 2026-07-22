@@ -4,7 +4,7 @@ import { useState } from 'react';
 import Heading from '@/components/heading';
 import InputError from '@/components/input-error';
 import { Button } from '@/components/ui/button';
-import { baseUrl } from '@/lib/path';
+import { route } from 'ziggy-js';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 
@@ -36,7 +36,6 @@ export default function DistribusiCreate() {
     const [lokasiError, setLokasiError] = useState('');
     const [submitError, setSubmitError] = useState('');
 
-    const prefix = baseUrl(auth.user.role === 'admin' ? '/admin' : '/petugas');
     const totalBerat = data.items.reduce((sum, item) => sum + (parseFloat(item.berat) || 0), 0);
     const filledCount = data.items.filter((item) => parseFloat(item.berat) > 0).length;
 
@@ -69,7 +68,7 @@ export default function DistribusiCreate() {
             return;
         }
 
-        post(`${prefix}/distribusi`, {
+        post(route(auth.user.role === 'admin' ? 'admin.distribusi.index' : 'petugas.distribusi.index'), {
             ...data,
             tujuan_distribusi: data.tujuan_distribusi === 'Tujuan lainnya' ? data.tujuan_lainnya : data.tujuan_distribusi,
         });
@@ -236,7 +235,7 @@ export default function DistribusiCreate() {
                                 {processing ? 'Menyimpan...' : 'Simpan'}
                             </Button>
                             <Button variant="outline" asChild className="border-green-200 text-green-700 hover:bg-green-50">
-                                <Link href={`${prefix}/distribusi`} className="flex items-center gap-1">
+                                <Link href={route(auth.user.role === 'admin' ? 'admin.distribusi.index' : 'petugas.distribusi.index')} className="flex items-center gap-1">
                                     <ArrowLeft className="h-4 w-4" />
                                     Batal
                                 </Link>

@@ -1,5 +1,5 @@
 import { router } from '@inertiajs/react';
-import { logout as logoutRoute } from '@/routes';
+import { route } from 'ziggy-js';
 
 type Props = {
     className?: string;
@@ -8,7 +8,7 @@ type Props = {
 
 export default function LogoutButton({ className = '', children = 'Logout' }: Props) {
     const handleLogout = () => {
-        router.post(logoutRoute().url, {}, {
+        router.post(route('logout'), {}, {
             preserveScroll: false,
         });
     };

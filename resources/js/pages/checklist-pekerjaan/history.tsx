@@ -3,7 +3,7 @@ import { ArrowLeft, CalendarDays, FileDown } from 'lucide-react';
 import { useState } from 'react';
 import Heading from '@/components/heading';
 import { Button } from '@/components/ui/button';
-import { baseUrl } from '@/lib/path';
+import { route } from 'ziggy-js';
 import {
     Table,
     TableBody,
@@ -57,7 +57,7 @@ export default function ChecklistPekerjaanHistory({ petugas, records }: Props) {
 
     const applyFilter = () => {
         router.get(
-            `/admin/checklist-pekerjaan/${petugas.nip}/history`,
+            route('admin.checklist-pekerjaan.history', { petugas: petugas.nip }),
             params(),
             { preserveState: true, preserveScroll: true },
         );
@@ -77,7 +77,7 @@ export default function ChecklistPekerjaanHistory({ petugas, records }: Props) {
                     />
                     <div className="flex items-center gap-2">
                         <Button variant="outline" asChild className="border-green-200 text-green-700 hover:bg-green-50">
-                            <Link href={baseUrl('/admin/checklist-pekerjaan')} className="flex items-center gap-1">
+                            <Link href={route('admin.checklist-pekerjaan.index')} className="flex items-center gap-1">
                                 <ArrowLeft className="h-4 w-4" />
                                 Kembali
                             </Link>
@@ -97,12 +97,12 @@ export default function ChecklistPekerjaanHistory({ petugas, records }: Props) {
                             Petugas ini belum memiliki data checklist yang tersimpan.
                         </p>
                         <Button asChild className="mt-6 bg-green-600 hover:bg-green-700">
-                            <Link
-                                href={`/admin/checklist-pekerjaan/${petugas.nip}`}
-                                className="flex items-center gap-2"
-                            >
-                                Buat Checklist Baru
-                            </Link>
+                                                            <Link
+                                                                href={route('admin.checklist-pekerjaan.show', { checklist_pekerjaan: petugas.nip })}
+                                                                className="flex items-center gap-2"
+                                                            >
+                                                                Buat Checklist Baru
+                                                            </Link>
                         </Button>
                     </div>
                 ) : (
@@ -164,7 +164,7 @@ export default function ChecklistPekerjaanHistory({ petugas, records }: Props) {
                                     className="border-green-200 text-green-700 hover:bg-green-50"
                                 >
                                     <Link
-                                        href={`/admin/checklist-pekerjaan/${petugas.nip}/history`}
+                                        href={route('admin.checklist-pekerjaan.history', { petugas: petugas.nip })}
                                         className="flex items-center gap-1"
                                     >
                                         Reset
@@ -218,11 +218,11 @@ export default function ChecklistPekerjaanHistory({ petugas, records }: Props) {
                                                         asChild
                                                         className="bg-green-600 hover:bg-green-700"
                                                     >
-                                                        <Link
-                                                            href={`/admin/checklist-pekerjaan/${petugas.nip}?tanggal=${r.tanggal}`}
-                                                        >
-                                                            Detail
-                                                        </Link>
+                                                    <Link
+                                                        href={route('admin.checklist-pekerjaan.show', { checklist_pekerjaan: petugas.nip, tanggal: r.tanggal })}
+                                                    >
+                                                        Detail
+                                                    </Link>
                                                     </Button>
                                                 </TableCell>
                                             </TableRow>
