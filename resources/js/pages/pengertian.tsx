@@ -4,6 +4,7 @@ import Footer from "../components/Footer";
 import Navbar from "../components/Navbar";
 import { Reveal } from "../components/shared";
 import { C, display, body } from "../theme";
+import { asset } from "@/lib/path";
 
 type DetailItem = {
     key: string;
@@ -128,7 +129,7 @@ Bagi Institusi
         title: "Ruang Lingkup",
         shortDesc:
             "Ruang lingkup program mencakup seluruh area Perpustakaan Universitas Diponegoro, meliputi lantai satu hingga empat, area baca, ruang kantor, ruang pertemuan, toilet, teras, halaman, area parkir, dan UNDIP Press sebagai bagian dari lingkungan operasional perpustakaan.",
-        image: "/perpus.jpeg",
+        image: asset("/perpus.jpeg"),
     },
 ];
 

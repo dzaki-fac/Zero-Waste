@@ -13,16 +13,9 @@ declare module '@inertiajs/core' {
             name: string;
             auth: Auth;
             sidebarOpen: boolean;
-            assetBase?: string;
             [key: string]: unknown;
         };
     }
 }
 
 export {};
-
-declare global {
-    interface Window {
-        __assetBase?: string;
-    }
-}
