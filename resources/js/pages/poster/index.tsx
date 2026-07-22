@@ -22,7 +22,6 @@ import {
     TableHeader,
     TableRow,
 } from '@/components/ui/table';
-import { baseUrl } from '@/lib/path';
 
 type PosterItem = {
     id: number;
@@ -69,7 +68,7 @@ export default function KelolaPoster({ posters }: Props) {
 
     function handleAdd(e: React.FormEvent) {
         e.preventDefault();
-        addForm.post(baseUrl('/admin/poster'), {
+        addForm.post('/admin/poster', {
             preserveScroll: true,
             onSuccess: () => {
                 setAddOpen(false);
@@ -112,7 +111,7 @@ URL.revokeObjectURL(editPreview);
 return;
 }
 
-        editForm.patch(baseUrl(`/admin/poster/${editingItem.id}`), {
+        editForm.patch(`/admin/poster/${editingItem.id}`, {
             preserveScroll: true,
             onSuccess: () => {
                 setEditOpen(false);
@@ -134,7 +133,7 @@ return;
 
         setDeleteError(null);
         setDeleteProcessing(true);
-        router.delete(baseUrl(`/admin/poster/${deletingItem.id}`), {
+        router.delete(`/admin/poster/${deletingItem.id}`, {
             preserveScroll: true,
             onSuccess: () => {
                 setDeleteOpen(false);

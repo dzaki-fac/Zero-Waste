@@ -3,7 +3,6 @@ import { ArrowLeft, Save } from 'lucide-react';
 import Heading from '@/components/heading';
 import InputError from '@/components/input-error';
 import { Button } from '@/components/ui/button';
-import { baseUrl } from '@/lib/path';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import {
@@ -37,7 +36,7 @@ type Props = {
 
 export default function DistribusiEdit({ distribusi }: Props) {
     const { auth, options } = usePage().props as unknown as { auth: Auth; options: Options };
-    const prefix = baseUrl(auth.user.role === 'admin' ? '/admin' : '/petugas');
+    const prefix = auth.user.role === 'admin' ? '/admin' : '/petugas';
 
     const initialTanggal = (() => {
         const d = new Date(distribusi.tanggal);

@@ -39,7 +39,6 @@ import {
 } from '@/components/ui/table';
 import { cn } from '@/lib/utils';
 import type { Auth } from '@/types';
-import { baseUrl } from '@/lib/path';
 
 type UserResource = {
     id: number;
@@ -141,7 +140,7 @@ export default function AdminAccounts() {
 
         debounceRef.current = setTimeout(() => {
             router.get(
-                baseUrl('/admin/akun'),
+                '/admin/akun',
                 {
                     search: value || undefined,
                     role: activeFilter !== 'all' ? activeFilter : undefined,
@@ -168,7 +167,7 @@ export default function AdminAccounts() {
 
     function handleAdd(e: React.FormEvent) {
         e.preventDefault();
-        addForm.post(baseUrl('/admin/akun'), {
+        addForm.post('/admin/akun', {
             preserveScroll: true,
             onSuccess: () => {
                 setAddOpen(false);
@@ -185,7 +184,7 @@ export default function AdminAccounts() {
             return;
         }
 
-        editForm.patch(baseUrl(`/admin/akun/${editingUser.id}`), {
+        editForm.patch(`/admin/akun/${editingUser.id}`, {
             preserveScroll: true,
             onSuccess: () => {
                 setEditOpen(false);
@@ -200,7 +199,7 @@ export default function AdminAccounts() {
         }
 
         setDeleteProcessing(true);
-        router.delete(baseUrl(`/admin/akun/${deletingUser.id}`), {
+        router.delete(`/admin/akun/${deletingUser.id}`, {
             preserveScroll: true,
             onSuccess: () => {
                 setDeleteOpen(false);
@@ -213,7 +212,7 @@ export default function AdminAccounts() {
 
     function handleFilterChange(value: string) {
         router.get(
-            baseUrl('/admin/akun'),
+            '/admin/akun',
             {
                 role: value === 'all' ? undefined : value,
                 search: searchInput || undefined,
@@ -224,7 +223,7 @@ export default function AdminAccounts() {
 
     function goToPage(page: number) {
         router.get(
-            baseUrl('/admin/akun'),
+            '/admin/akun',
             { page, ...filters },
             { preserveScroll: true },
         );
