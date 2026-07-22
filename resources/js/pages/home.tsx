@@ -1,6 +1,5 @@
 import { Head } from '@inertiajs/react';
 import { usePage, router } from '@inertiajs/react';
-import { baseUrl } from '@/lib/path';
 import type { LucideIcon } from "lucide-react";
 import {
   Recycle,

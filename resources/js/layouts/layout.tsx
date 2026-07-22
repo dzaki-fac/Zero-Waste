@@ -2,7 +2,6 @@ import { Link, usePage } from "@inertiajs/react";
 import { Menu, X, Instagram, Youtube, Globe } from "lucide-react";
 import React, { useState  } from "react";
 import type {ReactNode} from "react";
-import { asset } from '@/lib/path';
 
 export const C = {
   navy900: "#0A1440",
@@ -136,7 +135,7 @@ e.currentTarget.style.backgroundColor = "transparent";
       <header className="sticky top-0 z-40 border-b" style={{ backgroundColor: C.navy900, borderColor: C.navy700 }}>
         <div className="w-full pl-5 sm:pl-8 pr-5 sm:pr-8 h-16 flex items-center justify-between">
           <div className="flex items-center gap-2.5">
-            <img src={asset('/images/undip-logo.png')} alt="UNDIP" className="w-10 h-11 rounded-md object-contain shrink-0" />
+            <img src="/images/undip-logo.png" alt="UNDIP" className="w-10 h-11 rounded-md object-contain shrink-0" />
             <div style={display} className="leading-tight">
               <div className="text-[10px] font-semibold tracking-wide" style={{ color: C.gold500 }}>UNIVERSITAS DIPONEGORO</div>
               <div className="text-white text-[11px] tracking-wide">UPT PERPUSTAKAAN DAN UNDIP PRESS</div>
