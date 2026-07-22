@@ -39,7 +39,7 @@ import {
 } from '@/components/ui/table';
 import { cn } from '@/lib/utils';
 import type { Auth } from '@/types';
-import { baseUrl } from '@/lib/path';
+import { route } from 'ziggy-js';
 
 type UserResource = {
     id: number;
@@ -141,7 +141,7 @@ export default function AdminAccounts() {
 
         debounceRef.current = setTimeout(() => {
             router.get(
-                baseUrl('/admin/akun'),
+                route('admin.accounts.index'),
                 {
                     search: value || undefined,
                     role: activeFilter !== 'all' ? activeFilter : undefined,
@@ -168,7 +168,7 @@ export default function AdminAccounts() {
 
     function handleAdd(e: React.FormEvent) {
         e.preventDefault();
-        addForm.post(baseUrl('/admin/akun'), {
+        addForm.post(route('admin.accounts.store'), {
             preserveScroll: true,
             onSuccess: () => {
                 setAddOpen(false);
@@ -185,7 +185,7 @@ export default function AdminAccounts() {
             return;
         }
 
-        editForm.patch(baseUrl(`/admin/akun/${editingUser.id}`), {
+        editForm.patch(route('admin.accounts.update', { user: editingUser.id }), {
             preserveScroll: true,
             onSuccess: () => {
                 setEditOpen(false);
@@ -200,7 +200,7 @@ export default function AdminAccounts() {
         }
 
         setDeleteProcessing(true);
-        router.delete(baseUrl(`/admin/akun/${deletingUser.id}`), {
+        router.delete(route('admin.accounts.destroy', { user: deletingUser.id }), {
             preserveScroll: true,
             onSuccess: () => {
                 setDeleteOpen(false);
@@ -213,7 +213,7 @@ export default function AdminAccounts() {
 
     function handleFilterChange(value: string) {
         router.get(
-            baseUrl('/admin/akun'),
+            route('admin.accounts.index'),
             {
                 role: value === 'all' ? undefined : value,
                 search: searchInput || undefined,
@@ -224,7 +224,7 @@ export default function AdminAccounts() {
 
     function goToPage(page: number) {
         router.get(
-            baseUrl('/admin/akun'),
+            route('admin.accounts.index'),
             { page, ...filters },
             { preserveScroll: true },
         );

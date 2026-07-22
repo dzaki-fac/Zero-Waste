@@ -3,7 +3,7 @@ import { ClipboardCheck, ClipboardList, Download, History, FileDown, Search, X }
 import { useState, useMemo } from 'react';
 import Heading from '@/components/heading';
 import { Button } from '@/components/ui/button';
-import { baseUrl } from '@/lib/path';
+import { route } from 'ziggy-js';
 import {
     Table,
     TableBody,
@@ -50,7 +50,7 @@ return;
 
         setExportingNip(nip);
         const a = document.createElement('a');
-        a.href = `/admin/checklist-pekerjaan/export?nip=${nip}`;
+        a.href = route('admin.checklist-pekerjaan.export', { nip });
         a.download = '';
         document.body.appendChild(a);
         a.click();
@@ -94,7 +94,7 @@ return;
                             )}
                         </div>
                         <a
-                            href={baseUrl('/admin/checklist-pekerjaan/export-all')}
+                            href={route('admin.checklist-pekerjaan.export-all')}
                             download
                             className="inline-flex shrink-0 items-center gap-2 rounded-md bg-green-600 px-4 py-2 text-sm font-medium text-white hover:bg-green-700 transition-colors"
                         >
@@ -150,8 +150,8 @@ return;
                                                 {item.nip ? (
                                                     <>
                                                         <Button asChild className="h-9 w-[110px] bg-green-600 hover:bg-green-700 text-xs">
-                                                            <Link
-                                                                href={`/admin/checklist-pekerjaan/${item.nip}`}
+                                                                        <Link
+                                                                href={route('admin.checklist-pekerjaan.show', { checklist_pekerjaan: item.nip })}
                                                                 className="flex items-center justify-center gap-1"
                                                             >
                                                                 <ClipboardCheck className="h-3.5 w-3.5" />
@@ -160,7 +160,7 @@ return;
                                                         </Button>
                                                         <Button variant="outline" asChild className="h-9 w-[110px] border-green-200 text-green-700 hover:bg-green-50 text-xs">
                                                             <Link
-                                                                href={`/admin/checklist-pekerjaan/${item.nip}/history`}
+                                                                href={route('admin.checklist-pekerjaan.history', { petugas: item.nip })}
                                                                 className="flex items-center justify-center gap-1"
                                                             >
                                                                 <History className="h-3.5 w-3.5" />

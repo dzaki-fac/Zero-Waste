@@ -4,7 +4,7 @@ import { useState } from 'react';
 import Heading from '@/components/heading';
 import InputError from '@/components/input-error';
 import { Button } from '@/components/ui/button';
-import { baseUrl } from '@/lib/path';
+import { route } from 'ziggy-js';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 
@@ -30,7 +30,7 @@ export default function PilahSampahCreate() {
 
     const [submitError, setSubmitError] = useState('');
 
-    const prefix = baseUrl(auth.user.role === 'admin' ? '/admin' : '/petugas');
+    const role = auth.user.role;
     const totalBerat = data.items.reduce((sum, item) => sum + (parseFloat(item.berat) || 0), 0);
     const filledCount = data.items.filter((item) => parseFloat(item.berat) > 0).length;
 
@@ -45,7 +45,7 @@ export default function PilahSampahCreate() {
         }
 
         setSubmitError('');
-        post(`${prefix}/pilah-sampah`);
+        post(route(`${role}.pilah-sampah.store`));
     };
 
     const now = new Date(Date.now() - new Date().getTimezoneOffset() * 60000).toISOString().slice(0, 16);
@@ -156,7 +156,7 @@ export default function PilahSampahCreate() {
                                 {processing ? 'Menyimpan...' : 'Simpan'}
                             </Button>
                             <Button variant="outline" asChild className="border-green-200 text-green-700 hover:bg-green-50">
-                                <Link href={`${prefix}/pilah-sampah`} className="flex items-center gap-1">
+                                <Link href={route(`${role}.pilah-sampah.index`)} className="flex items-center gap-1">
                                     <ArrowLeft className="h-4 w-4" />
                                     Batal
                                 </Link>

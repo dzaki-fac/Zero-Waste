@@ -1,7 +1,7 @@
 import { Menu, X } from "lucide-react";
 import { useState } from "react";
-import { useNavigate, useLocation } from "react-router-dom";
-import { baseUrl } from "@/lib/path";
+import { router, usePage } from "@inertiajs/react";
+import { route } from 'ziggy-js';
 import { NAV_ITEMS, PAGE_ROUTES } from "../navData";
 import { C, display } from "../theme";
 import UndipLogoIcon from "./Undiplogoicon";
@@ -13,18 +13,24 @@ interface NavbarProps {
   onNavItemClick?: (id: string) => void;
 }
 
+const ROUTE_MAP: Record<string, string> = {
+  pengertian: "pengertian",
+  struktur: "struktur",
+  sop: "sop",
+  peraturan: "peraturan",
+};
+
 export default function Navbar({ activeSection, onNavItemClick }: NavbarProps) {
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
-  const navigate = useNavigate();
-  const location = useLocation();
+  const { url } = usePage();
 
   const handleNavClick = (id: string) => {
     setMobileNavOpen(false);
 
     if (PAGE_ROUTES[id]) {
-      navigate(PAGE_ROUTES[id]);
-    } else if (location.pathname !== "/") {
-      window.location.href = baseUrl("/") + "#" + id;
+      router.visit(route(ROUTE_MAP[id] || id));
+    } else if (url !== "/") {
+      window.location.href = route("home") + "#" + id;
     } else {
       onNavItemClick?.(id);
     }
@@ -32,10 +38,6 @@ export default function Navbar({ activeSection, onNavItemClick }: NavbarProps) {
 
   return (
     <>
-      {/* Header pakai latar putih supaya logo UNDIP & ZeroLib tetap kebaca
-          jelas. `relative` dipakai sebagai acuan posisi untuk menu mobile
-          yang di-absolute-kan di bawah, jadi menu "melayang" menutupi
-          konten di bawahnya alih-alih mendorongnya. */}
       <header
         className="sticky top-0 z-40 border-b relative"
         style={{ backgroundColor: "#fff", borderColor: C.line }}
@@ -44,10 +46,10 @@ export default function Navbar({ activeSection, onNavItemClick }: NavbarProps) {
           <button
             type="button"
             onClick={() => {
-              if (location.pathname === "/") {
+              if (url === "/") {
                 window.scrollTo({ top: 0, behavior: "smooth" });
               } else {
-                navigate("/");
+                router.visit(route("home"));
               }
             }}
             className="flex items-center gap-1.5 sm:gap-4 cursor-pointer min-w-0 overflow-hidden"
@@ -75,13 +77,13 @@ export default function Navbar({ activeSection, onNavItemClick }: NavbarProps) {
                   style={{ ...display, color: active ? C.leaf500 : C.ink500 }}
                   onMouseEnter={(e) => {
  if (!active) {
-e.currentTarget.style.color = C.leaf500;
-} 
+ e.currentTarget.style.color = C.leaf500;
+ } 
 }}
                   onMouseLeave={(e) => {
  if (!active) {
-e.currentTarget.style.color = C.ink500;
-} 
+ e.currentTarget.style.color = C.ink500;
+ } 
 }}
                 >
                   {n.label}
@@ -98,9 +100,6 @@ e.currentTarget.style.color = C.ink500;
             })}
           </nav>
 
-          {/* Tombol hamburger: icon di-crossfade + rotate pas ganti state,
-              bukan langsung "loncat" ganti icon. Dua icon ditumpuk lalu
-              opacity/rotate-nya dianimasikan bergantian. */}
           <button
             className="md:hidden shrink-0 relative w-[22px] h-[22px]"
             style={{ color: C.leaf500 }}
@@ -126,10 +125,6 @@ e.currentTarget.style.color = C.ink500;
           </button>
         </div>
 
-        {/* Backdrop tipis di belakang menu supaya kelihatan jelas dia
-            "melayang" di atas konten. Fade in/out bareng menu, dan klik di
-            luar menu akan menutupnya. Selalu di-render (bukan cuma pas
-            open) supaya ada transisi keluar yang halus, bukan hilang tiba². */}
         <div
           className="md:hidden fixed inset-0 top-14 sm:top-16 transition-opacity duration-300 ease-out"
           style={{
@@ -140,12 +135,6 @@ e.currentTarget.style.color = C.ink500;
           onClick={() => setMobileNavOpen(false)}
         />
 
-        {/* Menu mobile: absolute + overlay konten di bawahnya (tidak
-            mendorong layout). Dianimasikan dengan max-height + opacity +
-            translate supaya buka/tutupnya smooth, dan tiap item punya
-            delay bertahap (staggered) biar terasa lebih hidup. Selalu
-            di-render (max-height 0 saat tertutup) supaya transisi keluar
-            juga halus, bukan langsung hilang. */}
         <div
           className="md:hidden absolute top-full left-0 right-0 overflow-hidden border-t shadow-lg transition-all duration-300 ease-out"
           style={{

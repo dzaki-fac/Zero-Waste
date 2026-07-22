@@ -3,7 +3,7 @@ import { ArrowLeft, Save } from 'lucide-react';
 import Heading from '@/components/heading';
 import InputError from '@/components/input-error';
 import { Button } from '@/components/ui/button';
-import { baseUrl } from '@/lib/path';
+import { route } from 'ziggy-js';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import {
@@ -36,7 +36,7 @@ type Props = {
 
 export default function PilahSampahEdit({ pilahSampah }: Props) {
     const { auth, options } = usePage().props as unknown as { auth: Auth; options: Options };
-    const prefix = baseUrl(auth.user.role === 'admin' ? '/admin' : '/petugas');
+    const role = auth.user.role;
 
     const initialTanggal = (() => {
         const d = new Date(pilahSampah.tanggal);
@@ -53,7 +53,7 @@ export default function PilahSampahEdit({ pilahSampah }: Props) {
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        put(`${prefix}/pilah-sampah/${pilahSampah.id}`);
+        put(route(`${role}.pilah-sampah.update`, { pilah_sampah: pilahSampah.id }));
     };
 
     return (
@@ -133,7 +133,7 @@ export default function PilahSampahEdit({ pilahSampah }: Props) {
                                 Perbarui
                             </Button>
                             <Button variant="outline" asChild className="border-green-200 text-green-700 hover:bg-green-50">
-                                <Link href={`${prefix}/pilah-sampah`} className="flex items-center gap-1">
+                                <Link href={route(`${role}.pilah-sampah.index`)} className="flex items-center gap-1">
                                     <ArrowLeft className="h-4 w-4" />
                                     Batal
                                 </Link>
