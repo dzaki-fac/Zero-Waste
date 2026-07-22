@@ -3,7 +3,7 @@ import { ArrowLeft, CalendarDays, FileDown } from 'lucide-react';
 import { useState } from 'react';
 import Heading from '@/components/heading';
 import { Button } from '@/components/ui/button';
-import { route } from 'ziggy-js';
+import { baseUrl } from '@/lib/path';
 import {
     Table,
     TableBody,
@@ -57,7 +57,7 @@ export default function ChecklistPekerjaanHistory({ petugas, records }: Props) {
 
     const applyFilter = () => {
         router.get(
-            route('admin.checklist-pekerjaan.history', { petugas: petugas.nip }),
+            `/admin/checklist-pekerjaan/${petugas.nip}/history`,
             params(),
             { preserveState: true, preserveScroll: true },
         );
@@ -77,7 +77,7 @@ export default function ChecklistPekerjaanHistory({ petugas, records }: Props) {
                     />
                     <div className="flex items-center gap-2">
                         <Button variant="outline" asChild className="border-green-200 text-green-700 hover:bg-green-50">
-                            <Link href={route('admin.checklist-pekerjaan.index')} className="flex items-center gap-1">
+                            <Link href={baseUrl('/admin/checklist-pekerjaan')} className="flex items-center gap-1">
                                 <ArrowLeft className="h-4 w-4" />
                                 Kembali
                             </Link>
@@ -98,7 +98,7 @@ export default function ChecklistPekerjaanHistory({ petugas, records }: Props) {
                         </p>
                         <Button asChild className="mt-6 bg-green-600 hover:bg-green-700">
                             <Link
-                                href={route('admin.checklist-pekerjaan.show', { checklist_pekerjaan: petugas.nip })}
+                                href={`/admin/checklist-pekerjaan/${petugas.nip}`}
                                 className="flex items-center gap-2"
                             >
                                 Buat Checklist Baru
@@ -164,7 +164,7 @@ export default function ChecklistPekerjaanHistory({ petugas, records }: Props) {
                                     className="border-green-200 text-green-700 hover:bg-green-50"
                                 >
                                     <Link
-                                        href={route('admin.checklist-pekerjaan.history', { petugas: petugas.nip })}
+                                        href={`/admin/checklist-pekerjaan/${petugas.nip}/history`}
                                         className="flex items-center gap-1"
                                     >
                                         Reset
@@ -219,7 +219,7 @@ export default function ChecklistPekerjaanHistory({ petugas, records }: Props) {
                                                         className="bg-green-600 hover:bg-green-700"
                                                     >
                                                         <Link
-                                                            href={route('admin.checklist-pekerjaan.show', { checklist_pekerjaan: petugas.nip, tanggal: r.tanggal })}
+                                                            href={`/admin/checklist-pekerjaan/${petugas.nip}?tanggal=${r.tanggal}`}
                                                         >
                                                             Detail
                                                         </Link>

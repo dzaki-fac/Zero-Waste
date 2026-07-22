@@ -4,7 +4,7 @@ import { useState, useMemo } from 'react';
 import Heading from '@/components/heading';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { route } from 'ziggy-js';
+import { baseUrl } from '@/lib/path';
 import {
     Select,
     SelectContent,
@@ -41,7 +41,7 @@ const years = Array.from({ length: 11 }, (_, i) => currentYear - i);
 
 export default function PenimbanganIndex({ penimbangan }: Props) {
     const { auth } = usePage().props as { auth: Auth };
-    const role = auth.user.role;
+    const prefix = baseUrl(auth.user.role === 'admin' ? '/admin' : '/petugas');
     const { options: pageOptions } = usePage().props as { options?: { area: string[]; jenis_sampah: string[] } };
     const areaOptions = pageOptions?.area ?? [];
     const jenisSampahOptions = pageOptions?.jenis_sampah ?? [];
@@ -125,7 +125,7 @@ return true;
 
     const handleDelete = (id: number) => {
         if (confirm('Yakin ingin menghapus data ini?')) {
-            router.delete(route(`${role}.penimbangan.destroy`, { penimbangan: id }));
+            router.delete(`${prefix}/penimbangan/${id}`);
         }
     };
 
@@ -173,8 +173,8 @@ params.set('custom_end', customEndDate);
 
         const qs = params.toString();
 
-        return `${route(`${role}.penimbangan.export`)}${qs ? `?${qs}` : ''}`;
-    }, [search, filterArea, filterJenis, filterPeriod, weekRange, selectedMonth, selectedYear, customStartDate, customEndDate, role]);
+        return `${prefix}/penimbangan/export${qs ? `?${qs}` : ''}`;
+    }, [search, filterArea, filterJenis, filterPeriod, weekRange, selectedMonth, selectedYear, customStartDate, customEndDate, prefix]);
 
     return (
         <>
@@ -195,7 +195,7 @@ params.set('custom_end', customEndDate);
                             </a>
                         </Button>
                         <Button asChild className="bg-green-600 hover:bg-green-700">
-                            <Link href={route(`${role}.penimbangan.create`)} className="flex items-center gap-2">
+                            <Link href={`${prefix}/penimbangan/create`} className="flex items-center gap-2">
                                 <Plus className="h-4 w-4" />
                                 Tambah Baru
                             </Link>
@@ -223,7 +223,7 @@ params.set('custom_end', customEndDate);
                             Mulai catat data penimbangan sampah untuk membantu pengelolaan lingkungan yang lebih baik.
                         </p>
                         <Button asChild className="mt-6 bg-green-600 hover:bg-green-700">
-                            <Link href={route(`${role}.penimbangan.create`)} className="flex items-center gap-2">
+                            <Link href={`${prefix}/penimbangan/create`} className="flex items-center gap-2">
                                 <Plus className="h-4 w-4" />
                                 Tambah Penimbangan
                             </Link>
@@ -418,7 +418,7 @@ e.preventDefault()
                                                 <TableCell className="text-right">
                                                     <div className="flex justify-end gap-2">
                                                         <Button variant="outline" size="sm" asChild className="border-green-200 text-green-700 hover:bg-green-50 hover:text-green-800">
-                                                            <Link href={route(`${role}.penimbangan.edit`, { penimbangan: item.id })} className="flex items-center gap-1">
+                                                            <Link href={`${prefix}/penimbangan/${item.id}/edit`} className="flex items-center gap-1">
                                                                 <Pencil className="h-3.5 w-3.5" />
                                                                 Edit
                                                             </Link>

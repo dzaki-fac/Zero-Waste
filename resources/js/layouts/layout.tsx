@@ -2,7 +2,6 @@ import { Link, usePage } from "@inertiajs/react";
 import { Menu, X, Instagram, Youtube, Globe } from "lucide-react";
 import React, { useState  } from "react";
 import type {ReactNode} from "react";
-import { route } from 'ziggy-js';
 import { asset } from '@/lib/path';
 
 export const C = {
@@ -98,10 +97,10 @@ export default function Layout({
           setMobileNavOpen(false);
 
           if (onAnchorClick) {
- onAnchorClick(item.id);
- } else {
- window.location.href = route("home") + "#" + item.id;
- }
+onAnchorClick(item.id);
+} else {
+window.location.href = `/#${item.id}`;
+}
         }}
         className={cls}
         style={sharedStyle}

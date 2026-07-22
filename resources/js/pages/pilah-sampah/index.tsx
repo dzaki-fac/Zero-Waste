@@ -4,7 +4,7 @@ import { useState, useMemo } from 'react';
 import Heading from '@/components/heading';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { route } from 'ziggy-js';
+import { baseUrl } from '@/lib/path';
 import {
     Select,
     SelectContent,
@@ -40,7 +40,7 @@ const years = Array.from({ length: 11 }, (_, i) => currentYear - i);
 
 export default function PilahSampahIndex({ pilahSampah }: Props) {
     const { auth, options } = usePage().props as unknown as { auth: Auth; options: { jenis_sampah: string[]; jenis_detail: string[] } };
-    const role = auth.user.role;
+    const prefix = baseUrl(auth.user.role === 'admin' ? '/admin' : '/petugas');
     const [search, setSearch] = useState('');
     const [filterJenis, setFilterJenis] = useState('all');
     const jenisDetailOptions = options.jenis_detail;
@@ -120,7 +120,7 @@ return true;
 
     const handleDelete = (id: number) => {
         if (confirm('Yakin ingin menghapus data ini?')) {
-            router.delete(route(`${role}.pilah-sampah.destroy`, { pilah_sampah: id }));
+            router.delete(`${prefix}/pilah-sampah/${id}`);
         }
     };
 
@@ -164,8 +164,8 @@ params.set('custom_end', customEndDate);
 
         const qs = params.toString();
 
-        return `${route(`${role}.pilah-sampah.export`)}${qs ? `?${qs}` : ''}`;
-    }, [search, filterJenis, filterPeriod, weekRange, selectedMonth, selectedYear, customStartDate, customEndDate, role]);
+        return `${prefix}/pilah-sampah/export${qs ? `?${qs}` : ''}`;
+    }, [search, filterJenis, filterPeriod, weekRange, selectedMonth, selectedYear, customStartDate, customEndDate, prefix]);
 
     return (
         <>
@@ -186,7 +186,7 @@ params.set('custom_end', customEndDate);
                             </a>
                         </Button>
                         <Button asChild className="bg-green-600 hover:bg-green-700">
-                            <Link href={route(`${role}.pilah-sampah.create`)} className="flex items-center gap-2">
+                            <Link href={`${prefix}/pilah-sampah/create`} className="flex items-center gap-2">
                                 <Plus className="h-4 w-4" />
                                 Tambah Baru
                             </Link>
@@ -214,9 +214,9 @@ params.set('custom_end', customEndDate);
                             Mulai catat data pemilahan sampah untuk membantu pengelolaan lingkungan yang lebih baik.
                         </p>
                         <Button asChild className="mt-6 bg-green-600 hover:bg-green-700">
-                            <Link href={route(`${role}.pilah-sampah.create`)} className="flex items-center gap-2">
+                            <Link href={`${prefix}/pilah-sampah/create`} className="flex items-center gap-2">
                                 <Plus className="h-4 w-4" />
-                                Tambah pemilahan
+                                Tambah Pilah Sampah
                             </Link>
                         </Button>
                     </div>
@@ -395,7 +395,7 @@ e.preventDefault()
                                                     <TableCell className="text-right">
                                                         <div className="flex justify-end gap-2">
                                                             <Button variant="outline" size="sm" asChild className="border-green-200 text-green-700 hover:bg-green-50 hover:text-green-800">
-                                                                 <Link href={route(`${role}.pilah-sampah.edit`, { pilah_sampah: item.id })} className="flex items-center gap-1">
+                                                                <Link href={`${prefix}/pilah-sampah/${item.id}/edit`} className="flex items-center gap-1">
                                                                     <Pencil className="h-3.5 w-3.5" />
                                                                     Edit
                                                                 </Link>

@@ -1,11 +1,8 @@
-import { Ziggy } from '@/ziggy';
-
 function getRuntimeBase(): string {
-    if (import.meta.env.DEV) {
-        return import.meta.env.BASE_URL || '/';
+    if (typeof window !== 'undefined' && window.__assetBase !== undefined && window.__assetBase !== '') {
+        return window.__assetBase;
     }
-    const url = Ziggy.url.replace(/\/+$/, '');
-    return url ? url + '/' : '/';
+    return import.meta.env.BASE_URL || '/';
 }
 
 export function baseUrl(path: string): string {

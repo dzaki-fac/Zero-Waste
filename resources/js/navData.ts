@@ -9,9 +9,9 @@ export const NAV_ITEMS = [
   { id: "edukasi", label: "Edukasi" },
 ];
 
-export const PAGE_ROUTES: Record<string, boolean> = {
-  pengertian: true,
-  struktur: true,
-  sop: true,
-  peraturan: true,
+export const PAGE_ROUTES: Record<string, string> = {
+  sop: "/sop",
+  pengertian: "/pengertian",
+  struktur: "/struktur",
+  peraturan: "/peraturan",
 };

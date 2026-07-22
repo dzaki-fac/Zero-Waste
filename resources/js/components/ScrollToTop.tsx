@@ -1,15 +1,13 @@
 import { useEffect } from "react";
-import { router } from "@inertiajs/react";
+import { useLocation } from "react-router-dom";
 
 export default function ScrollToTop() {
+  const { pathname, state } = useLocation();
   useEffect(() => {
-    const removeListener = router.on("navigate", () => {
+    if (!(state as { scrollTo?: string })?.scrollTo) {
       window.scrollTo(0, 0);
-    });
-    return () => {
-      removeListener();
-    };
-  }, []);
+    }
+  }, [pathname]);
 
   return null;
 }
