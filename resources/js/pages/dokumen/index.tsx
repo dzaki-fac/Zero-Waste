@@ -14,7 +14,7 @@ import {
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { route } from 'ziggy-js';
+import { baseUrl } from '@/lib/path';
 
 type DocumentItem = {
     id: number;
@@ -111,7 +111,7 @@ return;
 return;
 }
 
-        replaceForm.patch(route('admin.dokumen.update', { document: doc.id }), {
+        replaceForm.patch(baseUrl(`/admin/dokumen/${doc.id}`), {
             preserveScroll: true,
             onSuccess: () => {
                 setReplaceType(null);
@@ -139,7 +139,7 @@ return;
 
         setDeleteError(null);
         setDeleteProcessing(true);
-        uploadForm.delete(route('admin.dokumen.destroy', { document: doc.id }), {
+        uploadForm.delete(baseUrl(`/admin/dokumen/${doc.id}`), {
             preserveScroll: true,
             onSuccess: () => {
                 setDeleteOpen(false);
@@ -257,7 +257,7 @@ return;
 return;
 }
 
-                                                    uploadForm.post(route('admin.dokumen.store'), {
+                                                    uploadForm.post(baseUrl('/admin/dokumen'), {
                                                         preserveScroll: true,
                                                         onSuccess: () => {
                                                             uploadForm.reset();

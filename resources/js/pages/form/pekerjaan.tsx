@@ -3,7 +3,7 @@ import { ArrowLeft, CalendarDays, CheckCircle2, Circle, MapPin } from 'lucide-re
 import { useEffect, useRef, useState } from 'react';
 import Heading from '@/components/heading';
 import { Button } from '@/components/ui/button';
-import { route } from 'ziggy-js';
+import { baseUrl } from '@/lib/path';
 
 type MasterTask = {
     id: number;
@@ -91,9 +91,9 @@ clearTimeout(debounceRef.current);
 
         debounceRef.current = setTimeout(() => {
             router.post(
-                route('form.checklist-pekerjaan.store'),
+                baseUrl('/form/checklist-pekerjaan'),
                 {
-                    _redirect: route('form'),
+                    _redirect: baseUrl('/form'),
                     nip: auth.user.nip,
                     tanggal: selectedDate,
                     area: activeArea,
@@ -132,7 +132,7 @@ clearTimeout(debounceRef.current);
         setActiveArea(area);
         setAreaAlert(false);
         router.get(
-            route('form.pekerjaan'),
+            baseUrl('/form/pekerjaan'),
             { tanggal: selectedDate, area },
             { preserveState: false, preserveScroll: true },
         );
@@ -142,7 +142,7 @@ clearTimeout(debounceRef.current);
         const newDate = e.target.value;
         setSelectedDate(newDate);
         router.get(
-            route('form.pekerjaan'),
+            baseUrl('/form/pekerjaan'),
             { tanggal: newDate, area: activeArea || undefined },
             { preserveState: false, preserveScroll: true },
         );
@@ -301,7 +301,7 @@ return null;
                             asChild
                             className="w-full border-green-200 text-sm text-green-700 hover:bg-green-50"
                         >
-                            <Link href={route('form')} className="flex items-center justify-center gap-2">
+                            <Link href={baseUrl('/form')} className="flex items-center justify-center gap-2">
                                 <ArrowLeft className="h-4 w-4" />
                                 Kembali
                             </Link>

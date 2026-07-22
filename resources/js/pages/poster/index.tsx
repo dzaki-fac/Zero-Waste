@@ -22,7 +22,7 @@ import {
     TableHeader,
     TableRow,
 } from '@/components/ui/table';
-import { route } from 'ziggy-js';
+import { baseUrl } from '@/lib/path';
 
 type PosterItem = {
     id: number;
@@ -69,7 +69,7 @@ export default function KelolaPoster({ posters }: Props) {
 
     function handleAdd(e: React.FormEvent) {
         e.preventDefault();
-        addForm.post(route('admin.poster.store'), {
+        addForm.post(baseUrl('/admin/poster'), {
             preserveScroll: true,
             onSuccess: () => {
                 setAddOpen(false);
@@ -112,7 +112,7 @@ URL.revokeObjectURL(editPreview);
 return;
 }
 
-        editForm.patch(route('admin.poster.update', { poster: editingItem.id }), {
+        editForm.patch(baseUrl(`/admin/poster/${editingItem.id}`), {
             preserveScroll: true,
             onSuccess: () => {
                 setEditOpen(false);
@@ -134,7 +134,7 @@ return;
 
         setDeleteError(null);
         setDeleteProcessing(true);
-        router.delete(route('admin.poster.destroy', { poster: deletingItem.id }), {
+        router.delete(baseUrl(`/admin/poster/${deletingItem.id}`), {
             preserveScroll: true,
             onSuccess: () => {
                 setDeleteOpen(false);

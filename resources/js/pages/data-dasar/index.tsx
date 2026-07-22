@@ -14,7 +14,7 @@ import {
     SelectValue,
 } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
-import { route } from 'ziggy-js';
+import { baseUrl } from '@/lib/path';
 
 type JenisSampahItem = {
     kategori: string;
@@ -139,7 +139,7 @@ export default function DataDasarIndex({ dataDasar, rincianArea: rincianAreaProp
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        post(route('admin.data-dasar.update'), {
+        post(baseUrl('/admin/data-dasar'), {
             onSuccess: () => setIsEditing(false),
         });
     };
@@ -234,7 +234,7 @@ export default function DataDasarIndex({ dataDasar, rincianArea: rincianAreaProp
                             <>
                                 {dataDasar && (
                                     <Button asChild variant="outline" className="border-green-200 text-green-700 hover:bg-green-50">
-                                        <a href={route('admin.data-dasar.export')}>
+                                        <a href={baseUrl('/admin/data-dasar/export')}>
                                             <FileDown className="h-4 w-4" />
                                             Export CSV
                                         </a>

@@ -1,6 +1,6 @@
 import { Head } from '@inertiajs/react';
 import { usePage, router } from '@inertiajs/react';
-import { route } from 'ziggy-js';
+import { baseUrl } from '@/lib/path';
 import type { LucideIcon } from "lucide-react";
 import {
   Recycle,
@@ -29,6 +29,7 @@ import {
 } from "lucide-react";
 import React, { useState, useRef, useEffect, useLayoutEffect   } from "react";
 import type {ReactNode, CSSProperties} from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from 'recharts';
 import { ChartTooltip, ChartLabel, getCategoryColor, PieLegend } from "../components/charts";
 import type { ChartData } from "../components/charts";
@@ -586,7 +587,7 @@ query.start_date = params.start_date;
 query.end_date = params.end_date;
 }
 
-        router.get(route('home'), query, { preserveState: true, preserveScroll: true, replace: true });
+        router.get(baseUrl('/'), query, { preserveState: true, preserveScroll: true, replace: true });
     }
 
     function handlePreset(preset: typeof PRESETS[number]) {
@@ -623,7 +624,8 @@ query.end_date = params.end_date;
   const [scrollY, setScrollY] = useState(0);
   const [heroMounted, setHeroMounted] = useState(false);
 
-  const { url: currentUrl } = usePage();
+  const location = useLocation();
+  const navigate = useNavigate();
 
   const sectionRefs = useRef<Record<string, HTMLElement | null>>({});
   const newsScrollRef = useRef<HTMLDivElement | null>(null);
@@ -655,7 +657,7 @@ query.end_date = params.end_date;
       window.history.scrollRestoration = "manual";
     }
 
-    const scrollToId = (typeof window !== "undefined" ? window.location.hash.replace("#", "") : "") || null;
+    const scrollToId = ((location.state as { scrollTo?: string })?.scrollTo) || (typeof window !== "undefined" ? window.location.hash.replace("#", "") : "") || null;
 
     if (scrollToId) {
       const align = () => {
@@ -676,11 +678,19 @@ return;
     }
   }, []);
 
+  // Bersihkan scrollTo state setelah browser paint, supaya tidak ke-trigger
+  // ulang saat user navigasi lain / refresh.
   useEffect(() => {
+    const scrollToId = (location.state as { scrollTo?: string })?.scrollTo;
+
+    if (scrollToId) {
+      navigate(location.pathname, { replace: true, state: {} });
+    }
+
     if (typeof window !== "undefined" && window.location.hash) {
       window.history.replaceState(null, "", window.location.pathname + window.location.search);
     }
-  }, []);
+  }, [location.state]);
 
   useEffect(() => {
     const t = setInterval(() => {

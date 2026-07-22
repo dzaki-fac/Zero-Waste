@@ -3,7 +3,7 @@ import { ArrowLeft, Send, Calendar, User, Trash2, CheckCircle2, MapPin } from 'l
 import { useEffect, useState } from 'react';
 import Heading from '@/components/heading';
 import InputError from '@/components/input-error';
-import { route } from 'ziggy-js';
+import { baseUrl } from '@/lib/path';
 import { Button } from '@/components/ui/button';
 import {
     Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle,
@@ -77,7 +77,7 @@ const handleSubmit = (e: React.FormEvent) => {
         }
 
         setSubmitError('');
-        post(route('petugas.penimbangan.store'));
+        post('/petugas/penimbangan');
     };
 
     const now = new Date(Date.now() - new Date().getTimezoneOffset() * 60000).toISOString().slice(0, 16);
@@ -248,7 +248,7 @@ const handleSubmit = (e: React.FormEvent) => {
                             asChild
                             className="flex-1 border-green-200 text-sm text-green-700 hover:bg-green-50"
                         >
-                            <Link href={route('form')} className="flex items-center justify-center gap-2">
+                            <Link href={baseUrl('/form')} className="flex items-center justify-center gap-2">
                                 <ArrowLeft className="h-4 w-4" />
                                 Batal
                             </Link>
@@ -308,7 +308,7 @@ const handleSubmit = (e: React.FormEvent) => {
                         </div>
                     </div>
 
-                    <Button onClick={() => router.visit(route('form'))} className="w-full bg-green-600 hover:bg-green-700">
+                    <Button onClick={() => router.visit(baseUrl('/form'))} className="w-full bg-green-600 hover:bg-green-700">
                         Tutup
                     </Button>
                 </DialogContent>

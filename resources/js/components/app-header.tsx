@@ -25,7 +25,6 @@ import AppLogoIcon from '@/components/Undiplogoicon';
 import { UserMenuContent } from '@/components/user-menu-content';
 import { useInitials } from '@/hooks/use-initials';
 import { cn, toUrl } from '@/lib/utils';
-import { route } from 'ziggy-js';
 import { home } from '@/routes';
 import type { BreadcrumbItem, NavItem } from '@/types';
 
@@ -110,7 +109,7 @@ export function AppHeader({ breadcrumbs = [] }: Props) {
                     </div>
 
                     <Link
-                        href={auth.user ? (auth.user.role === 'petugas' ? route('form') : route('admin.dashboard')) : home()}
+                        href={auth.user ? (auth.user.role === 'petugas' ? '/form' : '/admin/dashboard') : home()}
                         prefetch
                         className="flex items-center space-x-2"
                     >
