@@ -41,16 +41,23 @@ class DataDasarController extends Controller
 
     private function computeSampahResidu(): float
     {
-        $perDay = Distribusi::select(
+        $avgPilah = Penimbangan::select(
+            DB::raw('DATE(tanggal) as tanggal'),
+            DB::raw('SUM(berat_sampah) as total')
+        )
+            ->groupBy(DB::raw('DATE(tanggal)'))
+            ->get()
+            ->avg('total');
+
+        $avgDistribusi = Distribusi::select(
             DB::raw('DATE(tanggal) as tanggal'),
             DB::raw('SUM(berat) as total')
         )
             ->groupBy(DB::raw('DATE(tanggal)'))
-            ->get();
+            ->get()
+            ->avg('total');
 
-        return $perDay->isNotEmpty()
-            ? round($perDay->avg('total'), 2)
-            : 0;
+        return round(($avgPilah ?? 0) - ($avgDistribusi ?? 0), 2);
     }
 
     private function computeJenisSampahDominan(): array
