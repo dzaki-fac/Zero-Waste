@@ -41,9 +41,9 @@ class DataDasarController extends Controller
 
     private function computeSampahResidu(): float
     {
-        $avgPilah = Penimbangan::select(
+        $avgPilah = PilahSampah::select(
             DB::raw('DATE(tanggal) as tanggal'),
-            DB::raw('SUM(berat_sampah) as total')
+            DB::raw('SUM(berat) as total')
         )
             ->groupBy(DB::raw('DATE(tanggal)'))
             ->get()
