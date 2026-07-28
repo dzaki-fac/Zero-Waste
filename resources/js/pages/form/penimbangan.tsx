@@ -9,6 +9,7 @@ import {
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { baseUrl } from '@/lib/path';
 
 type Options = {
     area: string[];
@@ -76,7 +77,7 @@ const handleSubmit = (e: React.FormEvent) => {
         }
 
         setSubmitError('');
-        post('/petugas/penimbangan');
+        post(baseUrl('/petugas/penimbangan'));
     };
 
     const now = new Date(Date.now() - new Date().getTimezoneOffset() * 60000).toISOString().slice(0, 16);
@@ -247,7 +248,7 @@ const handleSubmit = (e: React.FormEvent) => {
                             asChild
                             className="flex-1 border-green-200 text-sm text-green-700 hover:bg-green-50"
                         >
-                            <Link href="/form" className="flex items-center justify-center gap-2">
+                            <Link href={baseUrl("/form")} className="flex items-center justify-center gap-2">
                                 <ArrowLeft className="h-4 w-4" />
                                 Batal
                             </Link>
@@ -307,7 +308,7 @@ const handleSubmit = (e: React.FormEvent) => {
                         </div>
                     </div>
 
-                    <Button onClick={() => router.visit('/form')} className="w-full bg-green-600 hover:bg-green-700">
+                    <Button onClick={() => router.visit(baseUrl('/form'))} className="w-full bg-green-600 hover:bg-green-700">
                         Tutup
                     </Button>
                 </DialogContent>

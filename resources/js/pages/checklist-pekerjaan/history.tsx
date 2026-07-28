@@ -11,6 +11,7 @@ import {
     TableHeader,
     TableRow,
 } from '@/components/ui/table';
+import { baseUrl } from '@/lib/path';
 
 const formatDate = (dateStr: string) => {
     const [y, m, d] = dateStr.split('-');
@@ -56,7 +57,7 @@ export default function ChecklistPekerjaanHistory({ petugas, records }: Props) {
 
     const applyFilter = () => {
         router.get(
-            `/admin/checklist-pekerjaan/${petugas.nip}/history`,
+            baseUrl(`/admin/checklist-pekerjaan/${petugas.nip}/history`),
             params(),
             { preserveState: true, preserveScroll: true },
         );
@@ -76,7 +77,7 @@ export default function ChecklistPekerjaanHistory({ petugas, records }: Props) {
                     />
                     <div className="flex items-center gap-2">
                         <Button variant="outline" asChild className="border-green-200 text-green-700 hover:bg-green-50">
-                            <Link href="/admin/checklist-pekerjaan" className="flex items-center gap-1">
+                            <Link href={baseUrl("/admin/checklist-pekerjaan")} className="flex items-center gap-1">
                                 <ArrowLeft className="h-4 w-4" />
                                 Kembali
                             </Link>
@@ -97,7 +98,7 @@ export default function ChecklistPekerjaanHistory({ petugas, records }: Props) {
                         </p>
                         <Button asChild className="mt-6 bg-green-600 hover:bg-green-700">
                             <Link
-                                href={`/admin/checklist-pekerjaan/${petugas.nip}`}
+                                href={baseUrl(`/admin/checklist-pekerjaan/${petugas.nip}`)}
                                 className="flex items-center gap-2"
                             >
                                 Buat Checklist Baru
@@ -163,7 +164,7 @@ export default function ChecklistPekerjaanHistory({ petugas, records }: Props) {
                                     className="border-green-200 text-green-700 hover:bg-green-50"
                                 >
                                     <Link
-                                        href={`/admin/checklist-pekerjaan/${petugas.nip}/history`}
+                                        href={baseUrl(`/admin/checklist-pekerjaan/${petugas.nip}/history`)}
                                         className="flex items-center gap-1"
                                     >
                                         Reset
@@ -218,7 +219,7 @@ export default function ChecklistPekerjaanHistory({ petugas, records }: Props) {
                                                         className="bg-green-600 hover:bg-green-700"
                                                     >
                                                         <Link
-                                                            href={`/admin/checklist-pekerjaan/${petugas.nip}?tanggal=${r.tanggal}`}
+                                                            href={baseUrl(`/admin/checklist-pekerjaan/${petugas.nip}?tanggal=${r.tanggal}`)}
                                                         >
                                                             Detail
                                                         </Link>

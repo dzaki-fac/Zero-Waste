@@ -447,7 +447,7 @@ class ChecklistPekerjaanController extends Controller
             $total = count($rows);
             $done = count(array_filter($rows, fn ($r) => $r['status'] === 'sudah'));
 
-            return redirect('/form/pekerjaan?' . http_build_query(['tanggal' => $validated['tanggal'], 'area' => $area]))->with('submitted', [
+            return redirect()->route('form.pekerjaan', ['tanggal' => $validated['tanggal'], 'area' => $area])->with('submitted', [
                 'area' => $area,
                 'tanggal' => $validated['tanggal'],
                 'total' => $total,
@@ -457,6 +457,6 @@ class ChecklistPekerjaanController extends Controller
             ]);
         }
 
-        return redirect("/admin/checklist-pekerjaan/{$petugas->nip}?" . http_build_query(['tanggal' => $validated['tanggal'], 'area' => $area]));
+        return redirect()->route('admin.checklist-pekerjaan.show', ['checklist_pekerjaan' => $petugas->nip, 'tanggal' => $validated['tanggal'], 'area' => $area]);
     }
 }

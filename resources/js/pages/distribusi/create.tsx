@@ -1,6 +1,7 @@
 import { Head, Link, useForm, usePage } from '@inertiajs/react';
 import { ArrowLeft, Save, Ship, MapPin } from 'lucide-react';
 import { useState } from 'react';
+import { baseUrl } from '@/lib/path';
 import Heading from '@/components/heading';
 import InputError from '@/components/input-error';
 import { Button } from '@/components/ui/button';
@@ -35,7 +36,7 @@ export default function DistribusiCreate() {
     const [lokasiError, setLokasiError] = useState('');
     const [submitError, setSubmitError] = useState('');
 
-    const prefix = auth.user.role === 'admin' ? '/admin' : '/petugas';
+    const prefix = auth.user.role === 'admin' ? baseUrl('/admin') : baseUrl('/petugas');
     const totalBerat = data.items.reduce((sum, item) => sum + (parseFloat(item.berat) || 0), 0);
     const filledCount = data.items.filter((item) => parseFloat(item.berat) > 0).length;
 

@@ -1,6 +1,7 @@
 import { Head, useForm } from '@inertiajs/react';
 import { FileText, Upload, Trash2, FileDown, Eye } from 'lucide-react';
 import { useState } from 'react';
+import { baseUrl } from '@/lib/path';
 import Heading from '@/components/heading';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -110,7 +111,7 @@ return;
 return;
 }
 
-        replaceForm.patch(`/admin/dokumen/${doc.id}`, {
+        replaceForm.patch(baseUrl(`/admin/dokumen/${doc.id}`), {
             preserveScroll: true,
             onSuccess: () => {
                 setReplaceType(null);
@@ -138,7 +139,7 @@ return;
 
         setDeleteError(null);
         setDeleteProcessing(true);
-        uploadForm.delete(`/admin/dokumen/${doc.id}`, {
+        uploadForm.delete(baseUrl(`/admin/dokumen/${doc.id}`), {
             preserveScroll: true,
             onSuccess: () => {
                 setDeleteOpen(false);
@@ -208,7 +209,7 @@ return;
 
                                             <div className="flex flex-wrap gap-2 pt-1">
                                                 <a
-                                                    href={doc.pdf_url}
+                                                    href={baseUrl(doc.pdf_url)}
                                                     target="_blank"
                                                     rel="noopener noreferrer"
                                                 >
@@ -256,7 +257,7 @@ return;
 return;
 }
 
-                                                    uploadForm.post('/admin/dokumen', {
+                                                    uploadForm.post(baseUrl('/admin/dokumen'), {
                                                         preserveScroll: true,
                                                         onSuccess: () => {
                                                             uploadForm.reset();

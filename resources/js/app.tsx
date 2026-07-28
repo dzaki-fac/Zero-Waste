@@ -31,7 +31,7 @@ createInertiaApp({
     withApp(app) {
         return (
             <TooltipProvider delayDuration={0}>
-                <BrowserRouter>
+                <BrowserRouter basename={import.meta.env.VITE_BASE_PATH || '/'}>
                     <ScrollToTop />
                     <Routes>
                         <Route path="/pengertian" element={<PengertianPage />} />

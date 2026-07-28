@@ -1,6 +1,7 @@
 import { Head, router, useForm } from '@inertiajs/react';
 import { Globe, Pencil, Plus, Trash2 } from 'lucide-react';
 import { useState } from 'react';
+import { baseUrl } from '@/lib/path';
 import Heading from '@/components/heading';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -73,7 +74,7 @@ export default function KelolaBerita({ news }: Props) {
 
     function handleAdd(e: React.FormEvent) {
         e.preventDefault();
-        addForm.post('/admin/berita', {
+        addForm.post(baseUrl('/admin/berita'), {
             preserveScroll: true,
             onSuccess: () => {
                 setAddOpen(false);
@@ -100,7 +101,7 @@ URL.revokeObjectURL(imagePreview);
             order: item.order,
         });
         editForm.clearErrors();
-        setEditImagePreview(item.image_url);
+        setEditImagePreview(baseUrl(item.image_url));
         setEditKey((k) => k + 1);
         setEditOpen(true);
     }
@@ -112,7 +113,7 @@ URL.revokeObjectURL(imagePreview);
             return;
         }
 
-        editForm.patch(`/admin/berita/${editingItem.id}`, {
+        editForm.patch(baseUrl(`/admin/berita/${editingItem.id}`), {
             preserveScroll: true,
             onSuccess: () => {
                 setEditOpen(false);
@@ -130,7 +131,7 @@ return;
 
         setDeleteError(null);
         setDeleteProcessing(true);
-        router.delete(`/admin/berita/${deletingItem.id}`, {
+        router.delete(baseUrl(`/admin/berita/${deletingItem.id}`), {
             preserveScroll: true,
             onSuccess: () => {
                 setDeleteOpen(false);
@@ -212,7 +213,7 @@ URL.revokeObjectURL(imagePreview);
                                             <TableCell>
                                                 {item.image_url ? (
                                                     <img
-                                                        src={item.image_url}
+                                                        src={baseUrl(item.image_url)}
                                                         alt="preview"
                                                         className="size-10 rounded-md object-cover border border-green-100"
                                                         onError={(e) => {

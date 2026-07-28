@@ -1,6 +1,7 @@
 import { Head, Link, router, usePage } from '@inertiajs/react';
 import { CalendarDays, FileDown, Leaf, Plus, Trash2, Pencil, Search } from 'lucide-react';
 import { useState, useMemo } from 'react';
+import { baseUrl } from '@/lib/path';
 import Heading from '@/components/heading';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -40,7 +41,7 @@ const years = Array.from({ length: 11 }, (_, i) => currentYear - i);
 
 export default function PenimbanganIndex({ penimbangan }: Props) {
     const { auth } = usePage().props as { auth: Auth };
-    const prefix = auth.user.role === 'admin' ? '/admin' : '/petugas';
+    const prefix = auth.user.role === 'admin' ? baseUrl('/admin') : baseUrl('/petugas');
     const { options: pageOptions } = usePage().props as { options?: { area: string[]; jenis_sampah: string[] } };
     const areaOptions = pageOptions?.area ?? [];
     const jenisSampahOptions = pageOptions?.jenis_sampah ?? [];

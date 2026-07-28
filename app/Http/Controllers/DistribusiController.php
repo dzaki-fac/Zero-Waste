@@ -71,7 +71,7 @@ class DistribusiController extends Controller
             }
 
             if ($redirect === '/form') {
-                return redirect('/form/distribusi')->with('submitted', [
+                return redirect()->route('form.distribusi')->with('submitted', [
                     'nama' => $nama,
                     'tanggal' => $request->input('tanggal'),
                     'items' => $created,

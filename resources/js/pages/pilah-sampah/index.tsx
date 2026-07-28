@@ -1,6 +1,7 @@
 import { Head, Link, router, usePage } from '@inertiajs/react';
 import { CalendarDays, FileDown, Leaf, Plus, Trash2, Pencil, Search } from 'lucide-react';
 import { useState, useMemo } from 'react';
+import { baseUrl } from '@/lib/path';
 import Heading from '@/components/heading';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -39,7 +40,7 @@ const years = Array.from({ length: 11 }, (_, i) => currentYear - i);
 
 export default function PilahSampahIndex({ pilahSampah }: Props) {
     const { auth, options } = usePage().props as unknown as { auth: Auth; options: { jenis_sampah: string[]; jenis_detail: string[] } };
-    const prefix = auth.user.role === 'admin' ? '/admin' : '/petugas';
+    const prefix = auth.user.role === 'admin' ? baseUrl('/admin') : baseUrl('/petugas');
     const [search, setSearch] = useState('');
     const [filterJenis, setFilterJenis] = useState('all');
     const jenisDetailOptions = options.jenis_detail;

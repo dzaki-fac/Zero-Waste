@@ -67,7 +67,7 @@ class PilahSampahController extends Controller
             }
 
             if ($redirect === '/form') {
-                return redirect('/form/pilah-sampah')->with('submitted', [
+                return redirect()->route('form.pilah-sampah')->with('submitted', [
                     'nama' => $nama,
                     'tanggal' => $request->input('tanggal'),
                     'items' => $created,

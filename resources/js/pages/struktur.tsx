@@ -1,5 +1,6 @@
 import { ChevronLeft, ChevronRight, ZoomIn, ZoomOut, Download, ScrollText, FileText } from "lucide-react";
 import { useState, useRef, useEffect } from "react";
+import { baseUrl } from "@/lib/path";
 import { Document, Page, pdfjs } from "react-pdf";
 import "react-pdf/dist/Page/AnnotationLayer.css";
 import "react-pdf/dist/Page/TextLayer.css";
@@ -8,10 +9,7 @@ import Navbar from "../components/Navbar";
 import { Reveal } from "../components/shared";
 import { C, display, body } from "../theme";
 
-pdfjs.GlobalWorkerOptions.workerSrc = new URL(
-  "pdfjs-dist/build/pdf.worker.min.mjs",
-  import.meta.url
-).toString();
+pdfjs.GlobalWorkerOptions.workerSrc = baseUrl("/pdf.worker.min.mjs");
 
 type DocumentItem = {
   id: number;
@@ -45,7 +43,7 @@ export default function StrukturPage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch("/api/document/struktur")
+    fetch(baseUrl("/api/document/struktur"))
       .then((res) => res.json())
       .then((data) => setDoc(data.document ?? null))
       .finally(() => setLoading(false));
@@ -130,7 +128,7 @@ el.scrollIntoView({ behavior: "smooth", block: "start" });
     setScale((s) => Math.min(2.5, +(s + 0.15).toFixed(2)));
   };
 
-  const pdfFile = doc?.pdf_url ?? null;
+  const pdfFile = doc?.pdf_url ? baseUrl(doc.pdf_url) : null;
 
   return (
     <div style={{ ...body, backgroundColor: C.paper50, color: C.ink900 }} className="min-h-screen flex flex-col">

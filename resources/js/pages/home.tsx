@@ -1,5 +1,6 @@
 import { Head } from '@inertiajs/react';
 import { usePage, router } from '@inertiajs/react';
+import { baseUrl } from '@/lib/path';
 import type { LucideIcon } from "lucide-react";
 import {
   Recycle,
@@ -566,8 +567,8 @@ export default function Dashboard() {
     const rawProps = usePage().props as unknown as Record<string, unknown>;
     const rawNews = (rawProps.news as Array<Record<string, unknown>>) || [];
     const rawPosters = (rawProps.posters as Array<Record<string, unknown>>) || [];
-    const news: NewsItem[] = rawNews.map((n) => ({ id: n.id as number, tag: n.tag as string, date: n.date as string, title: n.title as string, image: n.image_url as string, href: n.href as string, is_published: n.is_published as boolean, order: n.order as number }));
-    const posters: PosterItem[] = rawPosters.map((p) => ({ id: p.id as number, title: p.title as string, tag: p.tag as string, note: p.note as string | null, image: p.image_url as string, order: p.order as number, is_published: p.is_published as boolean }));
+    const news: NewsItem[] = rawNews.map((n) => ({ id: n.id as number, tag: n.tag as string, date: n.date as string, title: n.title as string, image: baseUrl(n.image_url as string), href: n.href as string, is_published: n.is_published as boolean, order: n.order as number }));
+    const posters: PosterItem[] = rawPosters.map((p) => ({ id: p.id as number, title: p.title as string, tag: p.tag as string, note: p.note as string | null, image: baseUrl(p.image_url as string), order: p.order as number, is_published: p.is_published as boolean }));
     const pageProps = rawProps as unknown as PageProps;
     const NEWS_LOOP = makeNewsLoop(news);
     const POSTERS = posters;
@@ -586,7 +587,7 @@ query.start_date = params.start_date;
 query.end_date = params.end_date;
 }
 
-        router.get('/', query, { preserveState: true, preserveScroll: true, replace: true });
+        router.get(baseUrl('/'), query, { preserveState: true, preserveScroll: true, replace: true });
     }
 
     function handlePreset(preset: typeof PRESETS[number]) {

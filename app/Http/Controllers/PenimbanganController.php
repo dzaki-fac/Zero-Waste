@@ -68,7 +68,7 @@ class PenimbanganController extends Controller
             }
 
             if ($redirect === '/form') {
-                return redirect('/form/penimbangan')->with('submitted', [
+                return redirect()->route('form.penimbangan')->with('submitted', [
                     'nama' => $nama,
                     'tanggal' => $request->input('tanggal'),
                     'area' => $request->input('area'),

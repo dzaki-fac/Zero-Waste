@@ -27,7 +27,7 @@ class FortifyServiceProvider extends ServiceProvider
         $this->app->singleton(LogoutResponse::class, fn () => new class implements LogoutResponse {
             public function toResponse($request)
             {
-                return redirect('/login');
+                return redirect()->route('login');
             }
         });
 

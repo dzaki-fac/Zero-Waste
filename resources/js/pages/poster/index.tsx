@@ -1,6 +1,7 @@
 import { Head, router, useForm } from '@inertiajs/react';
 import { Globe, Pencil, Plus, Trash2 } from 'lucide-react';
 import { useState } from 'react';
+import { baseUrl } from '@/lib/path';
 import Heading from '@/components/heading';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -68,7 +69,7 @@ export default function KelolaPoster({ posters }: Props) {
 
     function handleAdd(e: React.FormEvent) {
         e.preventDefault();
-        addForm.post('/admin/poster', {
+        addForm.post(baseUrl('/admin/poster'), {
             preserveScroll: true,
             onSuccess: () => {
                 setAddOpen(false);
@@ -111,7 +112,7 @@ URL.revokeObjectURL(editPreview);
 return;
 }
 
-        editForm.patch(`/admin/poster/${editingItem.id}`, {
+        editForm.patch(baseUrl(`/admin/poster/${editingItem.id}`), {
             preserveScroll: true,
             onSuccess: () => {
                 setEditOpen(false);
@@ -133,7 +134,7 @@ return;
 
         setDeleteError(null);
         setDeleteProcessing(true);
-        router.delete(`/admin/poster/${deletingItem.id}`, {
+        router.delete(baseUrl(`/admin/poster/${deletingItem.id}`), {
             preserveScroll: true,
             onSuccess: () => {
                 setDeleteOpen(false);
@@ -208,7 +209,7 @@ URL.revokeObjectURL(imagePreview);
                                             <TableCell>
                                                 {item.image_url ? (
                                                     <img
-                                                        src={item.image_url}
+                                                        src={baseUrl(item.image_url)}
                                                         alt="preview"
                                                         className="size-10 rounded-md object-cover border border-green-100"
                                                         onError={(e) => {
@@ -411,7 +412,7 @@ URL.revokeObjectURL(editPreview);
                                 <div>
                                     <p className="mb-2 text-sm text-green-700">Gambar saat ini</p>
                                     <img
-                                        src={editingItem.image_url}
+                                        src={baseUrl(editingItem.image_url)}
                                         alt="Current poster"
                                         className="h-32 w-auto rounded-lg border border-green-100 object-contain"
                                     />

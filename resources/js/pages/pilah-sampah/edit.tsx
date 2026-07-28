@@ -1,5 +1,6 @@
 import { Head, Link, useForm, usePage } from '@inertiajs/react';
 import { ArrowLeft, Save } from 'lucide-react';
+import { baseUrl } from '@/lib/path';
 import Heading from '@/components/heading';
 import InputError from '@/components/input-error';
 import { Button } from '@/components/ui/button';
@@ -35,7 +36,7 @@ type Props = {
 
 export default function PilahSampahEdit({ pilahSampah }: Props) {
     const { auth, options } = usePage().props as unknown as { auth: Auth; options: Options };
-    const prefix = auth.user.role === 'admin' ? '/admin' : '/petugas';
+    const prefix = auth.user.role === 'admin' ? baseUrl('/admin') : baseUrl('/petugas');
 
     const initialTanggal = (() => {
         const d = new Date(pilahSampah.tanggal);

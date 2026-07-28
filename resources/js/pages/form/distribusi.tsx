@@ -9,6 +9,7 @@ import {
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { baseUrl } from '@/lib/path';
 
 type Options = {
     area: Array<{ value: string; label: string; icon: string }>;
@@ -104,7 +105,7 @@ setLokasiError('');
             return;
         }
 
-        router.post('/form/distribusi', {
+        router.post(baseUrl('/form/distribusi'), {
             ...data,
             tujuan_distribusi: data.tujuan_distribusi === 'Tujuan lainnya' ? data.tujuan_lainnya : data.tujuan_distribusi,
         });
@@ -314,7 +315,7 @@ setLokasiError('');
                             asChild
                             className="flex-1 border-green-200 text-sm text-green-700 hover:bg-green-50"
                         >
-                            <Link href="/form" className="flex items-center justify-center gap-2">
+                            <Link href={baseUrl("/form")} className="flex items-center justify-center gap-2">
                                 <ArrowLeft className="h-4 w-4" />
                                 Batal
                             </Link>
@@ -379,7 +380,7 @@ setLokasiError('');
                         </div>
                     </div>
 
-                    <Button onClick={() => router.visit('/form')} className="w-full bg-green-600 hover:bg-green-700">
+                    <Button onClick={() => router.visit(baseUrl('/form'))} className="w-full bg-green-600 hover:bg-green-700">
                         Tutup
                     </Button>
                 </DialogContent>

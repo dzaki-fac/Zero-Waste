@@ -13,6 +13,7 @@ import {
     TableHeader,
     TableRow,
 } from '@/components/ui/table';
+import { baseUrl as appBaseUrl } from '@/lib/path';
 
 type MasterTask = {
     id: number;
@@ -135,8 +136,8 @@ export default function ChecklistPekerjaanShow({ petugas, tanggal, masterTasks, 
     const selectedDateRef = useRef(selectedDate);
     const petugasNipRef = useRef(petugas.nip);
 
-    const baseUrl = readOnly ? '/petugas/checklist-pekerjaan' : `/admin/checklist-pekerjaan/${petugas.nip}`;
-    const backUrl = readOnly ? '/petugas/dashboard' : '/admin/checklist-pekerjaan';
+    const basePageUrl = readOnly ? appBaseUrl('/petugas/checklist-pekerjaan') : appBaseUrl(`/admin/checklist-pekerjaan/${petugas.nip}`);
+    const backUrl = readOnly ? appBaseUrl('/petugas/dashboard') : appBaseUrl('/admin/checklist-pekerjaan');
 
     useEffect(() => {
         activeAreaRef.current = activeArea;
@@ -178,7 +179,7 @@ return;
 }
 
         router.post(
-            '/admin/checklist-pekerjaan',
+            appBaseUrl('/admin/checklist-pekerjaan'),
             {
                 nip,
                 tanggal: date,
@@ -227,7 +228,7 @@ clearTimeout(debounceRef.current);
 
         if (readOnly) {
             router.get(
-                baseUrl,
+                basePageUrl,
                 { tanggal: newDate, jenis: activeFilter ?? undefined, area: activeArea || undefined },
                 { preserveState: false, preserveScroll: true },
             );
@@ -240,7 +241,7 @@ return;
 }
 
         router.get(
-            `/admin/checklist-pekerjaan/${petugas.nip}`,
+            appBaseUrl(`/admin/checklist-pekerjaan/${petugas.nip}`),
             { tanggal: newDate, jenis: activeFilter ?? undefined, area: activeArea || undefined },
             {
                 preserveState: false,
@@ -254,7 +255,7 @@ return;
 
         if (readOnly) {
             router.get(
-                baseUrl,
+                basePageUrl,
                 { tanggal: selectedDate, jenis: value ?? undefined, area: activeArea || undefined },
                 { preserveState: true, preserveScroll: true },
             );
@@ -267,7 +268,7 @@ return;
 }
 
         router.get(
-            `/admin/checklist-pekerjaan/${petugas.nip}`,
+            appBaseUrl(`/admin/checklist-pekerjaan/${petugas.nip}`),
             { tanggal: selectedDate, jenis: value ?? undefined, area: activeArea || undefined },
             { preserveState: true, preserveScroll: true },
         );
@@ -279,7 +280,7 @@ return;
 
         if (readOnly) {
             router.get(
-                baseUrl,
+                basePageUrl,
                 { tanggal: selectedDate, jenis: activeFilter ?? undefined, area: value || undefined },
                 { preserveState: false, preserveScroll: true },
             );
@@ -292,7 +293,7 @@ return;
 }
 
         router.get(
-            `/admin/checklist-pekerjaan/${petugas.nip}`,
+            appBaseUrl(`/admin/checklist-pekerjaan/${petugas.nip}`),
             { tanggal: selectedDate, jenis: activeFilter ?? undefined, area: value || undefined },
             { preserveState: false, preserveScroll: true },
         );

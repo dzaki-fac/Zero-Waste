@@ -7,6 +7,7 @@ import ChecklistProgress from '@/components/checklist-progress';
 import NativeDatePicker from '@/components/native-date-picker';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { baseUrl } from '@/lib/path';
 import type { Auth } from '@/types';
 
 type ChartData = {
@@ -806,7 +807,7 @@ function DataDasarSummary({ dataDasar, rincianArea }: { dataDasar: DataDasarType
 export default function Dashboard() {
     const { auth, dataDasar, rincianArea, penimbanganByArea, pilahByJenis, distribusiByTujuan, petugasStats, statusBerat, siapDidistribusikanByJenis, progress, progressPetugasNip, progressDate, petugasList, filters } = usePage<PageProps & { auth: Auth }>().props;
     const isAdmin = auth.user.role === 'admin';
-    const dashboardUrl = isAdmin ? '/admin/dashboard' : '/petugas/dashboard';
+    const dashboardUrl = isAdmin ? baseUrl('/admin/dashboard') : baseUrl('/petugas/dashboard');
 
     const siapSortedData = siapDidistribusikanByJenis.slice().sort((a, b) => b.value - a.value);
     const siapTotal = siapDidistribusikanByJenis.reduce((s, d) => s + d.value, 0);
