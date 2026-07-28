@@ -1,0 +1,153 @@
+===============================================
+  SETUP GUIDE — Zero Waste (Subfolder Deploy)
+===============================================
+
+Prerequisites:
+- PHP 8.2+
+- Node.js 18+
+- Composer
+- MySQL / MariaDB
+- Apache dengan mod_rewrite aktif
+
+
+===============================================
+1. LARAVEL SETUP
+===============================================
+
+  cp .env.example .env
+  composer install
+  php artisan key:generate
+
+
+===============================================
+2. ENV CONFIGURATION
+===============================================
+
+  Edit .env dan pastikan nilai-nilai berikut:
+
+  APP_URL=http://<IP_SERVER>/zero-waste
+  SESSION_DRIVER=database
+  SESSION_PATH=/
+  SESSION_DOMAIN=null
+
+  Tambahkan baris ini (tidak ada di .env.example):
+
+  VITE_BASE_PATH=/zero-waste
+
+
+===============================================
+3. DATABASE
+===============================================
+
+  php artisan migrate
+  php artisan db:seed          (jika ada seeder)
+  php artisan storage:link
+
+
+===============================================
+4. FRONTEND BUILD
+===============================================
+
+  npm install
+  npm run build
+
+
+===============================================
+5. LARAVEL CACHE
+===============================================
+
+  php artisan config:clear
+  php artisan cache:clear
+  php artisan route:clear
+
+
+===============================================
+6. APACHE VHOST
+===============================================
+
+  Buat file vhost untuk IP, misalnya:
+  C:\laragon\etc\apache2\sites-enabled\Board-Game-ip.conf
+
+  Isi file:
+
+  <VirtualHost *:80>
+      ServerName <IP_SERVER>
+      DocumentRoot "C:/laragon/www"
+
+      <Directory "C:/laragon/www">
+          AllowOverride All
+          Require all granted
+      </Directory>
+
+      Alias /zero-waste "C:/laragon/www/Zero-Waste/public"
+      <Directory "C:/laragon/www/Zero-Waste/public">
+          AllowOverride All
+          Require all granted
+      </Directory>
+  </VirtualHost>
+
+  Catatan:
+  - Ganti <IP_SERVER> dengan IP mesin kamu (mis. 10.107.93.41)
+  - Sesuaikan path Zero-Waste sesuai lokasi project kamu
+  - DocumentRoot tetap ke folder www karena bisa ada project lain
+
+
+===============================================
+7. RESTART APACHE
+===============================================
+
+  Laragon > Menu > Apache > Restart
+  Atau: Stop lalu Start
+
+
+===============================================
+8. VERIFIKASI
+===============================================
+
+  Buka browser: http://<IP_SERVER>/zero-waste/
+  Halaman login harus muncul.
+
+  Cek console browser untuk error 404 pada aset (JS/CSS).
+  Jika ada, pastikan public/build/ sudah ada (hasil npm run build).
+
+
+===============================================
+YANG WAJIB ADA DI REPO
+===============================================
+
+  - public/.htaccess        (sudah ada Subfolder Alias fix)
+  - public/pdf.worker.min.mjs  (worker untuk PDF viewer)
+
+
+===============================================
+YANG TIDAK DI-COMMIT (BUAT MANUAL)
+===============================================
+
+  - .env                    (APP_KEY, VITE_BASE_PATH)
+  - public/storage          (jalankan php artisan storage:link)
+  - Apache vhost config     (buat manual per server)
+  - vendor/                 (jalankan composer install)
+  - node_modules/           (jalankan npm install)
+  - public/build/           (jalankan npm run build)
+
+
+===============================================
+TROUBLESHOOTING
+===============================================
+
+  Page expired (419):
+    Bersihkan cookies browser untuk IP/domain tersebut.
+    Pastikan SESSION_PATH=/ di .env.
+
+  PDF tidak muncul:
+    Pastikan php artisan storage:link sudah dijalankan.
+    Cek file ada di storage/app/public/documents/.
+
+  Aset 404 (JS/CSS):
+    Jalankan npm run build ulang.
+    Pastikan public/build/ ada isinya.
+
+  Apache 500:
+    Cek error log: C:\laragon\www\Zero-Waste\storage\logs\laravel.log
+
+===============================================
