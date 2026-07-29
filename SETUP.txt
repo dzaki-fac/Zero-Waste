@@ -25,14 +25,14 @@ Prerequisites:
 
   Edit .env dan pastikan nilai-nilai berikut:
 
-  APP_URL=http://<IP_SERVER>/zero-waste
+  APP_URL=http://<IP_SERVER>/zerolib
   SESSION_DRIVER=database
   SESSION_PATH=/
   SESSION_DOMAIN=null
 
   Tambahkan baris ini (tidak ada di .env.example):
 
-  VITE_BASE_PATH=/zero-waste
+  VITE_BASE_PATH=/zerolib
 
 
 ===============================================
@@ -79,7 +79,7 @@ Prerequisites:
           Require all granted
       </Directory>
 
-      Alias /zero-waste "C:/laragon/www/Zero-Waste/public"
+      Alias /zerolib "C:/laragon/www/Zero-Waste/public"
       <Directory "C:/laragon/www/Zero-Waste/public">
           AllowOverride All
           Require all granted
@@ -104,7 +104,7 @@ Prerequisites:
 8. VERIFIKASI
 ===============================================
 
-  Buka browser: http://<IP_SERVER>/zero-waste/
+  Buka browser: http://<IP_SERVER>/zerolib/
   Halaman login harus muncul.
 
   Cek console browser untuk error 404 pada aset (JS/CSS).

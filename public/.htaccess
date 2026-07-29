@@ -19,10 +19,10 @@
     RewriteRule ^ %1 [L,R=301]
 
     # Subfolder Alias fix: rewrite to absolute URL so Apache uses Alias instead of document_root
-    RewriteCond %{REQUEST_URI} ^/zero-waste/
+    RewriteCond %{REQUEST_URI} ^/zerolib/
     RewriteCond %{ENV:REDIRECT_STATUS} ^$
     RewriteCond %{REQUEST_FILENAME} !-f
-    RewriteRule ^ /zero-waste/index.php [L]
+    RewriteRule ^ /zerolib/index.php [L]
 
     # Send Requests To Front Controller...
     RewriteCond %{REQUEST_FILENAME} !-d
