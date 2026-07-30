@@ -1,5 +1,9 @@
 <?php
 
+use App\Http\Controllers\AdminAreaReviewController;
+use App\Http\Controllers\AdminReviewAreaController;
+use App\Http\Controllers\AdminReviewSubAreaController;
+use App\Http\Controllers\AreaReviewController;
 use App\Http\Controllers\ChecklistPekerjaanController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DataDasarController;
@@ -22,6 +26,11 @@ Route::inertia('/pengertian', 'pengertian');
 Route::get('/struktur', [DocumentController::class, 'strukturPage'])->name('struktur');
 Route::get('/peraturan', [DocumentController::class, 'peraturanPage'])->name('peraturan');
 Route::get('/api/document/{type}', [DocumentController::class, 'show']);
+
+Route::get('/review', [AreaReviewController::class, 'index'])->name('review.index');
+Route::post('/review', [AreaReviewController::class, 'store'])
+    ->middleware('throttle:area-reviews')
+    ->name('review.store');
 
 // Shared routes (accessible by both roles, no role check)
 Route::middleware(['auth'])->group(function () {
@@ -90,6 +99,22 @@ Route::middleware(['auth', CheckRole::class . ':admin'])
             ->names('poster');
         Route::get('data-dasar', [DataDasarController::class, 'index'])->name('data-dasar.index');
         Route::post('data-dasar', [DataDasarController::class, 'update'])->name('data-dasar.update');
+
+        Route::prefix('review')->name('review.')->group(function () {
+            Route::post('/areas', [AdminReviewAreaController::class, 'store'])->name('areas.store');
+            Route::put('/areas/{area}', [AdminReviewAreaController::class, 'update'])->name('areas.update');
+            Route::patch('/areas/{area}/toggle-status', [AdminReviewAreaController::class, 'toggleStatus'])->name('areas.toggle-status');
+
+            Route::post('/sub-areas', [AdminReviewSubAreaController::class, 'store'])->name('sub-areas.store');
+            Route::put('/sub-areas/{subArea}', [AdminReviewSubAreaController::class, 'update'])->name('sub-areas.update');
+            Route::patch('/sub-areas/{subArea}/toggle-status', [AdminReviewSubAreaController::class, 'toggleStatus'])->name('sub-areas.toggle-status');
+
+            Route::get('/', [AdminAreaReviewController::class, 'index'])->name('index');
+            Route::get('/{review}', [AdminAreaReviewController::class, 'show'])->name('show');
+            Route::patch('/{review}/hide', [AdminAreaReviewController::class, 'hide'])->name('hide');
+            Route::patch('/{review}/restore', [AdminAreaReviewController::class, 'restore'])->name('restore');
+            Route::delete('/{review}', [AdminAreaReviewController::class, 'destroy'])->name('destroy');
+        });
     });
 
 // Petugas routes

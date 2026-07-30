@@ -21,7 +21,9 @@ export default function Navbar({ activeSection, onNavItemClick }: NavbarProps) {
   const handleNavClick = (id: string) => {
     setMobileNavOpen(false);
 
-    if (PAGE_ROUTES[id]) {
+    if (id === 'review') {
+      window.location.href = '/review';
+    } else if (PAGE_ROUTES[id]) {
       navigate(PAGE_ROUTES[id]);
     } else if (location.pathname !== "/") {
       window.location.href = baseUrl("/") + "#" + id;
@@ -65,7 +67,8 @@ export default function Navbar({ activeSection, onNavItemClick }: NavbarProps) {
 
           <nav className="hidden md:flex items-center gap-6 lg:gap-8 shrink-0">
             {NAV_ITEMS.map((n) => {
-              const active = activeSection === n.id;
+              const routeActive = PAGE_ROUTES[n.id] && location.pathname === PAGE_ROUTES[n.id];
+              const active = activeSection === n.id || routeActive;
 
               return (
                 <button
@@ -157,7 +160,8 @@ e.currentTarget.style.color = C.ink500;
         >
           <div className="px-5 pb-4 pt-1 flex flex-col gap-1">
             {NAV_ITEMS.map((n, i) => {
-              const active = activeSection === n.id;
+              const routeActive = PAGE_ROUTES[n.id] && location.pathname === PAGE_ROUTES[n.id];
+              const active = activeSection === n.id || routeActive;
 
               return (
                 <button
