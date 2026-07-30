@@ -1,5 +1,5 @@
 import { Link, usePage } from '@inertiajs/react';
-import { ClipboardCheck, Database, Globe, LayoutDashboard, ListTodo, Recycle, Scale, Settings, Truck, Users } from 'lucide-react';
+import { ClipboardCheck, Database, Globe, LayoutDashboard, ListTodo, MessageSquare, Recycle, Scale, Settings, Truck, Users } from 'lucide-react';
 import AppLogo from '@/components/app-logo';
 import { NavMain } from '@/components/nav-main';
 import { NavUser } from '@/components/nav-user';
@@ -40,6 +40,7 @@ export function AppSidebar() {
         },
         { title: 'Data Dasar', href: baseUrl('/admin/data-dasar'), icon: Database },
         { title: 'Kelola Data', href: baseUrl('/admin/kelola-data'), icon: Settings },
+        { title: 'Kelola Review', href: baseUrl('/admin/review'), icon: MessageSquare },
         { title: 'Akun', href: baseUrl('/admin/akun'), icon: Users },
     ];
 

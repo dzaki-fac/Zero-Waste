@@ -17,4 +17,18 @@ require __DIR__.'/../vendor/autoload.php';
 /** @var Application $app */
 $app = require_once __DIR__.'/../bootstrap/app.php';
 
+// Fix SCRIPT_NAME when running in a subfolder
+// Apache rewrites to public/, but REQUEST_URI stays without /public/
+$scriptName = $_SERVER['SCRIPT_NAME'] ?? '';
+$requestUri = $_SERVER['REQUEST_URI'] ?? '';
+
+if (str_contains($scriptName, '/public/') && !str_contains($requestUri, '/public/')) {
+    $pos = stripos($scriptName, '/public/');
+    if ($pos !== false) {
+        $subfolder = substr($requestUri, 0, $pos);
+        $_SERVER['SCRIPT_NAME'] = $subfolder . '/index.php';
+        $_SERVER['PHP_SELF'] = $subfolder . '/index.php';
+    }
+}
+
 $app->handleRequest(Request::capture());
