@@ -1,7 +1,7 @@
 import { Head, router, usePage } from '@inertiajs/react';
 import {
     Star, Search, Eye, EyeOff, CheckCircle2,
-    Trash2, Undo2, Plus, Pencil, Power, PowerOff,
+    Trash2, Undo2, Plus, Pencil,
     ChevronDown, ChevronRight,
 } from 'lucide-react';
 import { useState, useCallback, useEffect, useRef } from 'react';
@@ -360,14 +360,13 @@ export default function AdminReviewIndex({
         }
     };
 
-    const toggleAreaStatus = (area: Area) => {
-        const action = area.is_active ? 'menonaktifkan' : 'mengaktifkan';
+    const deleteArea = (area: Area) => {
         setConfirm({
             open: true,
-            title: area.is_active ? 'Nonaktifkan Area' : 'Aktifkan Area',
-            message: `Apakah Anda yakin ingin ${action} area "${area.name}"?`,
+            title: 'Hapus Area',
+            message: `Apakah Anda yakin ingin menghapus area "${area.name}"? Seluruh bagian dan review di dalamnya akan ikut terhapus. Tindakan ini tidak dapat dibatalkan.`,
             action: () => {
-                router.patch(`/admin/review/areas/${area.id}/toggle-status`, {}, {
+                router.delete(`/admin/review/areas/${area.id}`, {
                     preserveScroll: true,
                     onSuccess: () => router.reload({ only: ['areas', 'allAreas'] }),
                 });
@@ -423,14 +422,13 @@ export default function AdminReviewIndex({
         }
     };
 
-    const toggleSubAreaStatus = (subArea: SubArea) => {
-        const action = subArea.is_active ? 'menonaktifkan' : 'mengaktifkan';
+    const deleteSubArea = (subArea: SubArea) => {
         setConfirm({
             open: true,
-            title: subArea.is_active ? 'Nonaktifkan Bagian' : 'Aktifkan Bagian',
-            message: `Apakah Anda yakin ingin ${action} bagian "${subArea.name}"?`,
+            title: 'Hapus Bagian',
+            message: `Apakah Anda yakin ingin menghapus bagian "${subArea.name}"? Seluruh review di dalamnya akan ikut terhapus. Tindakan ini tidak dapat dibatalkan.`,
             action: () => {
-                router.patch(`/admin/review/sub-areas/${subArea.id}/toggle-status`, {}, {
+                router.delete(`/admin/review/sub-areas/${subArea.id}`, {
                     preserveScroll: true,
                     onSuccess: () => router.reload({ only: ['areas', 'allAreas'] }),
                 });
@@ -773,17 +771,10 @@ export default function AdminReviewIndex({
                                                     <Button
                                                         variant="outline"
                                                         size="sm"
-                                                        onClick={() => toggleAreaStatus(area)}
-                                                        className={area.is_active
-                                                            ? 'border-red-200 text-red-600 hover:bg-red-50'
-                                                            : 'border-green-200 text-green-700 hover:bg-green-50'
-                                                        }
+                                                        onClick={() => deleteArea(area)}
+                                                        className="border-red-200 text-red-600 hover:bg-red-50"
                                                     >
-                                                        {area.is_active ? (
-                                                            <PowerOff className="h-3.5 w-3.5" />
-                                                        ) : (
-                                                            <Power className="h-3.5 w-3.5" />
-                                                        )}
+                                                        <Trash2 className="h-3.5 w-3.5" />
                                                     </Button>
                                                 </div>
                                             </div>
@@ -817,14 +808,10 @@ export default function AdminReviewIndex({
                                                             <Button
                                                                 variant="ghost"
                                                                 size="sm"
-                                                                onClick={() => toggleSubAreaStatus(sa)}
-                                                                className={sa.is_active ? 'text-red-500 hover:bg-red-50' : 'text-green-600 hover:bg-green-50'}
+                                                                onClick={() => deleteSubArea(sa)}
+                                                                className="text-red-500 hover:bg-red-50"
                                                             >
-                                                                {sa.is_active ? (
-                                                                    <PowerOff className="h-3.5 w-3.5" />
-                                                                ) : (
-                                                                    <Power className="h-3.5 w-3.5" />
-                                                                )}
+                                                                <Trash2 className="h-3.5 w-3.5" />
                                                             </Button>
                                                         </div>
                                                     </div>

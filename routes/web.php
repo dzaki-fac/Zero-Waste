@@ -103,11 +103,11 @@ Route::middleware(['auth', CheckRole::class . ':admin'])
         Route::prefix('review')->name('review.')->group(function () {
             Route::post('/areas', [AdminReviewAreaController::class, 'store'])->name('areas.store');
             Route::put('/areas/{area}', [AdminReviewAreaController::class, 'update'])->name('areas.update');
-            Route::patch('/areas/{area}/toggle-status', [AdminReviewAreaController::class, 'toggleStatus'])->name('areas.toggle-status');
+            Route::delete('/areas/{area}', [AdminReviewAreaController::class, 'destroy'])->name('areas.destroy');
 
             Route::post('/sub-areas', [AdminReviewSubAreaController::class, 'store'])->name('sub-areas.store');
             Route::put('/sub-areas/{subArea}', [AdminReviewSubAreaController::class, 'update'])->name('sub-areas.update');
-            Route::patch('/sub-areas/{subArea}/toggle-status', [AdminReviewSubAreaController::class, 'toggleStatus'])->name('sub-areas.toggle-status');
+            Route::delete('/sub-areas/{subArea}', [AdminReviewSubAreaController::class, 'destroy'])->name('sub-areas.destroy');
 
             Route::get('/', [AdminAreaReviewController::class, 'index'])->name('index');
             Route::get('/{review}', [AdminAreaReviewController::class, 'show'])->name('show');
