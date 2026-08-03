@@ -137,8 +137,8 @@ export default function ReviewIndex({ areas, reviews, filters, subAreasOptions, 
     const [filterSubArea, setFilterSubArea] = useState(filters.sub_area_id ? String(filters.sub_area_id) : '');
     const [filterRating, setFilterRating] = useState(filters.rating ? String(filters.rating) : '');
 
-    const [formArea, setFormArea] = useState('');
-    const [formSubArea, setFormSubArea] = useState('');
+    const [formArea, setFormArea] = useState(areas[0] ? String(areas[0].id) : '');
+    const [formSubArea, setFormSubArea] = useState('__overall');
     const [formRating, setFormRating] = useState(0);
     const [formComment, setFormComment] = useState('');
     const [showSuccess, setShowSuccess] = useState(false);
@@ -170,7 +170,7 @@ export default function ReviewIndex({ areas, reviews, filters, subAreasOptions, 
 
     const handleAreaChange = (value: string) => {
         setFormArea(value);
-        setFormSubArea('');
+        setFormSubArea('__overall');
         setFilterArea(value);
         setFilterSubArea('');
         applyFilters(value, '', filterRating);

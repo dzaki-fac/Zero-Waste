@@ -39,20 +39,11 @@ class AdminReviewSubAreaController extends Controller
         return back()->with('success', 'Bagian berhasil diperbarui.');
     }
 
-    public function toggleStatus(SubArea $subArea): RedirectResponse
+    public function destroy(SubArea $subArea): RedirectResponse
     {
-        $newStatus = !$subArea->is_active;
+        $subArea->areaReviews()->delete();
+        $subArea->delete();
 
-        if (!$newStatus && $subArea->areaReviews()->exists()) {
-            $subArea->update(['is_active' => false]);
-
-            return back()->with('success', 'Bagian berhasil dinonaktifkan. Review yang sudah ada tetap tersimpan.');
-        }
-
-        $subArea->update(['is_active' => $newStatus]);
-
-        $message = $newStatus ? 'Bagian berhasil diaktifkan.' : 'Bagian berhasil dinonaktifkan.';
-
-        return back()->with('success', $message);
+        return back()->with('success', 'Bagian beserta review terkait berhasil dihapus.');
     }
 }

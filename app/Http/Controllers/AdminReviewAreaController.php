@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\Admin\StoreAreaRequest;
 use App\Http\Requests\Admin\UpdateAreaRequest;
 use App\Models\Area;
+use App\Models\AreaReview;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 
@@ -38,20 +39,18 @@ class AdminReviewAreaController extends Controller
         return back()->with('success', 'Area berhasil diperbarui.');
     }
 
-    public function toggleStatus(Area $area): RedirectResponse
+    public function destroy(Area $area): RedirectResponse
     {
-        $newStatus = !$area->is_active;
+        $subAreaIds = $area->subAreas()->pluck('id');
 
-        if (!$newStatus && $area->areaReviews()->exists()) {
-            $area->update(['is_active' => false]);
-
-            return back()->with('success', 'Area berhasil dinonaktifkan. Review yang sudah ada tetap tersimpan.');
+        if ($subAreaIds->isNotEmpty()) {
+            AreaReview::whereIn('sub_area_id', $subAreaIds)->delete();
+            $area->subAreas()->delete();
         }
 
-        $area->update(['is_active' => $newStatus]);
+        $area->areaReviews()->delete();
+        $area->delete();
 
-        $message = $newStatus ? 'Area berhasil diaktifkan.' : 'Area berhasil dinonaktifkan.';
-
-        return back()->with('success', $message);
+        return back()->with('success', 'Area beserta bagian dan review terkait berhasil dihapus.');
     }
 }
