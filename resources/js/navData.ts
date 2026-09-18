@@ -5,6 +5,7 @@ export const NAV_ITEMS = [
   { id: "sop", label: "SOP" },
   { id: "peraturan", label: "Peraturan" },   
   { id: "laporan", label: "Laporan" },
+  { id: "review", label: "Review" },
   { id: "berita", label: "Berita" },
   { id: "edukasi", label: "Edukasi" },
 ];
@@ -14,4 +15,5 @@ export const PAGE_ROUTES: Record<string, string> = {
   pengertian: "/pengertian",
   struktur: "/struktur",
   peraturan: "/peraturan",
+  review: "/review",
 };
